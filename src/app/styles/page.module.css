@@ -1,0 +1,73 @@
+.page{
+
+
+}
+
+.main{
+
+}
+
+.topo{
+    background-image: url("../../../public/img/main.png");
+    width: 100%;
+    background-repeat: no-repeat;
+    height: 100vh;
+    background-size: cover;
+}
+.imgTopo{
+    padding-top: 1%;
+    padding-left: 1%;
+}
+
+.text{
+    padding-top: 2%;
+    padding-left: 2%;
+    color: #FFFFFF;
+    font-size: 55px;
+}
+
+.prem{
+    padding-left: 5%;
+    color: #FFFFFF;
+    font-size: 90px;
+}
+
+.container{
+   display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.titleForm{
+    padding-top: 2%;
+    padding-left: 2%;
+    padding-right: 5%;
+    color: #0D1652;
+    font-size: 55px;
+    text-align: right;
+}
+
+.form{
+    width: 400px;
+    align-items: center;
+}
+.card{
+    padding-top: 1%;
+    padding-left: 4%;
+    padding-right: 4%;
+    padding-bottom: 2%;
+
+}
+
+.label{
+    text-align: left;
+    padding-left: 1%;
+ }
+
+.imgSection{
+    padding-left: -10%;
+}
+
+.buttonForm{
+    background: #70AD46;
+}
