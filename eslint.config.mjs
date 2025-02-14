@@ -1,9 +1,7 @@
-
 import { FlatCompat } from "@eslint/eslintrc";
 import importHelpersPlugin from "eslint-plugin-import-helpers";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,7 +16,7 @@ const eslintConfig = [
   ...compat.extends("prettier"),
   {
     plugins: {
-      "import-helpers": importHelpersPlugin, 
+      "import-helpers": importHelpersPlugin,
     },
     rules: {
       semi: ["error"],
@@ -42,7 +40,6 @@ const eslintConfig = [
       ],
     },
   },
-
 ];
 
 export default eslintConfig;

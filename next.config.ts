@@ -1,4 +1,3 @@
-
 import { NextConfig } from "next";
 
 import path from "path";
@@ -12,10 +11,8 @@ const nextConfig: NextConfig = {
     return config;
   },
   images: {
-  
-    domains: [], 
+    domains: [],
   },
-
 };
 
 export default nextConfig;
