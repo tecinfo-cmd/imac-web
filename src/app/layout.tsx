@@ -1,33 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+
 import "./styles/globals.css";
 import Header from "@/app/components/header";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import HeroSection from "@/app/components/ui/heroSection";
 
 export const metadata: Metadata = {
   title: "IMAC",
-  description: "Instituto Matogrossense da Carne",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-      <Header/>
-        {children}
+    <html lang="pt-BR">
+      <body className="bg-gray-100 text-gray-900">
+        <Header />
+        <HeroSection topImage={""} title={""} text={""} />
+        <main className="container mx-auto p-4">{children}</main>
       </body>
     </html>
   );
