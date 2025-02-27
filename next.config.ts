@@ -1,17 +1,13 @@
-import { NextConfig } from "next";
-
-import path from "path";
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@": path.resolve(__dirname, "src"),
-    };
-    return config;
-  },
-  images: {
-    domains: [],
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/consulta-car?:path*", 
+      },
+    ];
   },
 };
 
