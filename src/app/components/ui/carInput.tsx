@@ -8,9 +8,12 @@ import IMask from "imask";
 interface CARInputProps {
   value: string;
   onChange: (value: string) => void;
+  error?: string;
+  setError: (error: string | null) => void;
+  inputClassName: string;
 }
 
-const CARInput = ({ value, onChange }: CARInputProps) => {
+const CARInput = ({ value, onChange, error }: CARInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -39,7 +42,7 @@ const CARInput = ({ value, onChange }: CARInputProps) => {
   return (
     <div className="w-full">
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        Número do CAR*
+        número do CAR federal*
       </label>
       <Input
         ref={inputRef}
@@ -47,11 +50,15 @@ const CARInput = ({ value, onChange }: CARInputProps) => {
         onChange={(e) => onChange(e.target.value)}
         placeholder="UF-0000000-00000000000000000"
         className={cn(
-          "w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none",
-          "border-[#666666] dark:border-[#666666] bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+          "w-full px-4 py-2 border rounded-lg bg-white text-gray-900",
+          error
+            ? "border-red-500 focus:border-red-500 focus:ring-0 focus:outline-none"
+            : "border-gray-400 focus:border-gray-400 focus:ring-0 focus:outline-none"
         )}
         label={""}
       />
+
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };

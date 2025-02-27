@@ -7,15 +7,15 @@ export default function Header() {
   return (
     <header className="w-full bg-white shadow-md">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
-        {
+        <div className="relative w-[120px] h-[40px] sm:w-[140px] sm:h-[45px] md:w-[150px] md:h-[50px] lg:w-[180px] lg:h-[60px]">
           <Image
             src="/img/logo.png"
             alt="Logo da Empresa"
-            width={150}
-            height={50}
-            className="h-6 sm:h-8 md:h-10 lg:h-12 mr-2"
+            fill
+            sizes="w-30 h-10 sm:w-35 sm:h-3 md:w-37 md:h-3 lg:w-45 lg:h-4"
+            className="object-contain"
           />
-        }
+        </div>
 
         <Button className="bg-[#52A532] hover:bg-green-700">Entrar</Button>
       </div>

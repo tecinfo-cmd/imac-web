@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FaAngleRight } from "react-icons/fa6";
 
 import { Button } from "@/app/components/ui/button";
 
@@ -18,12 +17,13 @@ const HeroSection: React.FC<HeroProps> = () => {
     >
       <div className="absolute inset-0 bg-gradient-to-r from-[#1A2510]/95 via-[#1A2510]/80 to-transparent"></div>
 
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 md:w-32 md:h-32 mt-6">
+      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-24 h-24 md:w-32 md:h-32">
         <Image
           src="/img/image_home.png"
           alt="Top Image"
-          width={128}
-          height={128}
+          fill
+          sizes="w-24 h-24 md:w-32 md:h-32"
+          style={{ objectFit: "contain" }}
         />
       </div>
 
@@ -40,7 +40,6 @@ const HeroSection: React.FC<HeroProps> = () => {
         <Link href="#form" scroll={true}>
           <Button className="mt-3 w-64 sm:w-80 md:w-96 h-10 text-lg px-6 py-3 hover:bg-green-700 rounded-lg flex items-center justify-center gap-1">
             Consultar agora
-            <FaAngleRight />
           </Button>
         </Link>
       </div>
