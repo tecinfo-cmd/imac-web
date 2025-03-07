@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import "./styles/globals.css";
+import Footer from "@/app/components/footer";
 import Header from "@/app/components/header";
 import HeroSection from "@/app/components/ui/heroSection";
 
@@ -22,6 +23,7 @@ export default function RootLayout({
         <Header />
         <HeroSection topImage={""} title={""} text={""} />
         <main className="container mx-auto p-4">{children}</main>
+        <Footer />
       </body>
     </html>
   );
