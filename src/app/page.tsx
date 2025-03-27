@@ -1,6 +1,5 @@
 "use client";
 
-import Head from "next/head";
 import { useState, useRef } from "react";
 import React from "react";
 import { BsFileText } from "react-icons/bs";
@@ -9,18 +8,21 @@ import { MdOutlineMarkEmailRead } from "react-icons/md";
 import { TbLeaf } from "react-icons/tb";
 import { TfiBookmarkAlt } from "react-icons/tfi";
 
-import EmailModal from "@/app/components/modals/emailModal";
-import Modal from "@/app/components/modals/modal";
-import { Button } from "@/app/components/ui/button";
-import { Card } from "@/app/components/ui/card";
-import CARInput from "@/app/components/ui/carInput";
-import { CheckboxComponent } from "@/app/components/ui/checkbox";
-import { Input } from "@/app/components/ui/input";
-import MaskedInput from "@/app/components/ui/maskedInput";
-import { MaskedModalInput } from "@/app/components/ui/maskedModalInput";
-import Step from "@/app/components/ui/step";
+import Footer from "../components/ui/footer";
+import Header from "../components/ui/header";
+import HeroSection from "../components/ui/heroSection";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import CARInput from "@/components/ui/carInput";
+import { CheckboxComponent } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import MaskedInput from "@/components/ui/maskedInput";
+import { MaskedModalInput } from "@/components/ui/maskedModalInput";
+import EmailModal from "@/components/ui/modals/emailModal";
+import Modal from "@/components/ui/modals/modal";
+import Step from "@/components/ui/step";
 
-import { useCAR } from "./hooks/useCAR";
+import { useCAR } from "@/hooks/useCAR";
 
 export default function Home() {
   const [carValue, setCarValue] = useState<string>("");
@@ -151,15 +153,9 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Imac</title>
-        <meta
-          name="description"
-          content="Uma página construída com Next.js, TypeScript, Tailwind e Radix UI."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-      <div id="form" className="min-h-screen flex flex-col">
+      <Header />
+      <HeroSection topImage={""} title={""} text={""} />
+      <div id="form" className="min-h-screen flex flex-col py-4 px-6">
         <main className="flex-grow container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -399,6 +395,7 @@ export default function Home() {
           )}
         </div>
       </Modal>
+      <Footer />
     </>
   );
 }
