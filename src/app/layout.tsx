@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import "./styles/globals.css";
-import Footer from "@/app/components/footer";
-import Header from "@/app/components/header";
-import HeroSection from "@/app/components/ui/heroSection";
+import { AuthProvider } from "@/context/provider";
+
+import QueryProvider from "./QueryProvider";
 
 export const metadata: Metadata = {
   title: "IMAC",
@@ -19,11 +19,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className="bg-gray-100 text-gray-900">
-        <Header />
-        <HeroSection topImage={""} title={""} text={""} />
-        <main className="container mx-auto p-4">{children}</main>
-        <Footer />
+      <body>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
