@@ -1,0 +1,100 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { FiLogOut } from "react-icons/fi";
+import {
+  PiCowboyHatLight,
+  PiFarmLight,
+  PiSealCheckLight,
+} from "react-icons/pi";
+import { RiMenuUnfoldLine } from "react-icons/ri";
+
+import { useAuthContext } from "@/context";
+import { LogoWhite } from "@/icons/LogoWhite";
+import { useAuthStore } from "@/store/useAuthStore";
+
+interface HeaderProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export const LayoutContainer = ({ title, children }: HeaderProps) => {
+  const { signOut } = useAuthContext();
+  const { userData } = useAuthStore();
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const activePathClass = (path: string) =>
+    `flex items-center gap-3 py-1 px-4 ${
+      pathname === path
+        ? "bg-[#D7EADD] text-[#175912]"
+        : "hover:bg-[#D7EADD] hover:text-[#175912]"
+    }`;
+
+  return (
+    <div className="flex">
+      <aside
+        className={`fixed left-0 top-1/2 -translate-y-1/2 shadow-sm h-[400px] bg-[#23811C] text-white flex flex-col justify-between transition-all duration-300 ${
+          isOpen ? "w-72" : "w-24"
+        } rounded-tr-2xl rounded-br-2xl`}
+      >
+        <div className="flex flex-col items-center">
+          <div className="flex items-center gap-2 pb-6 p-4">
+            <div className="flex-1">
+              <LogoWhite />
+            </div>
+            {isOpen && (
+              <h5 className="text-sm font-semibold">
+                Programa de Reinserção e Monitoramento
+              </h5>
+            )}
+          </div>
+
+          <nav className="flex flex-col gap-4 w-full">
+            <button
+              className="flex items-center gap-3 py-1 px-4"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <RiMenuUnfoldLine size={44} /> {isOpen && <span>Menu</span>}
+            </button>
+            <Link href="#" className={activePathClass("/farms")}>
+              <PiFarmLight size={44} />
+              {isOpen && <span>Propriedades</span>}
+            </Link>
+            <Link href="#" className={activePathClass("/owners")}>
+              <PiCowboyHatLight size={44} />
+              {isOpen && <span>Proprietários</span>}
+            </Link>
+            <Link
+              href="/"
+              className="flex items-center gap-3 hover:bg-[#D7EADD] hover:text-[#175912] py-1 px-4"
+            >
+              <PiSealCheckLight size={44} />
+              {isOpen && <span>Elegibilidade</span>}
+            </Link>
+          </nav>
+        </div>
+      </aside>
+
+      <div className="flex flex-col flex-1 ml-[calc(100%_/_12)]">
+        <header className="flex items-center justify-between gap-4 m-4 pb-4 border border-transparent border-b-[#CAC4D0]">
+          <h1 className="text-[#1A6415] text-2xl font-semibold">{title}</h1>
+          <div className="flex items-center gap-4 text-[#0A3503]">
+            <div>
+              <p className="text-[17px] font-semibold">
+                {userData?.pessoa?.nome}
+              </p>
+              <p className="text-sm">{userData?.email}</p>
+            </div>
+            <button onClick={signOut}>
+              <FiLogOut size={26} />
+            </button>
+          </div>
+        </header>
+
+        <main className="p-6">{children}</main>
+      </div>
+    </div>
+  );
+};
