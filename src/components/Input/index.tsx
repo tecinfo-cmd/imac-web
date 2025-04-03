@@ -1,5 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import { Controller } from "react-hook-form";
+import { BiLogoMastercard } from "react-icons/bi";
+import { HiMiniCreditCard } from "react-icons/hi2";
+import { IoMdCalendar } from "react-icons/io";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 interface InputProps {
@@ -9,6 +14,8 @@ interface InputProps {
   control: any;
   type?: string;
   minWidth?: string | number;
+  icon?: React.ReactNode;
+  mask?: (value: string) => string;
 }
 
 export const Input = ({
@@ -17,9 +24,13 @@ export const Input = ({
   placeholder,
   control,
   type = "text",
-  minWidth = 344,
+  minWidth = 68,
+  mask,
 }: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
+  const isDateInput = name === "validade" || name === "data";
+  const isCardInput = name === "numeroCartao";
+  const isCvvInput = name === "CVV";
 
   const isPassword = type === "password";
   const inputType = isPassword && showPassword ? "text" : type;
@@ -54,18 +65,39 @@ export const Input = ({
           <div className="relative w-full">
             <input
               {...field}
-              value={field.value ?? ""}
+              value={mask ? mask(field.value ?? "") : field.value}
               type={inputType}
               placeholder={placeholder}
               className={`w-full min-w-[${minWidth}px] p-4 rounded focus:outline-none border-[#CAC4D0] shadow-sm placeholder:text-[#D7D6D7] ${
                 error ? "border-[#F12929]" : ""
-              }`}
+              } focus:text-black focus:ring-[#21801a]`}
+              style={{
+                color: field.value ? "black" : "#CAC4D0",
+              }}
             />
+
+            {isDateInput && (
+              <span className="absolute inset-y-0 right-2 flex items-center text-gray-300">
+                <IoMdCalendar size={20} />
+              </span>
+            )}
+
+            {isCardInput && (
+              <span className="absolute inset-y-0 right-4 flex items-center text-gray-300">
+                <BiLogoMastercard size={20} />
+              </span>
+            )}
+            {isCvvInput && (
+              <span className="absolute inset-y-0 right-4 flex items-center text-gray-300">
+                <HiMiniCreditCard size={20} />
+              </span>
+            )}
+
             {isPassword && (
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-4 flex items-center text-gray-300 cursor-pointer"
+                className="absolute inset-y-0 right-4 flex items-center text-gray-300 cursor-pointer ml-1"
               >
                 {showPassword ? (
                   <IoEyeOutline size={20} />
