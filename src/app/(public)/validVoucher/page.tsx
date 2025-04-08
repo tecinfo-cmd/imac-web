@@ -42,25 +42,25 @@ export default function ValidVoucher() {
         </p>
       </header>
       <div className="bg-[#D7EADD] min-h-screen w-full flex justify-center items-center relative overflow-hidden">
-        <div className="fixed top-0 right-[800] opacity-20">
+        <div className="absolute top-0 right-0 w-[40vw] h-[40vh] opacity-20 pointer-events-none select-none z-0">
           <LogoGreen width={1300} height={1300} />
         </div>
 
-        <div className="fixed bottom-[-100] left-[800] opacity-20 transform rotate-180">
+        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vh] opacity-20 transform rotate-180 pointer-events-none select-none z-0">
           <LogoGreen width={1300} height={1300} />
         </div>
-        <div className="justify-center flex flex-col">
+        <div className="justify-center flex flex-col w-[450px]">
           <h1 className="text-[#0A3503] text-center text-uppercase font-inter font-bold text-2xl leading-[37px] tracking-[0.1em] md:text-[24px] md:leading-[37px] mb-8 mt-5">
             VALIDAR VOUCHER
           </h1>
           <form
-            className="flex flex-col w-[450px] gap-3"
+            className="flex flex-col w-full min-w-[320px] gap-3"
             onSubmit={handleSubmit(onSubmit)}
           >
             <Selector
               name="select"
               label="Selecionar propriedade"
-              placeholder="Selecione propriedade à qual deseja validar voucher"
+              placeholder="Selecione propriedade"
               control={control}
               options={[
                 { value: "1", label: "Propriedade 1" },
