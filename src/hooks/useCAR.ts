@@ -27,8 +27,19 @@ export function useCAR() {
     const result = await fetchCARData(documentType, formattedValue);
 
     if (result && Array.isArray(result) && result.length > 0) {
+      let nomeProprietario = "Nome não encontrado";
+    
+      try {
+        const proprietarios = JSON.parse(result[0].proprietarios);
+        if (Array.isArray(proprietarios) && proprietarios.length > 0) {
+          nomeProprietario = proprietarios[0].nome;
+        }
+      } catch (e) {
+        console.warn("Erro ao parsear os proprietários", e);
+      }
+    
       const formattedData = {
-        nome: result[0].nome || "Nome não encontrado",
+        nome: nomeProprietario,
         carFederal: result[0].carFederal || "CAR Federal não disponível",
       };
 
