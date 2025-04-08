@@ -26,7 +26,7 @@ const Selector: React.FC<RegisterSelectProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
-  const [dropUp, setDropUp] = useState(false); 
+  const [dropUp, setDropUp] = useState(false);
   const inputRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = options.filter((option) =>
