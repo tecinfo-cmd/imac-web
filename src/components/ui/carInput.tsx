@@ -19,7 +19,7 @@ const CARInput = ({ value, onChange, error }: CARInputProps) => {
   useEffect(() => {
     if (inputRef.current) {
       const maskOptions = {
-        mask: "AA-0000000-****************",
+        mask: `AA-0000000-${"*".repeat(32)}`,
         definitions: {
           A: /[A-Z]/,
           "*": /[A-Z0-9]/,
