@@ -68,7 +68,7 @@ export const Input = ({
               value={mask ? mask(field.value ?? "") : field.value}
               type={inputType}
               placeholder={placeholder}
-              className={`w-full min-w-[${minWidth}px] p-4 rounded focus:outline-none border-[#CAC4D0] shadow-sm placeholder:text-[#D7D6D7] ${
+              className={`z-10 w-full min-w-[${minWidth}px] p-4 rounded focus:outline-none border-[#CAC4D0] shadow-sm placeholder:text-[#D7D6D7] ${
                 error ? "border-[#F12929]" : ""
               } focus:text-black focus:ring-[#21801a]`}
               style={{
