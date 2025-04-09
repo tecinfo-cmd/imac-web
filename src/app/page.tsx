@@ -17,7 +17,10 @@ import CARInput from "@/components/ui/carInput";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import MaskedInput from "@/components/ui/maskedInput";
-import { MaskedModalInput } from "@/components/ui/maskedModalInput";
+import {
+  MaskedModalInput,
+  MaskedModalInputHandle,
+} from "@/components/ui/maskedModalInput";
 import EmailModal from "@/components/ui/modals/emailModal";
 import Modal from "@/components/ui/modals/modal";
 import Step from "@/components/ui/step";
@@ -31,7 +34,6 @@ export default function Home() {
     "cpf" | "cnpj" | "carEstadual" | undefined
   >(undefined);
 
-  const [documentValue, setDocumentValue] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -46,8 +48,7 @@ export default function Home() {
   const [isChecked, setIsChecked] = useState(false);
   const [isModalTwoOpen, setIsModalTwoOpen] = useState(false);
 
-  const documentInputRef = useRef<HTMLInputElement>(null);
-
+  const documentInputRef = useRef<MaskedModalInputHandle>(null);
   const documentTypeValue = ["cpf", "cnpj", "carEstadual"].includes(
     documentType ?? ""
   )
@@ -55,17 +56,6 @@ export default function Home() {
     : undefined;
 
   const { data, fetchData } = useCAR();
-
-  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase();
-
-    if (documentType === "carEstadual") {
-      const regex = /^[A-Z]{0,2}\d{0,5}\/?\d{0,4}$/;
-      if (!regex.test(value)) return;
-    }
-
-    setDocumentValue(value);
-  };
 
   const handleCarValueChange = (value: string) => {
     setCarValue(value);
@@ -76,8 +66,12 @@ export default function Home() {
   };
 
   const fetchCARNumbers = async () => {
-    if (!documentValue?.trim()) {
-      setModalErrors({ value: "Por favor, insira um valor para buscar." });
+    const rawValue = documentInputRef.current?.getUnmaskedValue();
+
+    if (!rawValue || !rawValue.trim()) {
+      setModalErrors({
+        value: "Por favor, insira um valor valido para buscar.",
+      });
       return;
     }
 
@@ -90,12 +84,15 @@ export default function Home() {
     setModalErrors({});
 
     try {
-      console.log("Buscando CAR com:", { documentType, documentValue });
+      console.log("Função chamada");
+      console.log("Valor desmascarado:", rawValue);
+      console.log("Tipo de documento:", documentType);
 
       const response = await fetchData(
         documentType as "cpf" | "cnpj" | "carEstadual",
-        documentValue
+        rawValue
       );
+      console.log("Resposta da API:", response);
 
       if (response && response.carFederal) {
         setCarNumbers([response.carFederal]);
@@ -114,14 +111,18 @@ export default function Home() {
       setCarNumbers([]);
     } finally {
       setDocumentType(undefined);
-      setDocumentValue("");
       setIsLoading(false);
     }
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const rawCpfValue = documentInputRef.current?.getUnmaskedValue();
+
     const newErrors: { [key: string]: string } = {};
+    if (!rawCpfValue || rawCpfValue.length !== 11)
+      
+      newErrors.cpf = "Campo obrigatório. | Insira um CPF válido.";
 
     if (!carValue)
       newErrors.carValue =
@@ -138,14 +139,42 @@ export default function Home() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      setIsModalTwoOpen(true);
+      
+      const payload = {
+        carFederal: carValue,
+        telefone: phone,
+        email,
+        cpfCnpj: rawCpfValue,
+      };
+    
+      try {
+        const response = await fetch("https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+    
+        if (!response.ok) {
+          throw new Error("Erro ao enviar solicitação.");
+        }
+    
+        const result = await response.json();
+        console.log("Resposta da API:", result);
+    
+        setIsModalTwoOpen(true);
+      } catch (error) {
+        console.error("Erro ao enviar para API:", error);
+        
+      }
     }
   };
 
   const resetModal = () => {
     setCarNumbers([]);
     setSelectedCar(null);
-    setDocumentValue("");
+
     setDocumentType(undefined);
     setModalErrors({});
     setIsModalOpen(false);
@@ -193,6 +222,15 @@ export default function Home() {
                     </a>
                   </p>
                 </div>
+                <MaskedModalInput
+                  documentType="cpf"
+                  type="text"
+                  ref={documentInputRef}
+                  placeholder="Digite seu CPF"
+                  className="border border-gray-400 focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#A2A2A2] bg-white"
+                  label="CPF do próprietario*"
+                  error={errors.cpf}
+                />
                 <MaskedInput
                   mask="(00) 00000-0000"
                   label="telefone de contato (whatsapp)*"
@@ -319,10 +357,8 @@ export default function Home() {
                 documentType={documentTypeValue}
                 type="text"
                 ref={documentInputRef}
-                value={documentValue}
-                disabled={!documentType}
-                onChange={handleDocumentChange}
                 placeholder="valor"
+                disabled={!documentType}
                 className="border border-[#222222] focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#A2A2A2] bg-white"
                 label={""}
                 onKeyDown={(e: { key: string; preventDefault: () => void }) => {
@@ -335,7 +371,7 @@ export default function Home() {
             </div>
             <button
               onClick={fetchCARNumbers}
-              className="absolute right-0 sm:right-0 md:right-0 top-0 translate-y-2 h-12 w-12 bg-white border-t border-b border-[#222222] rounded-r-md hover:bg-gray-100 transition duration-200 flex items-center justify-center"
+              className="absolute right-0 sm:right-0 md:right-0 top-0 translate-y-0 h-12 w-12 bg-white border-t border-b border-r border-[#222222] rounded-r-md hover:bg-gray-100 transition duration-200 flex items-center justify-center"
               disabled={!documentType}
             >
               <IoMdSearch className="h-5 w-5 text-[#A2A2A2]" />

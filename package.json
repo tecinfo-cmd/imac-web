@@ -33,6 +33,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-input-mask": "^3.0.6",
+    "@types/react-query": "^1.2.8",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "eslint-config-prettier": "^10.0.1",

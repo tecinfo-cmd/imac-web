@@ -15,7 +15,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       <Comp
         ref={ref}
         className={cn(
-          "px-4 py-2 rounded flex items-center justify-center font-medium transition bg-[#52A532] text-white hover:bg-[#469029]",
+          " z-10 px-4 py-2 rounded flex items-center justify-center font-medium transition bg-[#52A532] text-white hover:bg-[#469029]",
           className
         )}
         {...props}

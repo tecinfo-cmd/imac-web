@@ -1,70 +1,64 @@
 "use client";
+
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { FiLoader } from "react-icons/fi";
 
-import { Input } from "../../../components/Input";
-import { Button } from "../../../components/ui/button";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
-import { useAuthContext } from "@/context";
-import { SignInCredentials } from "@/hooks/useAuth/useSignIn";
 import { Logo } from "@/icons/Logo";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = yup.object({
   email: yup.string().email().required(),
-  senha: yup.string().required(),
 });
 
-export default function Auth() {
-  const { handleSignIn, isPending } = useAuthContext();
-
-  const { control, handleSubmit } = useForm({
+export default function ResetPassword() {
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const handleSubmitSignIn = (data: SignInCredentials) => {
-    handleSignIn(data);
+  const handleSubmitReset = () => {
+    alert("email Enviado");
   };
 
   return (
     <div className="bg-[#DFEEE5] min-h-screen flex flex-col md:grid md:grid-cols-[60%_40%] items-center justify-center place-items-center">
-      <div className="bg-[#1A6415] bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0)_44%,_rgba(0,0,0,0.38)_100%)] w-full h-full rounded-r-full flex items-center justify-center p-4">
+      <div className="bg-[#1A6415] bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0)_44%,_rgba(0,0,0,0.38)_100%)] w-full h-full rounded-r-full flex flex-col items-center justify-center p-4">
+        <h1 className="text-center text-[#ffffff] mb-10 text-2xl md:text-3xl font-bold">
+          RECUPERAR SENHA
+        </h1>
+
         <div className="bg-[#DFEEE5] w-full max-w-[400px] rounded-xl shadow-lg p-5 flex flex-col justify-center items-center">
           <Logo width={135} height={150} />
+
           <form
             className="flex flex-col gap-3 w-full"
-            onSubmit={handleSubmit(handleSubmitSignIn)}
+            onSubmit={handleSubmit(handleSubmitReset)}
           >
+            <p className="text-center text-[#21801A] mt-4 text-sm md:text-base">
+              Informe seu e-mail cadastrado abaixo e enviaremos um link para
+              redefinição da senha.
+            </p>
             <Input
               name="email"
-              label="E-mail"
               placeholder="Insira seu email"
               control={control}
             />
-            <Input
-              name="senha"
-              type="password"
-              label="Senha"
-              placeholder="Insira sua senha"
-              control={control}
-            />
-            <Link
-              href="/resetPassword"
-              className="text-end text-[#21801A] mr-4 mb-4 text-sm"
-            >
-              Esqueceu a senha?
-            </Link>
+
             <Button type="submit" className="w-full md:w-[130px] self-center">
-              {isPending ? <FiLoader /> : "Entrar"}
+              {isSubmitting ? <FiLoader /> : "Enviar"}
             </Button>
           </form>
           <span className="text-center text-[#21801A] mt-4 text-sm md:text-base">
-            Não possui uma conta?
-            <br />
-            <Link href="/register" className="underline">
-              Cadastra-se
+            <Link href="/auth" className="underline">
+              Voltar à tela de login
             </Link>
           </span>
         </div>
@@ -79,4 +73,4 @@ export default function Auth() {
       </div>
     </div>
   );
-}
+};
