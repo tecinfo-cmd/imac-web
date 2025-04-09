@@ -58,7 +58,7 @@ export const LayoutContainer = ({ title, children }: HeaderProps) => {
             >
               <RiMenuUnfoldLine size={44} /> {isOpen && <span>Menu</span>}
             </button>
-            <Link href="#" className={activePathClass("/farms")}>
+            <Link href="/farms" className={activePathClass("/farms")}>
               <PiFarmLight size={44} />
               {isOpen && <span>Propriedades</span>}
             </Link>
