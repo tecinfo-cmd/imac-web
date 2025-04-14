@@ -121,7 +121,6 @@ export default function Home() {
 
     const newErrors: { [key: string]: string } = {};
     if (!rawCpfValue || rawCpfValue.length !== 11)
-      
       newErrors.cpf = "Campo obrigatório. | Insira um CPF válido.";
 
     if (!carValue)
@@ -139,34 +138,45 @@ export default function Home() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      
       const payload = {
         carFederal: carValue,
         telefone: phone,
         email,
         cpfCnpj: rawCpfValue,
       };
-    
+      console.log("Payload enviado:", payload);
+
       try {
-        const response = await fetch("https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-    
+        const response = await fetch(
+          "https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
         if (!response.ok) {
-          throw new Error("Erro ao enviar solicitação.");
+          const responseText = await response.text();
+          throw new Error(
+            `Erro ao enviar solicitação: ${response.status} - ${responseText}`
+          );
         }
-    
+
+        setCarValue("");
+          setPhone("");
+          setEmail("");
+          setIsChecked(false);
+          documentInputRef.current?.clearValue();
+
         const result = await response.json();
         console.log("Resposta da API:", result);
-    
+
         setIsModalTwoOpen(true);
       } catch (error) {
         console.error("Erro ao enviar para API:", error);
-        
       }
     }
   };
@@ -227,7 +237,7 @@ export default function Home() {
                   type="text"
                   ref={documentInputRef}
                   placeholder="Digite seu CPF"
-                  className="border border-gray-400 focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#A2A2A2] bg-white"
+                  className="bg-white border border-gray-400 focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#A2A2A2]"
                   label="CPF do próprietario*"
                   error={errors.cpf}
                 />
@@ -239,8 +249,8 @@ export default function Home() {
                   onChange={(e: {
                     target: { value: React.SetStateAction<string> };
                   }) => setPhone(e.target.value)}
-                  placeholder="(XX) XXXXX - XXXX"
-                  className="w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px]"
+                  placeholder="(XX) XXXXXXX - XXXX"
+                  className="bg-white w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px]"
                   error={errors.phone}
                 />
 
