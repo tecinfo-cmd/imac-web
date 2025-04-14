@@ -6,6 +6,7 @@ import IMask, { InputMask } from "imask";
 export interface MaskedModalInputHandle {
   getUnmaskedValue: () => string;
   getMaskedValue: () => string;
+  clearValue: () => void;
 }
 
 interface InputWithLabelProps
@@ -60,14 +61,21 @@ export const MaskedModalInput = React.forwardRef<
   React.useImperativeHandle(ref, () => ({
     getUnmaskedValue: () => {
       if (documentType === "carEstadual") {
-        
         return maskInstanceRef.current?.value || "";
       } else {
-       
         return maskInstanceRef.current?.unmaskedValue || "";
       }
     },
     getMaskedValue: () => maskInstanceRef.current?.value || "",
+    clearValue: () => {
+      if (maskInstanceRef.current) {
+        maskInstanceRef.current.value = "";
+        maskInstanceRef.current.updateValue(); 
+      }
+      if (inputRef.current) {
+        inputRef.current.value = "";
+      }
+    },
   }));
 
   return (
@@ -83,7 +91,7 @@ export const MaskedModalInput = React.forwardRef<
         id={props.id}
         className={cn(
           "border border-[#222222] focus:outline-none placeholder-[#A2A2A2] bg-white",
-          "dark:bg-gray-400 text-gray-900 dark:text-white",
+          "text-gray-900 dark:text-white",
           error
             ? "border-red-500 focus:ring-0 focus:border-red-500"
             : "border-[#222222] focus:ring-2 focus:ring-green-500",
