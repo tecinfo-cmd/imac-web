@@ -123,10 +123,10 @@ export default function Home() {
     if (!rawCpfValue || rawCpfValue.length !== 11)
       newErrors.cpf = "Campo obrigatório. | Insira um CPF válido.";
 
-    if (!carValue)
+    if (!carValue || carValue.length !== 43)
       newErrors.carValue =
         "Campo obrigatório. | Insira um número de CAR válido.";
-    if (!phone)
+    if (!phone || phone.length !== 15)
       newErrors.phone =
         "Campo obrigatório. | Insira um número de telefone válido.";
     if (!email)
@@ -166,10 +166,10 @@ export default function Home() {
         }
 
         setCarValue("");
-          setPhone("");
-          setEmail("");
-          setIsChecked(false);
-          documentInputRef.current?.clearValue();
+        setPhone("");
+        setEmail("");
+        setIsChecked(false);
+        documentInputRef.current?.clearValue();
 
         const result = await response.json();
         console.log("Resposta da API:", result);
@@ -246,10 +246,10 @@ export default function Home() {
                   label="telefone de contato (whatsapp)*"
                   type="tel"
                   value={phone}
-                  onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                  }) => setPhone(e.target.value)}
-                  placeholder="(XX) XXXXXXX - XXXX"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setPhone(e.target.value)
+                  }
+                  placeholder="(XX) XXXXX - XXXX"
                   className="bg-white w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px]"
                   error={errors.phone}
                 />

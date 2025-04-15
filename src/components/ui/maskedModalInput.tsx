@@ -42,6 +42,7 @@ export const MaskedModalInput = React.forwardRef<
           },
           prepare: (str: string) => str.toUpperCase(),
         },
+        
       };
 
       if (documentType && maskOptions[documentType]) {
