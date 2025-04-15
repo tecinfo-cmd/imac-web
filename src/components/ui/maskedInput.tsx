@@ -9,22 +9,13 @@ interface MaskedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
 }
 
-const MaskedInput: React.FC<MaskedInputProps> = ({
-  mask,
-  label,
-  error,
-  ...props
-}) => {
+const MaskedInput: React.FC<MaskedInputProps> = ({ mask, error, label, ...props }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const maskRef = useRef<InstanceType<typeof IMask.InputMask> | null>(null);
+
 
   useEffect(() => {
     if (inputRef.current) {
-      maskRef.current = IMask(inputRef.current, { mask });
-
-      return () => {
-        maskRef.current?.destroy();
-      };
+      IMask(inputRef.current, { mask });
     }
   }, [mask]);
 
@@ -36,10 +27,10 @@ const MaskedInput: React.FC<MaskedInputProps> = ({
         {...props}
         className={cn(
           "w-full px-4 py-2 border rounded-lg focus:outline-none",
-          "border-[#666666] dark:border-[#666666] bg-white dark:bg-gray-900 text-gray-900 dark:text-white",
+          "border-[#666666] dark:border-[#666666] bg-white text-gray-900 dark:text-white",
           error
             ? "border-red-500 focus:ring-0 focus:border-red-500"
-            : "border-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500", 
+            : "border-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500",
           props.className
         )}
       />
@@ -50,4 +41,3 @@ const MaskedInput: React.FC<MaskedInputProps> = ({
 };
 
 export default MaskedInput;
-
