@@ -21,3 +21,5 @@ R
 "src/app/(public)/register/page.tsx,7\3\73ae82658459787a458d914b11c6a7a700811748
 V
 &src/app/(public)/validVoucher/page.tsx,2\3\2325b78b1d3a468d240eb70a0dc0b71d99f73cdd
+V
+&src/app/(public)/confirmation/page.tsx,4\2\4281f193894a4a10ca0a93e21021cf6eab19abbc

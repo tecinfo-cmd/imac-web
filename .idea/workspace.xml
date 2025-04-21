@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="70c3598f-9759-4419-98a1-c1e48b2e719f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.prettierignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.prettierrc.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/auth/page.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/components/footer/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/components/footer/styles.module.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/components/header/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/app/components/header/styles.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/3/3393394e21dbac7686e91ad17c5283fb052d67f3" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/3/3/3393394e21dbac7686e91ad17c5283fb052d67f3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/issuestore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sonarlint/securityhotspotstore/index.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(public)/confirmation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(public)/confirmation/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +35,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;development&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;homologacao&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/PROJETOS/CONNECT/PROJETOS/IMAC/imac-web&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
@@ -79,6 +76,8 @@
       <updated>1738427146283</updated>
       <workItem from="1738427149836" duration="167000" />
       <workItem from="1738431193795" duration="5996000" />
+      <workItem from="1745262725118" duration="240000" />
+      <workItem from="1745268089209" duration="644000" />
     </task>
     <servers />
   </component>

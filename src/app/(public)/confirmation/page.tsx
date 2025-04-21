@@ -47,7 +47,7 @@ function ConfirmationContent() {
     }
 
     fetch(
-      " https://imac-api-homol-dhflh.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes",
+      " https://imac-api-homol-dhflh.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes/validar",
       {
         method: "POST",
         headers: {
