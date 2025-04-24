@@ -5,6 +5,7 @@ import React from "react";
 import { BsFileText } from "react-icons/bs";
 import { IoMdSearch } from "react-icons/io";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
+import { TbLoaderQuarter } from "react-icons/tb";
 import { TbLeaf } from "react-icons/tb";
 import { TfiBookmarkAlt } from "react-icons/tfi";
 
@@ -384,9 +385,11 @@ export default function Home() {
               className="absolute right-0 sm:right-0 md:right-0 top-0 translate-y-0 h-12 w-12 bg-white border-t border-b border-r border-[#222222] rounded-r-md hover:bg-gray-100 transition duration-200 flex items-center justify-center"
               disabled={!documentType}
             >
-              <IoMdSearch className="h-5 w-5 text-[#A2A2A2]" />
-
-              {isLoading ? "" : ""}
+              {isLoading ? (
+                <TbLoaderQuarter className="animate-spin h-5 w-5 text-[#A2A2A2]" />
+              ) : (
+                <IoMdSearch className="h-5 w-5 text-[#A2A2A2]" />
+              )}
             </button>
 
             <div className="w-full mt-5 text-center">
