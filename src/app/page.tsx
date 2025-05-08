@@ -81,6 +81,20 @@ export default function Home() {
       return;
     }
 
+    if (documentType === "carEstadual") {
+      console.log("Valor bruto:", rawValue);
+
+      const match = rawValue.match(/^([A-Z]{2})(\d{4,6})\/(\d{4})$/i);
+
+      if (!match) {
+        setModalErrors({
+          value:
+            "Formato inválido. Use duas letras, 4-6 números, uma barra e 4 números finais (ex: AA1234/5678).",
+        });
+        return;
+      }
+    }
+
     setIsLoading(true);
     setModalErrors({});
 
