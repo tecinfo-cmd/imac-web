@@ -47,13 +47,12 @@ function ConfirmationContent() {
     }
 
     fetch(
-      " https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/agrotools/solicitacoes/:id/validar?token=",
+      `https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/agrotools/solicitacoes/${id}/validar?token=${token}`,
       {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id, token }),
       }
     )
       .then((res) => {

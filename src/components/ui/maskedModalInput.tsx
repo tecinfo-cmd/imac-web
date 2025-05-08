@@ -26,7 +26,6 @@ export const MaskedModalInput = React.forwardRef<
 
   React.useEffect(() => {
     if (inputRef.current) {
-      
       if (maskInstanceRef.current) {
         maskInstanceRef.current.destroy();
       }
@@ -35,14 +34,13 @@ export const MaskedModalInput = React.forwardRef<
         cpf: { mask: "000.000.000-00" },
         cnpj: { mask: "00.000.000/0000-00" },
         carEstadual: {
-          mask: "AA000000/0000",
+          mask: "AA0000[0][0]/0000",
           definitions: {
             A: /[A-Z]/,
             0: /\d/,
           },
           prepare: (str: string) => str.toUpperCase(),
         },
-        
       };
 
       if (documentType && maskOptions[documentType]) {
@@ -58,7 +56,6 @@ export const MaskedModalInput = React.forwardRef<
     };
   }, [documentType]);
 
-  
   React.useImperativeHandle(ref, () => ({
     getUnmaskedValue: () => {
       if (documentType === "carEstadual") {
@@ -71,7 +68,7 @@ export const MaskedModalInput = React.forwardRef<
     clearValue: () => {
       if (maskInstanceRef.current) {
         maskInstanceRef.current.value = "";
-        maskInstanceRef.current.updateValue(); 
+        maskInstanceRef.current.updateValue();
       }
       if (inputRef.current) {
         inputRef.current.value = "";
