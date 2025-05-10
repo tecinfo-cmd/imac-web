@@ -57,6 +57,10 @@ function ConfirmationContent() {
     )
       .then((res) => {
         if (res.ok) {
+          if (id) {
+            localStorage.setItem("userIdElegibilidade", id);
+            console.log("ID salvo no localStorage:", id);
+          }
           setStatus("success");
         } else {
           setStatus("error");
