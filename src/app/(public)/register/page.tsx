@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 
 import { yup } from "@/config/yup";
+import { useCadastroUsuario } from "@/hooks/useCadastroUsuario/useCadastroUsuario";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { maskCPF } from "@/utils/maskCPF";
@@ -15,44 +16,63 @@ import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = yup.object({
-  nomeCompleto: yup.string().required(),
+  nome: yup.string().required(),
   data: yup.string().required(),
-  CPF: yup.string().required(),
+  cpf: yup.string().required(),
   email: yup.string().email().required(),
   senha: yup.string().required(),
-  ConfirmarSenha: yup
+  confirmacaoSenha: yup
     .string()
     .required()
     .oneOf([yup.ref("senha")], "As senhas não coincidem"),
-  aceitarTermos: yup
+  aceitouTermos: yup
     .bool()
     .oneOf([true], "Você deve aceitar os termos para continuar."),
 });
 
 export default function Register() {
   const router = useRouter();
+  const { cadastrar, isLoading } = useCadastroUsuario();
 
   const {
     control,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      nomeCompleto: "",
+      nome: "",
       data: "",
-      CPF: "",
+      cpf: "",
       email: "",
       senha: "",
-      ConfirmarSenha: "",
-      aceitarTermos: false,
+      confirmacaoSenha: "",
+      aceitouTermos: false,
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Dados enviados:", data);
-    router.push("/validVoucher");
+  const onSubmit = async (data: any) => {
+    const formatDateToISO = (date: string) => {
+      const [day, month, year] = date.split("/");
+      return `${year}-${month}-${day}`;
+    };
+    try {
+      await cadastrar({
+        nome: data.nome,
+        dataNascimento: formatDateToISO(data.data),
+        cpf: data.cpf.replace(/\D/g, ""),
+        email: data.email,
+        senha: data.senha,
+        confirmacaoSenha: data.ConfirmacaoSenha,
+        aceitouTermos: data.aceitouTermos,
+      });
+
+      router.push("/validVoucher");
+    } catch (error) {
+      console.error("Erro no cadastro:", error);
+    }
   };
+
   return (
     <>
       <header className="w-full h-[120px] bg-[#23811C] flex items-center p-4 md:p-6 lg:p-8">
@@ -75,7 +95,7 @@ export default function Register() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <Input
-              name="nomeCompleto"
+              name="nome"
               label="Nome Completo"
               placeholder="Insira seu nome completo"
               control={control}
@@ -91,7 +111,7 @@ export default function Register() {
             />
 
             <Input
-              name="CPF"
+              name="cpf"
               type="text"
               label="CPF"
               placeholder="000.000.000-00"
@@ -115,7 +135,7 @@ export default function Register() {
             />
 
             <Input
-              name="ConfirmarSenha"
+              name="confirmacaoSenha"
               type="password"
               label="Confirmar senha"
               placeholder="Digite sua nova senha"
@@ -123,7 +143,7 @@ export default function Register() {
             />
 
             <Controller
-              name="aceitarTermos"
+              name="aceitouTermos"
               control={control}
               render={({ field }) => (
                 <CheckboxComponent
@@ -135,22 +155,22 @@ export default function Register() {
                 </CheckboxComponent>
               )}
             />
-            {errors.aceitarTermos && (
+            {errors.aceitouTermos && (
               <p className="text-[#F12929] font-light text-xs mt-1">
-                {errors.aceitarTermos.message}
+                {errors.aceitouTermos.message}
               </p>
             )}
 
             <Button
               type="submit"
               className="w-full md:w-[130px] self-center"
-              disabled={isSubmitting}
+              disabled={isLoading}
             >
-              {isSubmitting ? "Enviando..." : "Enviar"}
+              {isLoading ? "Enviando..." : "Enviar"}
             </Button>
           </form>
         </div>
       </div>
     </>
   );
-};
+}
