@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 
 import { Input } from "@/components/Input";
-import Selector from "@/components/Selector/selector";
 import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
+import { useBuyVoucher } from "@/hooks/useBuyVoucher/useBuyVoucher";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { maskCard, maskCVV, maskValidade } from "@/utils/maskCard";
@@ -29,11 +31,7 @@ const schema = yup.object({
 });
 
 export default function BuyVoucher() {
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm({
+  const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       nomeCompleto: "",
@@ -50,12 +48,58 @@ export default function BuyVoucher() {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Dados enviados:", data);
+  const {
+    control,
+    setValue,
+    handleSubmit,
+  } = methods;
+
+  const cep = useWatch({
+    control,
+    name: "CEP",
+  });
+
+  useEffect(() => {
+    const fetchEndereco = async () => {
+      const rawCEP = cep?.replace(/\D/g, "");
+      if (rawCEP?.length === 8) {
+        try {
+          const res = await fetch(`https://viacep.com.br/ws/${rawCEP}/json/`);
+          const data = await res.json();
+
+          if (data.erro) {
+            console.error("CEP inválido.");
+            return;
+          }
+
+          setValue("endereco", data.logradouro || "");
+          setValue("bairro", data.bairro || "");
+          setValue("cidade", data.localidade || "");
+          setValue("pais", "Brasil");
+        } catch (error) {
+          console.error("Erro ao buscar endereço:", error);
+        }
+      }
+    };
+
+    fetchEndereco();
+  }, [cep, setValue]);
+
+  const { pagar, isLoading } = useBuyVoucher();
+
+  const onSubmit = async (data: any) => {
+   try {
+    const result = await pagar(data);
+    console.log("Pagamento realizado com sucesso:", result);
+   
+  } catch (err) {
+    console.error("Falha no pagamento:", err);
+ 
+  }
   };
 
   return (
-    <>
+    <FormProvider {...methods}>
       <header className="w-full h-[120px] bg-[#23811C] flex items-center p-4 md:p-6 lg:p-8">
         <LogoWhite width={87} height={87} />
         <p className="text-[#ffffff] ml-4 sm:text-[20px] md:text-[22px] lg:text-[23px]">
@@ -141,12 +185,11 @@ export default function BuyVoucher() {
                 />
               </div>
               <div className="flex flex-col w-[130px] gap-3 ml-4">
-                <Selector
+                <Input
                   name="pais"
                   label="País"
                   placeholder="País"
                   control={control}
-                  options={[]}
                 />
               </div>
             </div>
@@ -179,30 +222,28 @@ export default function BuyVoucher() {
             </div>
             <div className="flex flex-row gap-4 items-start">
               <div className="flex flex-col w-[130px] gap-3">
-                <Selector
+                <Input
                   name="bairro"
                   label="Bairro"
                   placeholder="Bairro"
                   control={control}
-                  options={[]}
                 />
               </div>
               <div className="flex flex-col w-[130px] gap-3 ml-4 mb-4">
-                <Selector
+                <Input
                   name="cidade"
                   label="Cidade"
                   placeholder="Cidade"
                   control={control}
-                  options={[]}
                 />
               </div>
             </div>
             <Button
               type="submit"
               className="w-full md:w-[180px] self-center"
-              disabled={isSubmitting}
+              disabled={isLoading}
             >
-              {isSubmitting ? "Finalizando..." : "Finalizar Compra"}
+              {isLoading ? "Finalizando..." : "Finalizar Compra"}
             </Button>
           </form>
           <span className="text-center text-[#21801A] mt-4 text-sm md:text-base">
@@ -212,6 +253,6 @@ export default function BuyVoucher() {
           </span>
         </div>
       </div>
-    </>
+    </FormProvider>
   );
-};
+}
