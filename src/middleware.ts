@@ -19,8 +19,8 @@ export default function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/dashboard/:path*", 
-    "/farms/:path*",     
-    "/auth",            
+    "/dashboard/:path*",
+    "/propriedade/:path*",
+    "/auth",
   ],
 };

@@ -10,7 +10,7 @@ export interface SignInCredentials {
 
 export interface Session {
   email: string
-  access_token: string
+  accessToken: string
 }
 
 export const signInRequest = async (credentials: SignInCredentials) => {
