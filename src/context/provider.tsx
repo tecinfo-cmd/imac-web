@@ -55,16 +55,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async ({ email, senha }: SignInCredentials) => {
       try {
         const data = await signIn({ email, senha });
-        console.log(data);
-        const { access_token } = data;
+        const { accessToken } = data;
 
-        setCookie(undefined, "@IMAC:T", access_token, {
+        setCookie(undefined, "@IMAC:T", accessToken, {
           maxAge: 60 * 60 * 24 * 7,
           path: "/",
         });
         setEmail(email);
         router.push("/dashboard");
-        api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
       } catch (error) {
         console.error(error);
       }
