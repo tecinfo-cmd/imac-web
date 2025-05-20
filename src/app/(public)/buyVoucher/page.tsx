@@ -11,7 +11,7 @@ import { yup } from "@/config/yup";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { maskCard, maskCVV, maskValidade } from "@/utils/maskCard";
-import { maskCEP } from "@/utils/maskCEP";
+import { maskCep } from "@/utils/maskCEP";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 const schema = yup.object({
@@ -137,7 +137,7 @@ export default function BuyVoucher() {
                   label="CEP"
                   placeholder="_ _ _ _ _ - _ _ _"
                   control={control}
-                  mask={maskCEP}
+                  mask={maskCep}
                 />
               </div>
               <div className="flex flex-col w-[130px] gap-3 ml-4">
