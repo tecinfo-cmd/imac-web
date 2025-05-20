@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import axios from "axios";
+import { api } from "@/api";
+import { parseCookies } from "nookies";
 
 type PagamentoPayload = {
   nomeCompleto: string;
   numeroCartao: string;
   validade: string;
   CVV: string;
-  CEP: string;
+  cep: string;
   pais: string;
   endereco: string;
   numero: string;
@@ -17,30 +18,73 @@ type PagamentoPayload = {
 };
 
 export function useBuyVoucher() {
+  const [userData, setUserData] = useState<any | null>(null);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_HOST,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImR1a2UubmRzZ0BnbWFpbC5jb20iLCJjYXJnbyI6IlBST0RVVE9SIiwiaWF0IjoxNzQ2NzQ5MjQyLCJleHAiOjE3NDY4MzU2NDJ9.-nw4M8VoTIvUtwWbFCypSBYSVT3j4xp19D25Ign69AQ",
-    },
-  });
+  const cookies = parseCookies();
+  const carValue = cookies.carValue;
+
+  const loadUserData = useCallback(async () => {
+    setIsLoadingUserData(true);
+    try {
+      const cookies = parseCookies();
+      const email = cookies.email;
+
+      if (!email) {
+        throw new Error("Email não encontrado nos cookies.");
+      }
+
+      const response = await api.get(`/usuario/email/${email}`);
+      setUserData(response.data);
+    } catch (err) {
+      console.error("Erro ao carregar dados do usuário", err);
+    } finally {
+      setIsLoadingUserData(false);
+    }
+  }, []);
   const pagar = async (dados: PagamentoPayload) => {
+    if (!userData) {
+      throw new Error("Usuário não autenticado");
+    }
     setIsLoading(true);
     try {
       const [month, year] = dados.validade.split("/");
 
+      const propriedadeResponse = await api.get("propriedade-prem", {
+        params: {
+          carFederal: carValue,
+        },
+      });
+
+      const propriedades = propriedadeResponse.data;
+      if (!propriedades || propriedades.length === 0) {
+        throw new Error("Nenhuma propriedade encontrada para o CAR informado.");
+      }
+
+      const idSolicitacao = propriedades[0].solicitacaoElegibilidade?.id;
+
+      if (!idSolicitacao) {
+        throw new Error("ID da solicitação de elegibilidade não encontrado.");
+      }
+
       const payload = {
         buyer: {
+          name: userData.pessoa.nome,
+          email: userData.pessoa.email,
+          phone: userData.pessoa.telefone,
+          document: {
+            type: "CPF",
+            number: userData.pessoa.cpfCnpj,
+          },
           address: {
             street: dados.endereco,
             number: dados.numero,
             complement: dados.complemento,
             neighborhood: dados.bairro,
             city: dados.cidade,
-            zipCode: dados.CEP,
+            state: "MT",
+            zipCode: dados.cep,
             country: dados.pais,
           },
         },
@@ -56,20 +100,12 @@ export function useBuyVoucher() {
         },
       };
 
-      const idSolicitacao = localStorage.getItem("userIdElegibilidade");
-
-      if (!idSolicitacao) {
-        throw new Error(
-          "ID da solicitação não encontrado. Você confirmou o e-mail?"
-        );
-      }
-
       const response = await api.post(
         `agrotools/voucher/pagamento/${idSolicitacao}`,
         payload
       );
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao processar pagamento:", error);
       throw error;
     } finally {
@@ -77,5 +113,5 @@ export function useBuyVoucher() {
     }
   };
 
-  return { pagar, isLoading };
+  return { pagar, isLoading, loadUserData, userData, isLoadingUserData };
 }

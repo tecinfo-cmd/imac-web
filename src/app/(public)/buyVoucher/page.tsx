@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useWatch } from "react-hook-form";
@@ -21,7 +22,7 @@ const schema = yup.object({
   numeroCartao: yup.string().required("Obrigatório"),
   validade: yup.string().required("!"),
   CVV: yup.string().required("!"),
-  CEP: yup.string().required("!"),
+  cep: yup.string().required("!"),
   pais: yup.string().required("!"),
   endereco: yup.string().required(),
   numero: yup.string().required("!"),
@@ -31,6 +32,7 @@ const schema = yup.object({
 });
 
 export default function BuyVoucher() {
+  const router = useRouter();
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -38,7 +40,7 @@ export default function BuyVoucher() {
       numeroCartao: "",
       validade: "",
       CVV: "",
-      CEP: "",
+      cep: "",
       pais: "",
       endereco: "",
       numero: "",
@@ -48,15 +50,11 @@ export default function BuyVoucher() {
     },
   });
 
-  const {
-    control,
-    setValue,
-    handleSubmit,
-  } = methods;
+  const { control, setValue, handleSubmit, reset } = methods;
 
   const cep = useWatch({
     control,
-    name: "CEP",
+    name: "cep",
   });
 
   useEffect(() => {
@@ -85,17 +83,34 @@ export default function BuyVoucher() {
     fetchEndereco();
   }, [cep, setValue]);
 
-  const { pagar, isLoading } = useBuyVoucher();
+  const { pagar, isLoading, userData, loadUserData, isLoadingUserData } = useBuyVoucher();
+  useEffect(() => {
+    loadUserData(); 
+  }, [loadUserData]);
+
+  useEffect(() => {
+    if (!isLoadingUserData && !userData) {
+      router.push("/register");
+    }
+  }, [isLoadingUserData, userData, router]);
+
+  if (isLoadingUserData) {
+    return <p>Carregando seus dados...</p>;
+  }
+
+  if (!userData) {
+    return null; 
+  }
 
   const onSubmit = async (data: any) => {
-   try {
-    const result = await pagar(data);
-    console.log("Pagamento realizado com sucesso:", result);
-   
-  } catch (err) {
-    console.error("Falha no pagamento:", err);
- 
-  }
+    try {
+      const result = await pagar(data);
+      console.log("Pagamento realizado com sucesso:", result);
+    } catch (err) {
+      console.error("Falha no pagamento:", err);
+    }finally{
+      reset();
+    }
   };
 
   return (
@@ -176,7 +191,7 @@ export default function BuyVoucher() {
             <div className="flex flex-row gap-4 items-start">
               <div className="flex flex-col w-[130px] gap-3">
                 <Input
-                  name="CEP"
+                  name="cep"
                   type="text"
                   label="CEP"
                   placeholder="_ _ _ _ _ - _ _ _"
