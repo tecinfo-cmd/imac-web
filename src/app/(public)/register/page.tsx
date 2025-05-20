@@ -1,25 +1,37 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { Input } from "@/components/Input";
 import { Button } from "@/components/ui/button";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 
+import { api } from "@/api";
 import { yup } from "@/config/yup";
 import { useCadastroUsuario } from "@/hooks/useCadastroUsuario/useCadastroUsuario";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
+import { maskCEP } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskDate } from "@/utils/maskDate";
+import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { setCookie } from "nookies";
 
 const schema = yup.object({
   nome: yup.string().required(),
   data: yup.string().required(),
   cpf: yup.string().required(),
   email: yup.string().email().required(),
+  telefone: yup.string().required(),
+  cep: yup.string().required(),
+  uf: yup.string().required("!"),
+  logradouro: yup.string().required(),
+  numero: yup.string().required("!"),
+  bairro: yup.string().required(),
+  cidade: yup.string().required(),
   senha: yup.string().required(),
   confirmacaoSenha: yup
     .string()
@@ -38,6 +50,8 @@ export default function Register() {
     control,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -45,11 +59,46 @@ export default function Register() {
       data: "",
       cpf: "",
       email: "",
+      telefone: "",
+      cep: "",
+      uf: "",
+      logradouro: "",
+      numero: "",
+      bairro: "",
+      cidade: "",
       senha: "",
       confirmacaoSenha: "",
       aceitouTermos: false,
     },
   });
+
+  const cep = watch("cep");
+
+  useEffect(() => {
+    const fetchEndereco = async () => {
+      const rawCEP = cep?.replace(/\D/g, "");
+      if (rawCEP?.length === 8) {
+        try {
+          const res = await fetch(`https://viacep.com.br/ws/${rawCEP}/json/`);
+          const data = await res.json();
+
+          if (data.erro) {
+            console.error("CEP inválido.");
+            return;
+          }
+
+          setValue("uf", data.uf || "");
+          setValue("logradouro", data.logradouro || "");
+          setValue("bairro", data.bairro || "");
+          setValue("cidade", data.localidade || "");
+        } catch (error) {
+          console.error("Erro ao buscar endereço:", error);
+        }
+      }
+    };
+
+    fetchEndereco();
+  }, [cep, setValue]);
 
   const onSubmit = async (data: any) => {
     const formatDateToISO = (date: string) => {
@@ -57,19 +106,41 @@ export default function Register() {
       return `${year}-${month}-${day}`;
     };
     try {
-      await cadastrar({
+      setCookie(undefined, "email", data.email, {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+      const { accessToken } = await cadastrar({
         nome: data.nome,
         dataNascimento: formatDateToISO(data.data),
         cpf: data.cpf.replace(/\D/g, ""),
         email: data.email,
+        telefone: data.telefone.replace(/\D/g, ""),
+        cep: data.cep.replace(/\D/g, ""),
+        uf: data.uf,
+        logradouro: data.logradouro,
+        numero: data.numero,
+        bairro: data.bairro,
+        cidade: data.cidade,
         senha: data.senha,
-        confirmacaoSenha: data.ConfirmacaoSenha,
+        confirmacaoSenha: data.confirmacaoSenha,
         aceitouTermos: data.aceitouTermos,
       });
 
+      setCookie(undefined, "@IMAC:T", accessToken, {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+
+      api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
       router.push("/validVoucher");
-    } catch (error) {
-      console.error("Erro no cadastro:", error);
+    } catch (error: any) {
+      if (error.response) {
+        console.error("Erro no cadastro:", error.response.data);
+      } else {
+        console.error("Erro no cadastro:", error);
+      }
     }
   };
 
@@ -123,6 +194,67 @@ export default function Register() {
               name="email"
               label="E-mail"
               placeholder="Insira seu email"
+              control={control}
+            />
+
+            <Input
+              name="telefone"
+              label="Telefone"
+              placeholder="Digite seu numero de telefone"
+              control={control}
+              mask={maskPhone}
+            />
+
+            <div className="flex flex-row gap-4 items-start">
+              <div className="flex flex-col w-[250px] gap-3">
+                <Input
+                  name="cep"
+                  label="CEP"
+                  placeholder="_ _ _ _ _ - _ _ _"
+                  control={control}
+                  mask={maskCEP}
+                />
+              </div>
+              <div className="flex flex-col w-[130px] gap-3">
+                <Input
+                  name="uf"
+                  label="UF"
+                  placeholder="MT"
+                  control={control}
+                />
+              </div>
+            </div>
+
+            <Input
+              name="logradouro"
+              label="Logradouro"
+              placeholder="Digite o seu Logradouro"
+              control={control}
+            />
+
+            <div className="flex flex-row gap-4 items-start">
+              <div className="flex flex-col w-[80px] gap-3">
+                <Input
+                  name="numero"
+                  label="N°"
+                  placeholder=""
+                  control={control}
+                />
+              </div>
+              <div className="flex flex-col w-[260px] gap-3">
+                <Input
+                  name="bairro"
+                  label="Bairro"
+                  placeholder="(Opcional)"
+                  control={control}
+                />
+              </div>
+            </div>
+
+            <Input
+              name="cidade"
+              label="Cidade"
+              placeholder="(Opcional)"
               control={control}
             />
 
