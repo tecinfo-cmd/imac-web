@@ -1,12 +1,17 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { GrValidate } from "react-icons/gr";
+import { MdErrorOutline } from "react-icons/md";
 
 import { Input } from "@/components/Input";
 import Selector from "@/components/Selector/selector";
 import { Button } from "@/components/ui/button";
+import EmailModal from "@/components/ui/modals/emailModal";
 
 import { yup } from "@/config/yup";
+import { useValidVoucher } from "@/hooks/useValidVoucher/useValidVoucher";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -29,8 +34,39 @@ export default function ValidVoucher() {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Dados enviados:", data);
+  const {
+    propriedades,
+    voucherValido,
+    buscarPropriedadesSalvas,
+    validarVoucher,
+  } = useValidVoucher();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalSuccess, setModalSuccess] = useState(false);
+
+  useEffect(() => {
+    void buscarPropriedadesSalvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onSubmit = async (data: any) => {
+    const selectedId = parseInt(data.select, 10);
+    const voucher = data.voucher;
+
+    await validarVoucher(voucher, selectedId);
+
+    if (voucherValido) {
+      setModalSuccess(true);
+      setModalMessage(
+        "Seu voucher foi validado com sucesso e está vinculado a propriedade selecionada."
+      );
+    } else {
+      setModalSuccess(false);
+      setModalMessage("Verifique-o e tente novamente.");
+    }
+
+    setIsModalOpen(true);
   };
 
   return (
@@ -62,10 +98,10 @@ export default function ValidVoucher() {
               label="Selecionar propriedade"
               placeholder="Selecione propriedade"
               control={control}
-              options={[
-                { value: "1", label: "Propriedade 1" },
-                { value: "2", label: "Propriedade 2" },
-              ]}
+              options={propriedades.map((prop) => ({
+                value: prop.id,
+                label: prop.nome,
+              }))}
             />
             <Input
               name="voucher"
@@ -91,6 +127,30 @@ export default function ValidVoucher() {
           </form>
         </div>
       </div>
+      <EmailModal
+        isOpen={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <div className="flex justify-center items-center w-full h-full">
+          <div className="w-[90%] max-w-[300px] h-auto max-h-[90%]  flex flex-col justify-center items-center">
+            {modalSuccess ? (
+              <GrValidate className="text-[#52A532] w-8 h-8 sm:w-9 sm:h-9 mb-2" />
+            ) : (
+              <MdErrorOutline className="text-red-600 w-8 h-8 sm:w-9 sm:h-9 mb-2" />
+            )}
+
+            <h2
+              className={`sm:text-lg font-bold mb-2${
+                modalSuccess ? "text-[#52A532]" : "text-red-600"
+              }`}
+            >
+              {modalSuccess ? "Parabéns!" : "Voucher Inválido!"}
+            </h2>
+            <p className="sm:text-sm text-center">{modalMessage}</p>
+          </div>
+        </div>
+      </EmailModal>
     </>
   );
 }

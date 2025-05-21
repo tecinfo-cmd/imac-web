@@ -31,10 +31,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    const { "@IMAC:T": access_token } = parseCookies();
+    const { "@IMAC:T": accessToken } = parseCookies();
 
-    if (access_token) {
-      api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+    if (accessToken) {
+      api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
       const fetchUserData = async () => {
         try {
@@ -55,7 +55,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async ({ email, senha }: SignInCredentials) => {
       try {
         const data = await signIn({ email, senha });
+        console.log(data);
         const { accessToken } = data;
+
+        setCookie(undefined, "email", data.email, {
+          maxAge: 60 * 60 * 24 * 7, 
+          path: "/",
+        });
 
         setCookie(undefined, "@IMAC:T", accessToken, {
           maxAge: 60 * 60 * 24 * 7,

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useRef } from "react";
 import React from "react";
 import { BsFileText } from "react-icons/bs";
@@ -27,6 +26,7 @@ import Modal from "@/components/ui/modals/modal";
 import Step from "@/components/ui/step";
 
 import { useCAR } from "@/hooks/useCAR";
+import { setCookie } from "nookies";
 
 export default function Home() {
   const [carValue, setCarValue] = useState<string>("");
@@ -160,6 +160,11 @@ export default function Home() {
         cpfCnpj: rawCpfValue,
       };
       console.log("Payload enviado:", payload);
+
+      setCookie(null, "carValue", carValue, {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
 
       try {
         const response = await fetch(

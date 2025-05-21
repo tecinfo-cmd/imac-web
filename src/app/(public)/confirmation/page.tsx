@@ -57,7 +57,7 @@ function ConfirmationContent() {
     )
       .then((res) => {
         if (res.ok) {
-          setStatus("success");
+          if (id) setStatus("success");
         } else {
           setStatus("error");
         }
