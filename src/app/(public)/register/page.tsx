@@ -32,7 +32,13 @@ const schema = yup.object({
   numero: yup.string().required("!"),
   bairro: yup.string().required(),
   cidade: yup.string().required(),
-  senha: yup.string().required(),
+  senha: yup
+    .string()
+    .required()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{11,}$/,
+      "Senha com mínimo 11 caracteres, incluindo 1 maiúscula, 1 minúscula, 1 número e 1 caractere especial."
+    ),
   confirmacaoSenha: yup
     .string()
     .required()
@@ -52,6 +58,7 @@ export default function Register() {
     formState: { errors },
     watch,
     setValue,
+    setError,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -83,7 +90,10 @@ export default function Register() {
           const data = await res.json();
 
           if (data.erro) {
-            console.error("CEP inválido.");
+            setError("cep", {
+              type: "manual",
+              message: "CEP inválido.",
+            });
             return;
           }
 
@@ -98,7 +108,7 @@ export default function Register() {
     };
 
     fetchEndereco();
-  }, [cep, setValue]);
+  }, [cep, setValue, setError]);
 
   const onSubmit = async (data: any) => {
     const formatDateToISO = (date: string) => {
