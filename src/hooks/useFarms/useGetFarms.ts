@@ -77,7 +77,7 @@ export const getFarms = async (params?: GetFarmsParams) => {
     };
 
     const { data } = await api.get("/propriedade-prem", { params: defaultParams });
-    return data as Propriedade[];
+    return data.data as Propriedade[];
   } catch (error) {
     return Promise.reject(error);
   }
