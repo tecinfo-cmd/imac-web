@@ -1,4 +1,5 @@
 import dynamic from "next/dynamic";
+import { JSX } from "react";
 import { Controller } from "react-hook-form";
 import { RiArrowDownSFill } from "react-icons/ri";
 
@@ -9,8 +10,9 @@ interface InputSelectProps {
   label?: string;
   placeholder?: string;
   control: any;
-  options: { value: string | number; label: string }[] | undefined;
+  options: { value: string | number; label: string; color?: string }[] | undefined;
   isSearchable?: boolean;
+  formatOptionLabel?: (option: any) => JSX.Element; 
 }
 
 export const InputSelect = ({
@@ -20,6 +22,7 @@ export const InputSelect = ({
   control,
   options,
   isSearchable = true,
+  ...rest
 }: InputSelectProps) => {
   return (
     <Controller
@@ -51,6 +54,7 @@ export const InputSelect = ({
               options={options}
               isSearchable={isSearchable}
               placeholder={placeholder}
+              {...rest}
               classNamePrefix="custom-select"
               styles={{
                 control: (base, state) => ({
