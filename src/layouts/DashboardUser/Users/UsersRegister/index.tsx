@@ -9,6 +9,7 @@ import {
 } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
+import { InputSelect } from "@/components/InputSelect";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +20,11 @@ import { maskPhone } from "@/utils/maskPhone";
 
 export const UsersRegisterLayout = () => {
   const customMenuItems = [
+    {
+      label: "Home",
+      href: "/dashboardUser",
+      icon: <Analityc />,
+    },
     {
       label: "Usuários",
       href: "/dashboardUser/users",
@@ -39,11 +45,6 @@ export const UsersRegisterLayout = () => {
       href: "/multas",
       icon: <PiCurrencyCircleDollarLight size={44} />,
     },
-    {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
-    },
   ];
   const { control, handleSubmit, onSubmit, isLoading } = useUserRegister();
 
@@ -55,7 +56,7 @@ export const UsersRegisterLayout = () => {
       >
         <Input
           name="nome"
-          label="Nome"
+          label="Nome Completo"
           placeholder="Digite o nome do usuário"
           control={control}
         />
@@ -85,17 +86,25 @@ export const UsersRegisterLayout = () => {
           placeholder="Digite o e-mail"
           control={control}
         />
-        <Input
+        <InputSelect
           name="perfil"
           label="Perfil"
-          placeholder="Administrativo"
+          placeholder="Administrador"
           control={control}
+          options={[
+            { label: "Administrativo", value: "ADMINISTRATIVO" },
+            { label: "Analista", value: "ANALISTA" },
+          ]}
         />
-        <Input
+        <InputSelect
           name="tipo"
           label="Tipo"
           placeholder="Pessoa Física"
           control={control}
+          options={[
+            { label: "Pessoa Física", value: "PF" },
+            { label: "Pessoa Jurídica", value: "PJ" },
+          ]}
         />
         <Input
           name="profissao"

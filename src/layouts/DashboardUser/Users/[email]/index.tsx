@@ -29,6 +29,7 @@ export const UserDetailLayout = () => {
   } = useUserDetail(email);
 
   const menuItems = [
+    { label: "Home", href: "/dashboardUser", icon: <Analityc /> },
     {
       label: "Usuários",
       href: "/dashboardUser/users",
@@ -49,7 +50,6 @@ export const UserDetailLayout = () => {
       href: "/multas",
       icon: <PiCurrencyCircleDollarLight size={44} />,
     },
-    { label: "Home", href: "/dashboardUser", icon: <Analityc /> },
   ];
 
   if (isLoading || !userData) return <p className="p-4">Carregando...</p>;
@@ -94,11 +94,15 @@ export const UserDetailLayout = () => {
           disabled
           control={control}
         />
-        <Input
+        <InputSelect
           name="perfil"
           label="Perfil"
-          placeholder="Administrativo"
+          placeholder="Administrador"
           control={control}
+          options={[
+            { label: "Administrativo", value: "ADMINISTRATIVO" },
+            { label: "Analista", value: "ANALISTA" },
+          ]}
         />
         <InputSelect
           name="tipo"
