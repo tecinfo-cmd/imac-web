@@ -84,12 +84,10 @@ export const useUserDetail = (email: string | string[] | undefined) => {
         return;
       }
 
-      const roleName = formData.perfil?.toLowerCase();
-
       const roleData =
-        roleName === "administrativo"
+        formData.perfil === "ADMINISTRATIVO"
           ? { nome: "ADMINISTRATIVO", id: 1 }
-          : roleName === "analista"
+          : formData.perfil === "ANALISTA"
           ? { nome: "ANALISTA", id: 2 }
           : null;
 

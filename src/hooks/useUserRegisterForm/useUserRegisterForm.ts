@@ -10,7 +10,14 @@ import { toast } from "sonner";
 const unmask = (value: string) => value.replace(/\D/g, "");
 
 const schema = yup.object().shape({
-  nome: yup.string().required(),
+  nome: yup
+    .string()
+    .required()
+    .test("nome-completo", "Digite o nome completo", (value) => {
+      if (!value) return false;
+      const partes = value.trim().split(" ");
+      return partes.length >= 2 && partes.every((p) => p.length > 1);
+    }),
   cpf: yup
     .string()
     .required()
@@ -42,23 +49,12 @@ export const useUserRegister = () => {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
 
-    const roleName = data.perfil?.toLowerCase();
     const roleData =
-      roleName === "administrativo"
+      data.perfil === "ADMINISTRATIVO"
         ? { nome: "ADMINISTRATIVO", id: 1 }
-        : roleName === "analista"
+        : data.perfil === "ANALISTA"
         ? { nome: "ANALISTA", id: 2 }
         : null;
-
-    const tipoRaw = data.tipo?.toLowerCase();
-    let tipo = null;
-
-    if (tipoRaw?.includes("pessoa física") || tipoRaw === "pf") {
-      tipo = "PF";
-    } else if (tipoRaw?.includes("pessoa jurídica") || tipoRaw === "pj") {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      tipo = "PJ";
-    }
 
     const payload = {
       ...data,
