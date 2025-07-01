@@ -38,8 +38,8 @@ export function ConfirmBox({ onConfirm , status}: ConfirmBoxProps) {
       </button>
 
       {showBox && (
-        <div className="absolute z-10 top-full mt-2 right-0 w-64 bg-white border border-gray-300 rounded shadow-lg p-4 text-center">
-          <p className="text-gray-700 mb-4">Tem certeza que deseja inativar?</p>
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 bg-white border border-gray-300 rounded shadow-lg p-4 text-center">
+          <p className="text-[#21801A] mb-4">Tem certeza que deseja inativar?</p>
           <div className="flex justify-center gap-4">
             <button
               onClick={handleConfirm}
