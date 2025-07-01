@@ -31,6 +31,11 @@ export const UsersLayout = () => {
 
   const customMenuItems = [
     {
+      label: "Home",
+      href: "/dashboardUser",
+      icon: <Analityc />,
+    },
+    {
       label: "Usuários",
       href: "/dashboardUser/users",
       icon: <PiUserCircleThin size={44} />,
@@ -49,11 +54,6 @@ export const UsersLayout = () => {
       label: "Multas",
       href: "/multas",
       icon: <Taxa className="text-current" />,
-    },
-    {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
     },
   ];
 

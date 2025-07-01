@@ -48,6 +48,11 @@ export const LayoutContainer = ({
 
   const defaultMenuItems: MenuItem[] = [
     {
+      label: "Home",
+      href: "/dashboardUser",
+      icon: <Analityc className="text-current" />,
+    },
+    {
       label: "Propriedades",
       href: "/propriedade",
       icon: <PiFarmLight size={44} />,
@@ -61,11 +66,6 @@ export const LayoutContainer = ({
       label: "Elegibilidade",
       href: "/",
       icon: <PiSealCheckLight size={44} />,
-    },
-    {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc className="text-current"/>,
     },
   ];
 

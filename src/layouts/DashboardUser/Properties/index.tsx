@@ -25,6 +25,11 @@ export const PropertiesLayout = () => {
 
   const customMenuItems = [
     {
+      label: "Home",
+      href: "/dashboardUser",
+      icon: <Analityc />,
+    },
+    {
       label: "Usuários",
       href: "/dashboardUser/users",
       icon: <PiUserCircleThin size={44} />,
@@ -43,11 +48,6 @@ export const PropertiesLayout = () => {
       label: "Multas",
       href: "/multas",
       icon: <Taxa className="currentcolor" />,
-    },
-    {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
     },
   ];
 
