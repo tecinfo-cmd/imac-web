@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams, useRouter } from "next/navigation";
+import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { FiLoader } from "react-icons/fi";
 
@@ -7,29 +9,51 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
+import { useRecoverPassword } from "@/hooks/useRecoverPassword/useRecoverPassword";
 import { Logo } from "@/icons/Logo";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
 
 const schema = yup.object({
-  email: yup.string().email().required(),
-  senha: yup.string().required(),
+  senha: yup
+    .string()
+    .required()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{11,}$/,
+      "Senha com mínimo 11 caracteres, incluindo 1 maiúscula, 1 minúscula, 1 número e 1 caractere especial."
+    ),
   confirmarSenha: yup
     .string()
     .required()
     .oneOf([yup.ref("senha")], "As senhas não coincidem"),
 });
 
-export default function RecoverPassword() {
+function RecoverPasswordInner() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
   const {
     control,
     handleSubmit,
     formState: { isSubmitting },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const handleSubmitReset = () => {
-    alert("Senha atualizada");
+  const router = useRouter();
+  const { recoverPassword } = useRecoverPassword();
+
+  const handleSubmitReset = async (data: any) => {
+    const result = await recoverPassword(
+      data.senha,
+      data.confirmarSenha,
+      token
+    );
+    reset();
+    toast(result.message);
+    if (result.success) {
+      router.push("/auth");
+    }
   };
 
   return (
@@ -42,12 +66,6 @@ export default function RecoverPassword() {
             className="flex flex-col gap-3 w-full"
             onSubmit={handleSubmit(handleSubmitReset)}
           >
-            <Input
-              name="email"
-              label="E-mail"
-              placeholder="Insira seu email"
-              control={control}
-            />
             <Input
               name="senha"
               label="Nova senha"
@@ -78,5 +96,13 @@ export default function RecoverPassword() {
         </h1>
       </div>
     </div>
+  );
+}
+
+export default function RecoverPassword() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <RecoverPasswordInner />
+    </Suspense>
   );
 }

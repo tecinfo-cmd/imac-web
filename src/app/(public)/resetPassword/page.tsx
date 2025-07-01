@@ -8,24 +8,35 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
+import { useResetPassword } from "@/hooks/useResetPassword/useResetPassword";
 import { Logo } from "@/icons/Logo";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
 
 const schema = yup.object({
   email: yup.string().email().required(),
 });
 
+type FormValues = {
+  email: string;
+};
+
 export default function ResetPassword() {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const handleSubmitReset = () => {
-    alert("email Enviado");
+  const { sendResetEmail } = useResetPassword();
+
+  const handleSubmitReset = async (data: FormValues) => {
+    const { message } = await sendResetEmail(data.email);
+    toast(message);
+    reset();
   };
 
   return (
@@ -73,4 +84,4 @@ export default function ResetPassword() {
       </div>
     </div>
   );
-};
+}
