@@ -7,7 +7,6 @@ import {
   PiSealCheckLight,
   PiFarmLight,
 } from "react-icons/pi";
-//import { TbChartInfographic } from "react-icons/tb";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
@@ -42,7 +41,6 @@ export const DashboardUserLayout = () => {
   };
 
   const getIndicador = (tipo: string) => {
-    // Se nenhuma data for selecionada, pega direto de porIndicadores (valores totais)
     if (!selectedDate) {
       return (
         data?.porIndicadores.find((i) => i.tipo === tipo) || {
@@ -52,7 +50,6 @@ export const DashboardUserLayout = () => {
       );
     }
 
-    // Quando uma data for selecionada, calcula com base nos dados por dia
     const filtrado =
       data?.infoPorDias.filter((d) => {
         const dia = new Date(d.dia);
@@ -156,7 +153,7 @@ export const DashboardUserLayout = () => {
     {
       label: "Multas",
       href: "/multas",
-      icon: <Taxa className="text-current"/>,
+      icon: <Taxa className="text-current" />,
     },
     {
       label: "Home",

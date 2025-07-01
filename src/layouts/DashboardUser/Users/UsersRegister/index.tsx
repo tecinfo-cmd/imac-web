@@ -17,7 +17,7 @@ import { Analityc } from "@/icons/Analityc";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
 
-export const UsersRegister = () => {
+export const UsersRegisterLayout = () => {
   const customMenuItems = [
     {
       label: "Usuários",
