@@ -10,9 +10,11 @@ interface InputSelectProps {
   label?: string;
   placeholder?: string;
   control: any;
-  options: { value: string | number; label: string; color?: string }[] | undefined;
+  options:
+    | { value: string | number; label: string; color?: string }[]
+    | undefined;
   isSearchable?: boolean;
-  formatOptionLabel?: (option: any) => JSX.Element; 
+  formatOptionLabel?: (option: any) => JSX.Element;
 }
 
 export const InputSelect = ({
@@ -50,7 +52,12 @@ export const InputSelect = ({
           <div className="relative w-full">
             <DynamicSelect
               {...field}
-              value={field.value || ""}
+              onChange={(selectedOption: any) =>
+                field.onChange(selectedOption?.value)
+              }
+              value={
+                options?.find((option) => option.value === field.value) || null
+              }
               options={options}
               isSearchable={isSearchable}
               placeholder={placeholder}
