@@ -8,15 +8,16 @@ interface ModalProps {
   onOpenChange: (open: boolean) => void;
   onClose: () => void;
   children: React.ReactNode;
+  className?:string;
 }
 
-const Modal: FC<ModalProps> = ({ isOpen, onOpenChange, onClose, children }) => {
+const Modal: FC<ModalProps> = ({ isOpen, onOpenChange, onClose, children, className }) => {
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-white opacity-80" />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-[90vw] sm:max-w-[400px] lg:max-w-[449px] max-h-[90vh] p-6 overflow-auto bg-white rounded-[20px] shadow-[0_8px_20px_rgba(0,0,0,0.1),0_-8px_20px_rgba(0,0,0,0.1)]"
+          className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-[90vw] sm:max-w-[400px] lg:max-w-[449px] max-h-[90vh] p-6 overflow-auto rounded-[20px] shadow-[0_8px_20px_rgba(0,0,0,0.1),0_-8px_20px_rgba(0,0,0,0.1)] ${className ?? "bg-white"}`}
           aria-describedby={undefined}
         >
           <Dialog.Close
