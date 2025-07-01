@@ -1,0 +1,142 @@
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+
+import { api } from "@/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+//import type { UseQueryOptions } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+export type UserDetailForm = {
+  telefone: string;
+  perfil: string;
+  tipo: string;
+  profissao: string;
+};
+
+interface Pessoa {
+  telefone: string | null;
+  nome: string;
+  cpfCnpj: string;
+  rgie: string;
+}
+
+interface Role {
+  id: number;
+  nome: string;
+}
+
+interface Usuario {
+  id: number;
+  email: string;
+  cargo: string;
+  tipo: string | null;
+  profissao: string | null;
+  pessoa: Pessoa;
+  roles: Role[];
+}
+
+export const useUserDetail = (email: string | string[] | undefined) => {
+  const queryClient = useQueryClient();
+
+  const { data: userData, isLoading } = useQuery<Usuario, Error>({
+    queryKey: ["userByEmail", email],
+    queryFn: async () => {
+      const { data } = await api.get(`/usuario/email/${email}`);
+      return data;
+    },
+    enabled: !!email,
+  });
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    getValues,
+    formState: { isDirty },
+  } = useForm<UserDetailForm>({
+    defaultValues: {
+      telefone: "",
+      perfil: "",
+      tipo: "",
+      profissao: "",
+    },
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    if (userData) {
+      reset({
+        telefone: userData.pessoa?.telefone || "",
+        perfil:
+          userData.roles && userData.roles.length > 0
+            ? userData.roles[0].nome
+            : "",
+        tipo: userData.tipo || "",
+        profissao: userData.profissao || "",
+      });
+    }
+  }, [userData, reset]);
+
+  const mutation = useMutation({
+    mutationFn: async (formData: UserDetailForm) => {
+      if (!userData) {
+        toast.error("Usuário não carregado.");
+        return;
+      }
+
+      const roleName = formData.perfil?.toLowerCase();
+
+      const roleData =
+        roleName === "administrativo"
+          ? { nome: "ADMINISTRATIVO", id: 1 }
+          : roleName === "analista"
+          ? { nome: "ANALISTA", id: 2 }
+          : null;
+
+      const payload: any = {
+        telefone: formData.telefone,
+        tipo: formData.tipo,
+        profissao: formData.profissao,
+      };
+
+      if (roleData) {
+        payload.roles = [roleData];
+      }
+
+      const response = await api.patch(`/usuario/${userData.id}`, payload);
+
+      console.log("Resposta PATCH:", response.data);
+      console.log(payload);
+
+      console.log("Status:", response.status);
+
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["userByEmail", email] });
+      toast.success("Usuário atualizado com sucesso!", { duration: 3000 });
+
+      const currentValues = getValues();
+      reset(currentValues);
+    },
+    onError: () => {
+      toast.error("Erro ao cadastrar usuário. tente novamente.", {
+        duration: 3000,
+      });
+    },
+  });
+
+  const onSubmit = (data: UserDetailForm) => {
+    mutation.mutate(data);
+  };
+
+  return {
+    control,
+    handleSubmit,
+    onSubmit,
+    userData,
+    isLoading,
+    isDirty,
+    isSaving: mutation.isPending,
+  };
+};
