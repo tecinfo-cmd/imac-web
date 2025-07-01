@@ -23,7 +23,7 @@ export function useBuyVoucher() {
   const [isLoading, setIsLoading] = useState(false);
 
   const cookies = parseCookies();
-  const carValue = cookies.carValue;
+  const email = cookies.email;
 
   const loadUserData = useCallback(async () => {
     setIsLoadingUserData(true);
@@ -51,9 +51,9 @@ export function useBuyVoucher() {
     try {
       const [month, year] = dados.validade.split("/");
 
-      const propriedadeResponse = await api.get("propriedade-prem", {
+      const propriedadeResponse = await api.get("propriedade-prem/proprietario", {
         params: {
-          carFederal: carValue,
+          email: email,
         },
       });
 
