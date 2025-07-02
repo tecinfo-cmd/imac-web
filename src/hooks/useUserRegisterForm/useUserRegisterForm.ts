@@ -32,8 +32,22 @@ const schema = yup.object().shape({
     .matches(/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/, "Telefone inválido"),
   email: yup.string().required(),
   profissao: yup.string().required(),
-  perfil: yup.string().required(),
-  tipo: yup.string().required(),
+  perfil: yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+    })
+    .nullable()
+    .required(),
+  tipo: yup
+    .object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+    })
+    .nullable()
+    .required(),
 });
 
 export const useUserRegister = () => {
@@ -50,9 +64,9 @@ export const useUserRegister = () => {
     setIsLoading(true);
 
     const roleData =
-      data.perfil === "ADMINISTRATIVO"
+      data.perfil?.value === "ADMINISTRATIVO"
         ? { nome: "ADMINISTRATIVO", id: 1 }
-        : data.perfil === "ANALISTA"
+        : data.perfil?.value === "ANALISTA"
         ? { nome: "ANALISTA", id: 2 }
         : null;
 
@@ -64,7 +78,7 @@ export const useUserRegister = () => {
       telefone: data.telefone ? unmask(data.telefone) : null,
       email: data.email ?? null,
       profissao: data.profissao ?? null,
-      tipo: data.tipo ?? null,
+      tipo: data.tipo?.value ?? null,
       roles: roleData ? [roleData] : [],
     };
     try {

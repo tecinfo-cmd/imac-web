@@ -6,10 +6,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 //import type { UseQueryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+type SelectOption = { label: string; value: string };
+
 export type UserDetailForm = {
   telefone: string;
-  perfil: string;
-  tipo: string;
+  perfil: SelectOption | null;
+  tipo: SelectOption | null;
   profissao: string;
 };
 
@@ -29,8 +31,8 @@ interface Usuario {
   id: number;
   email: string;
   cargo: string;
-  tipo: string | null;
-  profissao: string | null;
+  tipo: string;
+  profissao: string;
   pessoa: Pessoa;
   roles: Role[];
 }
@@ -56,8 +58,8 @@ export const useUserDetail = (email: string | string[] | undefined) => {
   } = useForm<UserDetailForm>({
     defaultValues: {
       telefone: "",
-      perfil: "",
-      tipo: "",
+      perfil: null,
+      tipo: null,
       profissao: "",
     },
     mode: "onChange",
@@ -69,9 +71,19 @@ export const useUserDetail = (email: string | string[] | undefined) => {
         telefone: userData.pessoa?.telefone || "",
         perfil:
           userData.roles && userData.roles.length > 0
-            ? userData.roles[0].nome
-            : "",
-        tipo: userData.tipo || "",
+            ? { label: userData.roles[0].nome, value: userData.roles[0].nome }
+            : null,
+        tipo: userData.tipo
+          ? {
+              label:
+                userData.tipo === "PF"
+                  ? "Pessoa Física"
+                  : userData.tipo === "PJ"
+                  ? "Pessoa Jurídica"
+                  : userData.tipo,
+              value: userData.tipo,
+            }
+          : null,
         profissao: userData.profissao || "",
       });
     }
@@ -85,9 +97,9 @@ export const useUserDetail = (email: string | string[] | undefined) => {
       }
 
       const roleData =
-        formData.perfil === "ADMINISTRATIVO"
+        formData.perfil?.value === "ADMINISTRATIVO"
           ? { nome: "ADMINISTRATIVO", id: 1 }
-          : formData.perfil === "ANALISTA"
+          : formData.perfil?.value === "ANALISTA"
           ? { nome: "ANALISTA", id: 2 }
           : null;
 
