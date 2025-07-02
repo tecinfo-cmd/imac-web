@@ -53,11 +53,9 @@ export const InputSelect = ({
             <DynamicSelect
               {...field}
               onChange={(selectedOption: any) =>
-                field.onChange(selectedOption?.value)
+                field.onChange(selectedOption)
               }
-              value={
-                options?.find((option) => option.value === field.value) || null
-              }
+              value={field.value}
               options={options}
               isSearchable={isSearchable}
               placeholder={placeholder}

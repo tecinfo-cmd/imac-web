@@ -27,10 +27,10 @@ const MaskedInput: React.FC<MaskedInputProps> = ({ mask, error, label, ...props 
         {...props}
         className={cn(
           "w-full px-4 py-2 border rounded-lg focus:outline-none",
-          "border-[#666666] dark:border-[#666666] bg-white text-gray-900 dark:text-white",
-          error
+          "border-[#CAC4D0] bg-white text-gray-900",
+           error
             ? "border-red-500 focus:ring-0 focus:border-red-500"
-            : "border-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500",
+            : " border-[#CAC4D0]",
           props.className
         )}
       />

@@ -16,12 +16,12 @@ export const CheckboxComponent = React.forwardRef<
         <Checkbox.Root
           ref={ref}
           className={cn(
-            "w-5 h-5 flex items-center justify-center border border-[#666666] bg-white",
+            "w-5 h-5 flex items-center justify-center border border-[#CAC4D0] bg-white",
             "focus:outline-none focus:ring-2 focus:ring-green-500",
             "data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600",
             error
               ? "border-red-500 focus:ring-0 focus:border-red-500"
-              : "border-gray-400 focus:ring-2 focus:ring-green-500",
+              : "border-[#CAC4D0] focus:ring-2 focus:ring-green-500",
             className
           )}
           onCheckedChange={onCheckedChange}

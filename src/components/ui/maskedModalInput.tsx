@@ -88,11 +88,11 @@ export const MaskedModalInput = React.forwardRef<
         ref={inputRef}
         id={props.id}
         className={cn(
-          "border border-[#222222] focus:outline-none placeholder-[#A2A2A2] bg-white",
-          "text-gray-900 dark:text-white",
+          "border border-[#CAC4D0] focus:outline-none placeholder-[#A2A2A2] bg-white",
+          "text-gray-900",
           error
             ? "border-red-500 focus:ring-0 focus:border-red-500"
-            : "border-[#222222] focus:ring-2 focus:ring-green-500",
+            : " border-[#CAC4D0]",
           className
         )}
         {...props}
