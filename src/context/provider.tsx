@@ -11,9 +11,14 @@ import {
 
 import { api } from "@/api";
 import { useAuthStore } from "@/store/useAuthStore";
+import { jwtDecode } from "jwt-decode";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
 
 import { SignInCredentials, useSignIn } from "../hooks/useAuth/useSignIn";
+
+interface DecodedToken {
+  roles: string[];
+}
 
 export interface AuthContextProps {
   handleSignIn: (credentials: SignInCredentials) => void;
@@ -59,7 +64,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         const { accessToken } = data;
 
         setCookie(undefined, "email", data.email, {
-          maxAge: 60 * 60 * 24 * 7, 
+          maxAge: 60 * 60 * 24 * 7,
           path: "/",
         });
 
@@ -68,8 +73,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
           path: "/",
         });
         setEmail(email);
-        router.push("/dashboard");
         api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+        const decoded = jwtDecode<DecodedToken>(accessToken);
+        console.log("Token decodificado:", decoded);
+
+        const role = decoded.roles?.[0]?.toUpperCase();
+
+        if (role === "ANALISTA") {
+          router.push("/dashboardUser");
+        } else if (role === "ADMINISTRATIVO") {
+          router.push("/dashboard");
+        } else {
+          router.push("/unauthorized");
+        }
       } catch (error) {
         console.error(error);
       }
