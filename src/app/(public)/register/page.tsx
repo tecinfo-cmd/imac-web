@@ -13,12 +13,12 @@ import { yup } from "@/config/yup";
 import { useCadastroUsuario } from "@/hooks/useCadastroUsuario/useCadastroUsuario";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
+import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskDate } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { setCookie } from "nookies";
-import {maskCep} from "@/utils/maskCEP";
 
 const schema = yup.object({
   nome: yup.string().required(),

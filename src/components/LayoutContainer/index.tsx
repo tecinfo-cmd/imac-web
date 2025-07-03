@@ -4,23 +4,36 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import {
-  PiCowboyHatLight,
   PiFarmLight,
   PiSealCheckLight,
+  PiCowboyHatLight,
 } from "react-icons/pi";
 import { RiMenuUnfoldLine } from "react-icons/ri";
 
 import { useAuthContext } from "@/context";
+import { Analityc } from "@/icons/Analityc";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { useAuthStore } from "@/store/useAuthStore";
+
+interface MenuItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}
 
 interface HeaderProps {
   title: string;
   children: React.ReactNode;
   actions?: React.ReactNode;
+  menuItems?: MenuItem[];
 }
 
-export const LayoutContainer = ({ title, children, actions }: HeaderProps) => {
+export const LayoutContainer = ({
+  title,
+  children,
+  actions,
+  menuItems,
+}: HeaderProps) => {
   const { signOut } = useAuthContext();
   const { userData } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -33,10 +46,35 @@ export const LayoutContainer = ({ title, children, actions }: HeaderProps) => {
         : "hover:bg-[#D7EADD] hover:text-[#175912]"
     }`;
 
+  const defaultMenuItems: MenuItem[] = [
+    {
+      label: "Home",
+      href: "/dashboardUser",
+      icon: <Analityc className="text-current" />,
+    },
+    {
+      label: "Propriedades",
+      href: "/propriedade",
+      icon: <PiFarmLight size={44} />,
+    },
+    {
+      label: "Proprietários",
+      href: "/owners",
+      icon: <PiCowboyHatLight size={44} />,
+    },
+    {
+      label: "Elegibilidade",
+      href: "/",
+      icon: <PiSealCheckLight size={44} />,
+    },
+  ];
+
+  const itemsToRender = menuItems ?? defaultMenuItems;
+
   return (
     <div className="flex">
       <aside
-        className={`z-20 fixed left-0 top-1/2 -translate-y-1/2 shadow-sm h-[400px] bg-[#23811C] text-white flex flex-col justify-between transition-all duration-300 ${
+        className={`z-20 fixed left-0 top-1/2 -translate-y-1/2 shadow-sm h-auto bg-[#23811C] text-white flex flex-col justify-between transition-all duration-300 ${
           isOpen ? "w-72" : "w-24"
         } rounded-tr-2xl rounded-br-2xl`}
       >
@@ -63,24 +101,17 @@ export const LayoutContainer = ({ title, children, actions }: HeaderProps) => {
             >
               <RiMenuUnfoldLine size={44} /> {isOpen && <span>Menu</span>}
             </button>
-            <Link
-              href="/propriedade"
-              className={activePathClass("/propriedade")}
-            >
-              <PiFarmLight size={44} />
-              {isOpen && <span>Propriedades</span>}
-            </Link>
-            <Link href="#" className={activePathClass("/owners")}>
-              <PiCowboyHatLight size={44} />
-              {isOpen && <span>Proprietários</span>}
-            </Link>
-            <Link
-              href="/"
-              className="flex items-center gap-3 hover:bg-[#D7EADD] hover:text-[#175912] py-1 px-4"
-            >
-              <PiSealCheckLight size={44} />
-              {isOpen && <span>Elegibilidade</span>}
-            </Link>
+
+            {itemsToRender.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={activePathClass(item.href)}
+              >
+                {item.icon}
+                {isOpen && <span>{item.label}</span>}
+              </Link>
+            ))}
           </nav>
         </div>
       </aside>

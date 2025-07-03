@@ -257,7 +257,7 @@ export default function Home() {
                   type="text"
                   ref={documentInputRef}
                   placeholder="Digite seu CPF"
-                  className="bg-white border border-gray-400 focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#A2A2A2]"
+                  className="border focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#CAC4D0]"
                   label="CPF do próprietario*"
                   error={errors.cpf}
                 />
@@ -270,7 +270,7 @@ export default function Home() {
                     setPhone(e.target.value)
                   }
                   placeholder="(XX) XXXXX - XXXX"
-                  className="bg-white w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px]"
+                  className="w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px] placeholder-[#CAC4D0]"
                   error={errors.phone}
                 />
 
@@ -288,7 +288,7 @@ export default function Home() {
                 <CheckboxComponent
                   checked={isChecked}
                   onCheckedChange={handleCheckboxChange}
-                  className="w-[17px] h-[17px] border-[1px] border-[#666666] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)] "
+                  className="w-[17px] h-[17px] border-[1px] border-[#CAC4D0] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)] "
                   error={errors.isChecked}
                 >
                   aceito os termos e condições de uso.
