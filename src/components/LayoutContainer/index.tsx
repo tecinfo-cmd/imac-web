@@ -78,7 +78,7 @@ export const LayoutContainer = ({
           isOpen ? "w-72" : "w-24"
         } rounded-tr-2xl rounded-br-2xl`}
       >
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center pb-4">
           <div className="flex items-center gap-2 pb-6 p-4">
             <div className="flex-1">
               <LogoWhite />

@@ -4,8 +4,7 @@ import Link from "next/link";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
-  PiFarmLight,
-  PiCurrencyCircleDollarLight,
+  //PiFarmLight,
 } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
@@ -35,7 +34,7 @@ export const UsersRegisterLayout = () => {
       href: "/dashboardUser/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
+    /*{
       label: "Propriedades",
       href: "/dashboardUser/properties",
       icon: <PiFarmLight size={44} />,
@@ -45,6 +44,7 @@ export const UsersRegisterLayout = () => {
       href: "/multas",
       icon: <PiCurrencyCircleDollarLight size={44} />,
     },
+    */
   ];
   const { control, handleSubmit, onSubmit, isLoading } = useUserRegister();
 

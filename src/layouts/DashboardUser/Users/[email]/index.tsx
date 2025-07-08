@@ -4,8 +4,7 @@ import { useParams } from "next/navigation";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
-  PiFarmLight,
-  PiCurrencyCircleDollarLight,
+  //PiFarmLight,
 } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
@@ -40,7 +39,7 @@ export const UserDetailLayout = () => {
       href: "/dashboardUser/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
+    /*{
       label: "Propriedades",
       href: "/dashboardUser/properties",
       icon: <PiFarmLight size={44} />,
@@ -50,6 +49,7 @@ export const UserDetailLayout = () => {
       href: "/multas",
       icon: <PiCurrencyCircleDollarLight size={44} />,
     },
+    */
   ];
 
   if (isLoading || !userData) return <p className="p-4">Carregando...</p>;
