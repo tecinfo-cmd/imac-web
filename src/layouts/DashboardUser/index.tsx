@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
-  PiFarmLight,
+  //PiFarmLight,
 } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -16,7 +16,7 @@ import DatePicker from "@/components/ui/datePicker";
 
 import { useGetDashboardData } from "@/hooks/useGetDashboardData/useGetDashboardData";
 import { Analityc } from "@/icons/Analityc";
-import { Taxa } from "@/icons/Taxa";
+//import { Taxa } from "@/icons/Taxa";
 import {
   LineChart,
   Line,
@@ -150,7 +150,7 @@ export const DashboardUserLayout = () => {
       href: "/dashboardUser/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
+    /*{
       label: "Propriedades",
       href: "/dashboardUser/properties",
       icon: <PiFarmLight size={44} />,
@@ -160,6 +160,7 @@ export const DashboardUserLayout = () => {
       href: "/multas",
       icon: <Taxa className="text-current" />,
     },
+    */
   ];
 
   if (isLoading) {

@@ -5,7 +5,7 @@ import { useState } from "react";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
-  PiFarmLight,
+  //PiFarmLight,
 } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
@@ -17,8 +17,7 @@ import { useDeleteUser } from "@/hooks/useGetUsers/useDeleteUser";
 import { useGetUsers } from "@/hooks/useGetUsers/useGetUsers";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
-import { Taxa } from "@/icons/Taxa";
-//import { Trash } from "@/icons/Trash";
+//import { Taxa } from "@/icons/Taxa";
 
 import { FilterUsers } from "./FilterUsers";
 
@@ -45,7 +44,7 @@ export const UsersLayout = () => {
       href: "/dashboardUser/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
+    /*{
       label: "Propriedades",
       href: "/dashboardUser/properties",
       icon: <PiFarmLight size={44} />,
@@ -55,6 +54,7 @@ export const UsersLayout = () => {
       href: "/multas",
       icon: <Taxa className="text-current" />,
     },
+    */
   ];
 
   return (
