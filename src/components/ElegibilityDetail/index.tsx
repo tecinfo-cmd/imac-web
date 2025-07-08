@@ -8,7 +8,9 @@ interface Props {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onClose: () => void;
-  car: string | null;
+  id: number | null;
+  cpfCnpj?: string;
+  carFederal?: string;
 }
 
 const formatDateTime = (value: string) => {
@@ -21,34 +23,20 @@ const formatDateTime = (value: string) => {
   return `${data} - ${hora}`;
 };
 
-function extractFirstError(errorsString?: string): string | null {
-  if (!errorsString) return null;
-
-  try {
-    const cleaned = errorsString.replace(/^\{|\}$/g, "");
-    const errors = cleaned.split(/","?/).map((e) => e.replace(/^"?|"?$/g, ""));
-    return errors[0] || null;
-  } catch {
-    return null;
-  }
-}
-
 export const ElegibilityDetail: FC<Props> = ({
   isOpen,
   onOpenChange,
   onClose,
-  car,
+  id,
+  cpfCnpj,
+  carFederal,
 }) => {
-  const { data, isLoading } = useGetElegibilityDetail(
-    car || "",
-    isOpen && !!car
-  );
+  const { data, isLoading } = useGetElegibilityDetail(id || "", isOpen && !!id);
 
   if (isLoading || !data || data.length === 0) return null;
 
-  const item = data[0];
-  const retorno = item.retornoAgrotools;
-  const primeiroErro = extractFirstError(retorno?.errors);
+  const item = data;
+  const retorno = item?.retornoAgrotools ?? {};
 
   return (
     <Modal
@@ -65,11 +53,13 @@ export const ElegibilityDetail: FC<Props> = ({
           <br />
           {item.nomePropriedade}
         </div>
-        <div>
-          <strong className="text-[#21801A]">CPF do solicitante</strong>
-          <br />
-          {item.cpfCnpj}
-        </div>
+        {cpfCnpj && (
+          <div>
+            <strong className="text-[#21801A]">CPF do solicitante</strong>
+            <br />
+            {cpfCnpj}
+          </div>
+        )}
         <div>
           <strong className="text-[#21801A]">Telefone do solicitante</strong>
           <br />
@@ -89,18 +79,21 @@ export const ElegibilityDetail: FC<Props> = ({
         <div className="pt-2">
           <strong className="text-[#21801A]">Resultado da Elegibilidade</strong>
           <ul className="list-disc ml-5">
+            {carFederal && (
+              <li>
+                CAR: <span className="text-black">{carFederal}</span>
+              </li>
+            )}
             <li>
-              CAR: <span className="text-black">{item.carFederal}</span>
-            </li>
-            <li>
-              PRODES Contíguo:{" "}
-              <span className="text-black">
-                {primeiroErro ? (
-                  <span className="text-black">{primeiroErro}</span>
-                ) : (
-                  "N/A"
-                )}
-              </span>
+              {retorno.deteccoes && retorno.deteccoes.length > 0 ? (
+                retorno.deteccoes.map((detec: any) => (
+                  <li key={detec.id}>
+                    {detec.tipo}: <strong className="text-black">{detec.area_ha}</strong>
+                  </li>
+                ))
+              ) : (
+                <span className="text-black ml-2">N/A</span>
+              )}
             </li>
             <li>
               Sobreposição com área de RL ou APP:{" "}
@@ -112,7 +105,7 @@ export const ElegibilityDetail: FC<Props> = ({
               Propriedade:{" "}
               <strong>
                 <span className="text-black">
-                  {item.status === "APROVADO" ? "APTA " : "NÃO APTA "}
+                  {item.status === "APROVADO" ? "ELEGÍVEL " : "NÃO ELEGÍVEL "}
                 </span>
               </strong>
               <span>a participar do PREM</span>

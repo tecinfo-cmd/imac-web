@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
-  PiFarmLight,
+  //PiFarmLight,
 } from "react-icons/pi";
 
 import { ElegibilityDetail } from "@/components/ElegibilityDetail";
@@ -14,8 +14,11 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { useGetElegibilities } from "@/hooks/useGetElegibilities/useGetElegibilities";
 import { Analityc } from "@/icons/Analityc";
+// eslint-disable-next-line import-helpers/order-imports
 import { Eye } from "@/icons/Eye";
-import { Taxa } from "@/icons/Taxa";
+//import { Taxa } from "@/icons/Taxa";
+
+import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
 import { FilterElegibility } from "./FilterElegibility";
 
@@ -27,11 +30,19 @@ export const ElegibilityLayout = () => {
     error,
   } = useGetElegibilities(filters);
 
-  const [selectedCar, setSelectedCar] = useState<string | null>(null);
+  const [selectedData, setSelectedData] = useState<{
+    id: number;
+    cpfCnpj: string;
+    carFederal: string;
+  } | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleViewClick = (car: string) => {
-    setSelectedCar(car);
+  const handleViewClick = (data: any) => {
+    setSelectedData({
+      id: data.id,
+      cpfCnpj: data.cpfCnpj,
+      carFederal: data.carFederal,
+    });
     setIsModalOpen(true);
   };
   const customMenuItems = [
@@ -50,7 +61,7 @@ export const ElegibilityLayout = () => {
       href: "/dashboardUser/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
+    /*{
       label: "Propriedades",
       href: "/dashboardUser/properties",
       icon: <PiFarmLight size={44} />,
@@ -60,11 +71,12 @@ export const ElegibilityLayout = () => {
       href: "/multas",
       icon: <Taxa className="text-current" />,
     },
+    */
   ];
 
   return (
     <LayoutContainer
-      title="Solicitação de Elegibilidade"
+      title="Acompanhamento de Elegibilidade"
       menuItems={customMenuItems}
     >
       <FilterElegibility onFilter={setFilters} />
@@ -88,7 +100,7 @@ export const ElegibilityLayout = () => {
         <Table.Container>
           <Table.Header>
             <Table.Title>Nome da Propriedade </Table.Title>
-            <Table.Title>Telefone</Table.Title>
+            <Table.Title>CPF/CNPJ</Table.Title>
             <Table.Title>Email</Table.Title>
             <Table.Title>CAR Federal</Table.Title>
             <Table.Title>Status</Table.Title>
@@ -99,7 +111,11 @@ export const ElegibilityLayout = () => {
             {elegibilities?.map((elegibilities: any) => (
               <Table.Row key={elegibilities.id}>
                 <Table.Cell>{elegibilities.nomePropriedade}</Table.Cell>
-                <Table.Cell>{elegibilities.telefone}</Table.Cell>
+                <Table.Cell>
+                  {elegibilities.cpfCnpj
+                    ? maskCPFOrCNPJ(elegibilities.cpfCnpj)
+                    : "-"}
+                </Table.Cell>
                 <Table.Cell>{elegibilities.email}</Table.Cell>
                 <Table.Cell>{elegibilities.carFederal}</Table.Cell>
                 <Table.Cell>
@@ -139,11 +155,7 @@ export const ElegibilityLayout = () => {
                       message="Visualizar"
                       id={`view-${elegibilities.id}`}
                     >
-                      <button
-                        onClick={() =>
-                          handleViewClick(elegibilities.carFederal)
-                        }
-                      >
+                      <button onClick={() => handleViewClick(elegibilities)}>
                         <Eye />
                       </button>
                     </Tooltip>
@@ -159,7 +171,9 @@ export const ElegibilityLayout = () => {
         isOpen={isModalOpen}
         onOpenChange={setIsModalOpen}
         onClose={() => setIsModalOpen(false)}
-        car={selectedCar}
+        id={selectedData?.id || null}
+        cpfCnpj={selectedData?.cpfCnpj}
+        carFederal={selectedData?.carFederal}
       />
     </LayoutContainer>
   );
