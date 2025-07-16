@@ -72,7 +72,7 @@ interface GetFarmsParams {
 export const getFarms = async (params?: GetFarmsParams) => {
   try {
     const defaultParams: GetFarmsParams = {
-      carFederal: "MT-5101407-2CAA43B4DD78476CBCB448A827B5CFD2",
+      carFederal: "MT-5107263-0730B0A715504FFDBC23DFBDB34808F6",
       ...params,
     };
 

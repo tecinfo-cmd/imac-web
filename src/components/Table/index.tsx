@@ -15,10 +15,18 @@ const TableContainer = ({ children, className }: TableProps) => {
   );
 };
 
-const TableHeader = ({ children, className }: TableProps) => {
+interface TableHeaderProps extends TableProps {
+  noBackground?: boolean;
+}
+
+const TableHeader = ({
+  children,
+  className,
+  noBackground = false,
+}: TableHeaderProps) => {
   return (
     <thead className={cn(className)}>
-      <tr className="bg-[#DFEEE5]">{children}</tr>
+      <tr className={`${!noBackground ? "bg-[#DFEEE5]" : ""}`}>{children}</tr>
     </thead>
   );
 };

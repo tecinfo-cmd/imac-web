@@ -75,7 +75,9 @@ export const FarmLayout = () => {
                     </Link>
                   </Tooltip>
                   <Tooltip message="Análise ambiental" id="Análise ambiental">
-                    <Monitor />
+                    <Link href={`/analise-ambiental/${farm.id}`}>
+                      <Monitor />
+                    </Link>
                   </Tooltip>
                   <Tooltip
                     message="Inativar propriedade"
