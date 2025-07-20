@@ -3,7 +3,14 @@ import { useCallback, useState } from "react";
 import { api } from "@/api";
 import { parseCookies } from "nookies";
 
+interface Propriedade {
+  carFederal: string;
+  id: number;
+  nomePropriedade: string;
+}
+
 type PagamentoPayload = {
+  select: string;
   nomeCompleto: string;
   numeroCartao: string;
   validade: string;
@@ -21,9 +28,45 @@ export function useBuyVoucher() {
   const [userData, setUserData] = useState<any | null>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [propriedades, setPropriedades] = useState<Propriedade[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const cookies = parseCookies();
   const email = cookies.email;
+
+  const buscarPropriedadesSalvas = useCallback(async (): Promise<
+    Propriedade[]
+  > => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.get("propriedade-prem?statusVoucher=false");
+
+      const data = response.data.data;
+
+      if (Array.isArray(data) && data.length > 0) {
+        const props: Propriedade[] = data.map((item: any) => ({
+          id: item.id,
+          nomePropriedade: item.nomePropriedade,
+          carFederal: item.carFederal,
+        }));
+
+        setPropriedades(props);
+        return props;
+      } else {
+        setError("Nenhuma propriedade encontrada para o CAR.");
+        setPropriedades([]);
+        return [];
+      }
+    } catch (err: any) {
+      console.error("Erro ao buscar propriedades:", err);
+      setError("Erro ao buscar propriedades.");
+      return [];
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const loadUserData = useCallback(async () => {
     setIsLoadingUserData(true);
@@ -51,11 +94,14 @@ export function useBuyVoucher() {
     try {
       const [month, year] = dados.validade.split("/");
 
-      const propriedadeResponse = await api.get("propriedade-prem/proprietario", {
-        params: {
-          email: email,
-        },
-      });
+      const propriedadeResponse = await api.get(
+        "propriedade-prem/proprietario",
+        {
+          params: {
+            email: email,
+          },
+        }
+      );
 
       const propriedades = propriedadeResponse.data;
       if (!propriedades || propriedades.length === 0) {
@@ -70,6 +116,7 @@ export function useBuyVoucher() {
 
       const payload = {
         buyer: {
+          select: dados.select,
           name: userData.pessoa.nome,
           email: userData.pessoa.email,
           phone: userData.pessoa.telefone,
@@ -113,5 +160,14 @@ export function useBuyVoucher() {
     }
   };
 
-  return { pagar, isLoading, loadUserData, userData, isLoadingUserData };
+  return {
+    pagar,
+    isLoading,
+    loadUserData,
+    userData,
+    isLoadingUserData,
+    propriedades,
+    error,
+    buscarPropriedadesSalvas,
+  };
 }
