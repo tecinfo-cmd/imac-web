@@ -1,11 +1,11 @@
 import { useState } from "react";
 
 import { api } from "@/api/index";
-import { parseCookies } from "nookies";
 
 interface Propriedade {
   id: string;
   nome: string;
+  carFederal: string;
 }
 
 export function useValidVoucher() {
@@ -14,17 +14,12 @@ export function useValidVoucher() {
   const [error, setError] = useState<string | null>(null);
   const [voucherValido, setVoucherValido] = useState<boolean | null>(null);
 
-  const cookies = parseCookies();
-  const carValue = cookies.carValue;
-
   async function buscarPropriedadesSalvas() {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await api.get("propriedade-prem", {
-        params: { carFederal: carValue },
-      });
+      const response = await api.get("propriedade-prem?statusVoucher=false");
 
       const data = response.data.data;
 
@@ -32,6 +27,8 @@ export function useValidVoucher() {
         const props: Propriedade[] = data.map((item) => ({
           id: item.id,
           nome: item.nomePropriedade,
+          carFederal: item.carFederal,
+
         }));
         setPropriedades(props);
         return props;

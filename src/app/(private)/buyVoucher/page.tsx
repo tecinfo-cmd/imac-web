@@ -7,7 +7,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
 import { Input } from "@/components/Input";
-import Selector from "@/components/Selector/selector";
+import { InputSelect } from "@/components/InputSelect";
 import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
@@ -60,7 +60,7 @@ export default function BuyVoucher() {
     name: "cep",
   });
 
-   useEffect(() => {
+  useEffect(() => {
     void buscarPropriedadesSalvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -158,7 +158,7 @@ export default function BuyVoucher() {
             className="flex flex-col gap-3 w-full"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <Selector
+            <InputSelect
               name="select"
               label="Selecionar propriedade"
               placeholder="Selecione propriedade"
