@@ -17,6 +17,11 @@ type CadastroPayload = {
   senha: string;
   confirmacaoSenha: string;
   aceitouTermos: boolean;
+  tipo: string;
+  roles: {
+    id: number;
+    nome: string;
+  }[];
 };
 
 export function useCadastroUsuario() {

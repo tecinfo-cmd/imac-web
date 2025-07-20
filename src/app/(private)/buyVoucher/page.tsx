@@ -7,6 +7,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
 import { Input } from "@/components/Input";
+import { InputSelect } from "@/components/InputSelect";
 import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
@@ -29,6 +30,7 @@ const schema = yup.object({
   complemento: yup.string().required(),
   bairro: yup.string().required("!"),
   cidade: yup.string().required("!"),
+  selecionarPropriedade: yup.string().required("!"),
 });
 
 export default function BuyVoucher() {
@@ -47,6 +49,7 @@ export default function BuyVoucher() {
       complemento: "",
       bairro: "",
       cidade: "",
+      selecionarPropriedade: "",
     },
   });
 
@@ -56,6 +59,11 @@ export default function BuyVoucher() {
     control,
     name: "cep",
   });
+
+  useEffect(() => {
+    void buscarPropriedadesSalvas();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const fetchEndereco = async () => {
@@ -83,9 +91,17 @@ export default function BuyVoucher() {
     fetchEndereco();
   }, [cep, setValue]);
 
-  const { pagar, isLoading, userData, loadUserData, isLoadingUserData } = useBuyVoucher();
+  const {
+    pagar,
+    isLoading,
+    userData,
+    loadUserData,
+    isLoadingUserData,
+    propriedades,
+    buscarPropriedadesSalvas,
+  } = useBuyVoucher();
   useEffect(() => {
-    loadUserData(); 
+    loadUserData();
   }, [loadUserData]);
 
   useEffect(() => {
@@ -99,7 +115,7 @@ export default function BuyVoucher() {
   }
 
   if (!userData) {
-    return null; 
+    return null;
   }
 
   const onSubmit = async (data: any) => {
@@ -108,7 +124,7 @@ export default function BuyVoucher() {
       console.log("Pagamento realizado com sucesso:", result);
     } catch (err) {
       console.error("Falha no pagamento:", err);
-    }finally{
+    } finally {
       reset();
     }
   };
@@ -142,6 +158,16 @@ export default function BuyVoucher() {
             className="flex flex-col gap-3 w-full"
             onSubmit={handleSubmit(onSubmit)}
           >
+            <InputSelect
+              name="select"
+              label="Selecionar propriedade"
+              placeholder="Selecione propriedade"
+              control={control}
+              options={propriedades.map((prop) => ({
+                value: String(prop.id),
+                label: `${prop.nomePropriedade} - ${prop.carFederal}`,
+              }))}
+            />
             <Input
               name="nomeCompleto"
               label="Nome Completo"

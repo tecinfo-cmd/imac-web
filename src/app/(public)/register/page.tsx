@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 import { Input } from "@/components/Input";
@@ -51,6 +51,7 @@ const schema = yup.object({
 export default function Register() {
   const router = useRouter();
   const { cadastrar, isLoading } = useCadastroUsuario();
+  const previousCepRef = useRef("");
 
   const {
     control,
@@ -59,6 +60,7 @@ export default function Register() {
     watch,
     setValue,
     setError,
+    clearErrors,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -94,6 +96,7 @@ export default function Register() {
               type: "manual",
               message: "CEP inválido.",
             });
+            previousCepRef.current = rawCEP;
             return;
           }
 
@@ -101,6 +104,7 @@ export default function Register() {
           setValue("logradouro", data.logradouro || "");
           setValue("bairro", data.bairro || "");
           setValue("cidade", data.localidade || "");
+          previousCepRef.current = "";
         } catch (error) {
           console.error("Erro ao buscar endereço:", error);
         }
@@ -109,6 +113,19 @@ export default function Register() {
 
     fetchEndereco();
   }, [cep, setValue, setError]);
+
+  useEffect(() => {
+    const rawCEP = cep?.replace(/\D/g, "");
+
+    if (
+      errors.cep && 
+      rawCEP && 
+      previousCepRef.current && 
+      rawCEP !== previousCepRef.current 
+    ) {
+      clearErrors("cep");
+    }
+  }, [cep, errors.cep, clearErrors]);
 
   const onSubmit = async (data: any) => {
     const formatDateToISO = (date: string) => {
@@ -135,6 +152,13 @@ export default function Register() {
         senha: data.senha,
         confirmacaoSenha: data.confirmacaoSenha,
         aceitouTermos: data.aceitouTermos,
+        tipo: "PF",
+        roles: [
+          {
+            id: 3,
+            nome: "PRODUTOR",
+          },
+        ],
       });
 
       setCookie(undefined, "@IMAC:T", accessToken, {

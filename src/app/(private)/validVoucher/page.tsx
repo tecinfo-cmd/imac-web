@@ -6,7 +6,7 @@ import { GrValidate } from "react-icons/gr";
 import { MdErrorOutline } from "react-icons/md";
 
 import { Input } from "@/components/Input";
-import Selector from "@/components/Selector/selector";
+import { InputSelect } from "@/components/InputSelect";
 import { Button } from "@/components/ui/button";
 import EmailModal from "@/components/ui/modals/emailModal";
 
@@ -93,14 +93,14 @@ export default function ValidVoucher() {
             className="flex flex-col w-full min-w-[320px] gap-3"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <Selector
+            <InputSelect
               name="select"
               label="Selecionar propriedade"
               placeholder="Selecione propriedade"
               control={control}
               options={propriedades.map((prop) => ({
                 value: prop.id,
-                label: prop.nome,
+                label: `${prop.nome} - ${prop.carFederal}`,
               }))}
             />
             <Input
