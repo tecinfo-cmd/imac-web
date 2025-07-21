@@ -40,6 +40,12 @@ const coOwnerSchema = yup.object().shape({
   ),
 });
 
+ const convertToAmericanDate = (date: string | null) => {
+  if (!date) return "";
+  const [day, month, year] = date.split("/");
+  return `${year}-${month}-${day}`;
+};
+
 export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
   const queryClient = useQueryClient();
   const { control, handleSubmit, register } = useForm({
@@ -60,6 +66,7 @@ export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
   const handleLinkCoOwner = async (data: any) => {
     const coOwners = data.coOwners.map(({ setAsMainOwner, ...owner }: any) => ({
       ...owner,
+      dataNascimento: convertToAmericanDate(owner.dataNascimento),
       tipoProprietario: setAsMainOwner ? "PROPRIETARIO" : "COPROPRIETARIO",
     }));
 
@@ -79,6 +86,7 @@ export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
 
       payload.push({
         ...rest,
+        dataNascimento: convertToAmericanDate(rest.pessoa.dataNascimento),
         idProprietario: existingMainOwner.id,
         tipoProprietario: "COPROPRIETARIO",
       });

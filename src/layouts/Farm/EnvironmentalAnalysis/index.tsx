@@ -139,6 +139,18 @@ export const EnvironmentalAnalysisLayout = () => {
             </div>
           </div>
         </div>
+          <div className="col-span-2 mt-4">
+          <div className="grid grid-cols-2">
+            <div>
+              <h2 className="text-[#21801A]">Etapa Atual</h2>
+              <p>{farm?.etapa}</p>
+            </div>
+            <div>
+              <h2 className="text-[#21801A]">Status</h2>
+            <p>{farm?.status}</p>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="grid p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-6 mt-8">
         {menuItems.map(({ label, icon: Icon, disabled, key }) => (
