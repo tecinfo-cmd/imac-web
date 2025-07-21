@@ -11,7 +11,6 @@ import {
 import { RiMenuUnfoldLine } from "react-icons/ri";
 
 import { useAuthContext } from "@/context";
-import { Analityc } from "@/icons/Analityc";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { useAuthStore } from "@/store/useAuthStore";
 
@@ -47,11 +46,6 @@ export const LayoutContainer = ({
     }`;
 
   const defaultMenuItems: MenuItem[] = [
-    {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc className="text-current" />,
-    },
     {
       label: "Propriedades",
       href: "/propriedade",

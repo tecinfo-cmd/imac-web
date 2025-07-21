@@ -11,6 +11,7 @@ import {
 
 import { api } from "@/api";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
 import { jwtDecode } from "jwt-decode";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
 
@@ -33,6 +34,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const { mutateAsync: signIn, isPending } = useSignIn();
   const { setUserData, clearSession } = useAuthStore();
+  const { setRole, clearRole } = useUserRoleStore();
   const [email, setEmail] = useState("");
 
   useEffect(() => {
@@ -76,29 +78,24 @@ export function AuthProvider({ children }: PropsWithChildren) {
         api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
         const decoded = jwtDecode<DecodedToken>(accessToken);
-        console.log("Token decodificado:", decoded);
+        
 
         const role = decoded.roles?.[0]?.toUpperCase();
-
-        if (role === "ANALISTA") {
-          router.push("/dashboardUser");
-        } else if (role === "ADMINISTRATIVO") {
-          router.push("/dashboard");
-        } else {
-          router.push("/unauthorized");
-        }
+        setRole(role);
+        router.push("/dashboard");
       } catch (error) {
         console.error(error);
       }
     },
-    [router, signIn]
+    [router, setRole, signIn]
   );
 
   const signOut = useCallback(() => {
     destroyCookie(undefined, "@IMAC:T");
     clearSession();
+    clearRole();
     router.push("/auth");
-  }, [clearSession, router]);
+  }, [clearRole, clearSession, router]);
 
   const cachedValue = useMemo(() => {
     return {

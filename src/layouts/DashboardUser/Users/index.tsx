@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
-  PiUserCircleThin,
   PiSealCheckLight,
-  //PiFarmLight,
+  PiAlignBottom,
+  PiUser,
 } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
@@ -15,9 +15,7 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { useDeleteUser } from "@/hooks/useGetUsers/useDeleteUser";
 import { useGetUsers } from "@/hooks/useGetUsers/useGetUsers";
-import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
-//import { Taxa } from "@/icons/Taxa";
 
 import { FilterUsers } from "./FilterUsers";
 
@@ -30,28 +28,28 @@ export const UsersLayout = () => {
 
   const customMenuItems = [
     {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <PiAlignBottom size={44} />,
     },
     {
       label: "Usuários",
-      href: "/dashboardUser/users",
-      icon: <PiUserCircleThin size={44} />,
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
     },
     {
       label: "Elegibilidade",
-      href: "/dashboardUser/elegibility",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
     /*{
       label: "Propriedades",
-      href: "/dashboardUser/properties",
+      href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
     {
       label: "Multas",
-      href: "/multas",
+      href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,
     },
     */
@@ -117,7 +115,7 @@ export const UsersLayout = () => {
                     <Tooltip message="Visualizar" id={`view-${user.id}`}>
                       <button
                         onClick={() =>
-                          router.push(`/dashboardUser/users/${user.email}`)
+                          router.push(`/dashboard/users/${user.email}`)
                         }
                       >
                         <Eye />

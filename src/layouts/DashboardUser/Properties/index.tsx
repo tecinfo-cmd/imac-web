@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import {
-  PiUserCircleThin,
   PiSealCheckLight,
-  PiFarmLight,
+  PiAlignBottom,
+  PiUser,
 } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -12,9 +12,7 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { useGetPropriedades } from "@/hooks/useGetProperties/userGetProperties";
-import { Analityc } from "@/icons/Analityc";
 import { Monitor } from "@/icons/Monitor";
-import { Taxa } from "@/icons/Taxa";
 import { X } from "@/icons/X";
 
 import { FilterProperties } from "./FilterProperties";
@@ -25,30 +23,31 @@ export const PropertiesLayout = () => {
 
   const customMenuItems = [
     {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <PiAlignBottom size={44} />,
     },
     {
       label: "Usuários",
-      href: "/dashboardUser/users",
-      icon: <PiUserCircleThin size={44} />,
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
     },
     {
       label: "Elegibilidade",
-      href: "/dashboardUser/elegibility",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
+    /*{
       label: "Propriedades",
-      href: "/dashboardUser/properties",
+      href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
     {
       label: "Multas",
-      href: "/multas",
-      icon: <Taxa className="currentcolor" />,
+      href: "/dashboard/multas",
+      icon: <Taxa className="text-current" />,
     },
+    */
   ];
 
   const statusOptions = [

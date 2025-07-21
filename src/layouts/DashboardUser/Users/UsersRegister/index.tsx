@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import {
-  PiUserCircleThin,
   PiSealCheckLight,
-  //PiFarmLight,
+  PiUser,
+  PiAlignBottom,
 } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
@@ -13,40 +13,40 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
 import { useUserRegister } from "@/hooks/useUserRegisterForm/useUserRegisterForm";
-import { Analityc } from "@/icons/Analityc";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
 
 export const UsersRegisterLayout = () => {
-  const customMenuItems = [
-    {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
-    },
-    {
-      label: "Usuários",
-      href: "/dashboardUser/users",
-      icon: <PiUserCircleThin size={44} />,
-    },
-    {
-      label: "Elegibilidade",
-      href: "/dashboardUser/elegibility",
-      icon: <PiSealCheckLight size={44} />,
-    },
-    /*{
-      label: "Propriedades",
-      href: "/dashboardUser/properties",
-      icon: <PiFarmLight size={44} />,
-    },
-    {
-      label: "Multas",
-      href: "/multas",
-      icon: <PiCurrencyCircleDollarLight size={44} />,
-    },
-    */
-  ];
   const { control, handleSubmit, onSubmit, isLoading } = useUserRegister();
+
+    const customMenuItems = [
+      {
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: <PiAlignBottom size={44} />,
+      },
+      {
+        label: "Usuários",
+        href: "/dashboard/users",
+        icon: <PiUser size={44} />,
+      },
+      {
+        label: "Elegibilidade",
+        href: "/dashboard/elegibility",
+        icon: <PiSealCheckLight size={44} />,
+      },
+      /*{
+        label: "Propriedades",
+        href: "/dashboard/properties",
+        icon: <PiFarmLight size={44} />,
+      },
+      {
+        label: "Multas",
+        href: "/dashboard/multas",
+        icon: <Taxa className="text-current" />,
+      },
+      */
+    ];
 
   return (
     <LayoutContainer title="Cadastrar Usuário" menuItems={customMenuItems}>

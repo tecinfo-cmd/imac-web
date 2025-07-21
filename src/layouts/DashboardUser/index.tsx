@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  PiUserCircleThin,
   PiSealCheckLight,
-  //PiFarmLight,
+  PiUser,
+  PiAlignBottom,
 } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -15,8 +15,6 @@ import { CardContent } from "@/components/ui/cardContent";
 import DatePicker from "@/components/ui/datePicker";
 
 import { useGetDashboardData } from "@/hooks/useGetDashboardData/useGetDashboardData";
-import { Analityc } from "@/icons/Analityc";
-//import { Taxa } from "@/icons/Taxa";
 import {
   LineChart,
   Line,
@@ -136,28 +134,28 @@ export const DashboardUserLayout = () => {
 
   const customMenuItems = [
     {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <PiAlignBottom size={44} />,
     },
     {
       label: "Usuários",
-      href: "/dashboardUser/users",
-      icon: <PiUserCircleThin size={44} />,
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
     },
     {
       label: "Elegibilidade",
-      href: "/dashboardUser/elegibility",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
     /*{
       label: "Propriedades",
-      href: "/dashboardUser/properties",
+      href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
     {
       label: "Multas",
-      href: "/multas",
+      href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,
     },
     */
@@ -263,16 +261,7 @@ export const DashboardUserLayout = () => {
         </div>
 
         <div className="flex flex-col gap-4">
-          {/*
-          <Card className="text-center bg-[#F1F7F3]">
-            <CardContent>
-              <h3 className="text-sm">Nº de Vouchers Frigorífico</h3>
-              <p className="text-4xl font-bold text-[#175912]">40</p>
-              <p className="text-xs mt-1">22% dos Elegíveis</p>
-            </CardContent>
-          </Card>
-          */}
-
+ 
           <Card className="text-center bg-[#F1F7F3]">
             <CardContent>
               <h3 className="text-sm">Nº de Propriedades Não Elegíveis</h3>
@@ -286,12 +275,6 @@ export const DashboardUserLayout = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
-
-      <div className="mt-6">
-        <a href="#" className="text-[#175912] font-semibold">
-          Voltar
-        </a>
       </div>
     </LayoutContainer>
   );

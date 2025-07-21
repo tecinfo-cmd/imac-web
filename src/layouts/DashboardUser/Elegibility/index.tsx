@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import {
-  PiUserCircleThin,
   PiSealCheckLight,
-  //PiFarmLight,
+  PiAlignBottom,
+  PiUser,
 } from "react-icons/pi";
 
 import { ElegibilityDetail } from "@/components/ElegibilityDetail";
@@ -13,11 +13,7 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { useGetElegibilities } from "@/hooks/useGetElegibilities/useGetElegibilities";
-import { Analityc } from "@/icons/Analityc";
-// eslint-disable-next-line import-helpers/order-imports
 import { Eye } from "@/icons/Eye";
-//import { Taxa } from "@/icons/Taxa";
-
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
 import { FilterElegibility } from "./FilterElegibility";
@@ -45,30 +41,31 @@ export const ElegibilityLayout = () => {
     });
     setIsModalOpen(true);
   };
+
   const customMenuItems = [
     {
-      label: "Home",
-      href: "/dashboardUser",
-      icon: <Analityc />,
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <PiAlignBottom size={44} />,
     },
     {
       label: "Usuários",
-      href: "/dashboardUser/users",
-      icon: <PiUserCircleThin size={44} />,
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
     },
     {
       label: "Elegibilidade",
-      href: "/dashboardUser/elegibility",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
     /*{
       label: "Propriedades",
-      href: "/dashboardUser/properties",
+      href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
     {
       label: "Multas",
-      href: "/multas",
+      href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,
     },
     */

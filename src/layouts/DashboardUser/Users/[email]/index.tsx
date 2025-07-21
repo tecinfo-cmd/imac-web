@@ -2,9 +2,9 @@
 
 import { useParams } from "next/navigation";
 import {
-  PiUserCircleThin,
   PiSealCheckLight,
-  //PiFarmLight,
+  PiAlignBottom,
+  PiUser,
 } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
@@ -13,7 +13,7 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
 import { useUserDetail } from "@/hooks/useGetUsers/useUserDetail";
-import { Analityc } from "@/icons/Analityc";
+
 
 export const UserDetailLayout = () => {
   const { email } = useParams();
@@ -27,27 +27,31 @@ export const UserDetailLayout = () => {
     isSaving,
   } = useUserDetail(email);
 
-  const menuItems = [
-    { label: "Home", href: "/dashboardUser", icon: <Analityc /> },
+  const customMenuItems = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <PiAlignBottom size={44} />,
+    },
     {
       label: "Usuários",
-      href: "/dashboardUser/users",
-      icon: <PiUserCircleThin size={44} />,
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
     },
     {
       label: "Elegibilidade",
-      href: "/dashboardUser/elegibility",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
     /*{
       label: "Propriedades",
-      href: "/dashboardUser/properties",
+      href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
     {
       label: "Multas",
-      href: "/multas",
-      icon: <PiCurrencyCircleDollarLight size={44} />,
+      href: "/dashboard/multas",
+      icon: <Taxa className="text-current" />,
     },
     */
   ];
@@ -55,7 +59,7 @@ export const UserDetailLayout = () => {
   if (isLoading || !userData) return <p className="p-4">Carregando...</p>;
 
   return (
-    <LayoutContainer title="Detalhes do Usuário" menuItems={menuItems}>
+    <LayoutContainer title="Detalhes do Usuário" menuItems={customMenuItems}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="grid grid-cols-1 md:grid-cols-3 gap-4"
