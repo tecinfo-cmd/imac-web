@@ -89,6 +89,8 @@ export interface Farm {
   cidade: Cidade;
   solicitacaoElegibilidade: SolicitacaoElegibilidade;
   documentos: Documento[];
+  etapa: string;
+  status: string;
 }
 
 export const getFarmById = async (id: number | undefined) => {

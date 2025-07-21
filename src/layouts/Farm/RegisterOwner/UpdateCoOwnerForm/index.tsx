@@ -22,6 +22,18 @@ interface UpdateCoOwnerFormProps {
   idProprietario: number | undefined;
 }
 
+const formatDateToBR = (dateString?: string) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("pt-BR").format(date);
+};
+
+ const convertToAmericanDate = (date: string | null) => {
+  if (!date) return "";
+  const [day, month, year] = date.split("/");
+  return `${year}-${month}-${day}`;
+};
+
 export const UpdateCoOwnerForm = ({
   farmId,
   idProprietario,
@@ -52,7 +64,9 @@ export const UpdateCoOwnerForm = ({
         nome: coOwner.pessoa.nome,
         cpfCnpj: coOwner.pessoa.cpfCnpj,
         rgInscricaoSocial: coOwner.pessoa.rgInscricaoSocial || "",
-        dataNascimento: coOwner.pessoa.dataNascimento || "",
+        dataNascimento: coOwner.pessoa.dataNascimento 
+      ? formatDateToBR(coOwner.pessoa.dataNascimento) 
+      : "",
         telefone: coOwner.pessoa.telefone || "",
         email: coOwner.pessoa.email || "",
         setAsMainOwner: coOwner.tipoProprietario === "PROPRIETARIO",
@@ -65,6 +79,7 @@ export const UpdateCoOwnerForm = ({
 
     const updatedOwner = {
       ...ownerData,
+      dataNascimento: convertToAmericanDate(ownerData.dataNascimento),
       idProprietario: coOwner?.id,
       tipoProprietario: setAsMainOwner ? "PROPRIETARIO" : "COPROPRIETARIO",
     };
@@ -88,6 +103,7 @@ export const UpdateCoOwnerForm = ({
 
       payload.push({
         ...rest,
+        dataNascimento: convertToAmericanDate(rest.pessoa.dataNascimento),
         idProprietario: existingMainOwner.id,
         tipoProprietario: "COPROPRIETARIO",
       });

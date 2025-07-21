@@ -56,7 +56,7 @@ export const FarmLayout = () => {
                 <div className="flex items-center gap-3">
                   <Tooltip
                     message="Visualizar ou editar dados"
-                    id="Visualizar ou editar dados"
+                    id={`Visualizar ou editar dados ${farm.id}`}
                   >
                     <Link
                       href={`/propriedade/${farm.id}`}
@@ -74,8 +74,10 @@ export const FarmLayout = () => {
                       <Eye />
                     </Link>
                   </Tooltip>
-                  <Tooltip message="Análise ambiental" id="Análise ambiental">
-                    <Monitor />
+                  <Tooltip message="Análise ambiental" id={`Análise ambiental ${farm.id}`}>
+                    <Link href={`/analise-ambiental/${farm.id}`}>
+                      <Monitor />
+                    </Link>
                   </Tooltip>
                   <Tooltip
                     message="Inativar propriedade"

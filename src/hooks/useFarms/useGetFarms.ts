@@ -1,4 +1,7 @@
+"use client";
+
 import { api } from "@/api";
+import { useAuthEmail } from "@/store/useAuthStore";
 import { useQuery } from "@tanstack/react-query";
 
 export const QUERY_KEY_GET_FARMS = "farms";
@@ -13,6 +16,21 @@ interface Cidade {
 interface Proprietario {
   id: number;
   telefone: string;
+  dataCriacao: string;
+  dataAtualizacao: string;
+}
+
+interface RetornoAgrotools {
+  id: number;
+  urlCheckout: string;
+  createdAt: string;
+  isEligible: boolean;
+  hasDocuments: boolean;
+  errors: string;
+  areas_desmatamento_total: number;
+  modulo_fiscal: string;
+  vlr_multa: number | null;
+  desconto_perc: number | null;
   dataCriacao: string;
   dataAtualizacao: string;
 }
@@ -33,21 +51,6 @@ interface SolicitacaoElegibilidade {
   retornoAgrotools: RetornoAgrotools;
 }
 
-interface RetornoAgrotools {
-  id: number;
-  urlCheckout: string;
-  createdAt: string;
-  isEligible: boolean;
-  hasDocuments: boolean;
-  errors: string;
-  areas_desmatamento_total: number;
-  modulo_fiscal: string;
-  vlr_multa: number | null;
-  desconto_perc: number | null;
-  dataCriacao: string;
-  dataAtualizacao: string;
-}
-
 export interface Propriedade {
   id: number;
   carFederal: string;
@@ -63,20 +66,16 @@ export interface Propriedade {
   solicitacaoElegibilidade: SolicitacaoElegibilidade;
 }
 
-interface GetFarmsParams {
+export interface GetFarmsParams {
   carFederal?: string;
   nomeFazenda?: string;
   codigoMunicipio?: string;
+  email?: string;
 }
 
-export const getFarms = async (params?: GetFarmsParams) => {
+export const getFarms = async (params: GetFarmsParams = {}) => {
   try {
-    const defaultParams: GetFarmsParams = {
-      carFederal: "MT-5101407-2CAA43B4DD78476CBCB448A827B5CFD2",
-      ...params,
-    };
-
-    const { data } = await api.get("/propriedade-prem", { params: defaultParams });
+    const { data } = await api.get("/propriedade-prem", { params });
     return data.data as Propriedade[];
   } catch (error) {
     return Promise.reject(error);
@@ -84,8 +83,16 @@ export const getFarms = async (params?: GetFarmsParams) => {
 };
 
 export function useGetFarms(params?: GetFarmsParams) {
+  const email = useAuthEmail();
+
+  const finalParams: GetFarmsParams = {
+    email,
+    ...params,
+  };
+
   return useQuery({
-    queryKey: [QUERY_KEY_GET_FARMS, params],
-    queryFn: () => getFarms(params),
+    queryKey: [QUERY_KEY_GET_FARMS, finalParams],
+    queryFn: () => getFarms(finalParams),
+    enabled: !!finalParams.email,
   });
 }
