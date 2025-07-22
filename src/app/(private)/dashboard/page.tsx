@@ -6,11 +6,11 @@ import { useUserRoleStore } from "@/store/useUserRoleStore";
 export default function Dashboard() {
     const { role } = useUserRoleStore();
 
-      if (role === "ANALISTA") {
-        return <DashboardUserLayout />;
+      if (role === "PRODUTOR") {
+        return <DashboardLayout />;
       }
 
-      if (role === "ADMINISTRATIVO") {
-        return <DashboardLayout />;
+      if (role === "ADMINISTRATIVO" || role === "ANALISTA") {
+        return <DashboardUserLayout />;
       }
 }
