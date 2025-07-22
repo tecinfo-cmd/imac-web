@@ -62,7 +62,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async ({ email, senha }: SignInCredentials) => {
       try {
         const data = await signIn({ email, senha });
-        console.log(data);
         const { accessToken } = data;
 
         setCookie(undefined, "email", data.email, {
