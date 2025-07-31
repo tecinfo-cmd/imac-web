@@ -88,6 +88,7 @@ export const InputSelect = ({
                 }),
                 menu: (base) => ({
                   ...base,
+                  zIndex: 9999,
                   borderRadius: "0.25rem",
                   borderColor: "#CAC4D0",
                 }),
