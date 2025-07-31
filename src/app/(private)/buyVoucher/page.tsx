@@ -17,6 +17,7 @@ import { LogoWhite } from "@/icons/LogoWhite";
 import { maskCard, maskCVV, maskValidade } from "@/utils/maskCard";
 import { maskCep } from "@/utils/maskCEP";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
 
 const schema = yup.object({
   nomeCompleto: yup.string().required(),
@@ -27,10 +28,16 @@ const schema = yup.object({
   pais: yup.string().required("!"),
   endereco: yup.string().required(),
   numero: yup.string().required("!"),
-  complemento: yup.string().required(),
+  complemento: yup.string(),
   bairro: yup.string().required("!"),
   cidade: yup.string().required("!"),
-  selecionarPropriedade: yup.string().required("!"),
+  nomePropriedade: yup.object()
+    .shape({
+      label: yup.string().required(),
+      value: yup.string().required(),
+    })
+    .nullable()
+    .required("!"),
 });
 
 export default function BuyVoucher() {
@@ -49,7 +56,7 @@ export default function BuyVoucher() {
       complemento: "",
       bairro: "",
       cidade: "",
-      selecionarPropriedade: "",
+      nomePropriedade: undefined,
     },
   });
 
@@ -59,11 +66,6 @@ export default function BuyVoucher() {
     control,
     name: "cep",
   });
-
-  useEffect(() => {
-    void buscarPropriedadesSalvas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     const fetchEndereco = async () => {
@@ -105,6 +107,10 @@ export default function BuyVoucher() {
   }, [loadUserData]);
 
   useEffect(() => {
+    buscarPropriedadesSalvas();
+  }, [buscarPropriedadesSalvas]);
+
+  useEffect(() => {
     if (!isLoadingUserData && !userData) {
       router.push("/register");
     }
@@ -120,10 +126,23 @@ export default function BuyVoucher() {
 
   const onSubmit = async (data: any) => {
     try {
-      const result = await pagar(data);
-      console.log("Pagamento realizado com sucesso:", result);
-    } catch (err) {
-      console.error("Falha no pagamento:", err);
+      const payload = {
+      ...data,
+      nomePropriedade: Number(data.nomePropriedade.value),
+    };
+    const result = await pagar(payload);
+      toast.success("O pedido de aquisição do voucher foi solicitado com sucesso, o pagamento está sendo processado", { duration: 3000 });
+      router.push("/propriedade");
+      console.log("O pedido de aquisição do voucher foi solicitado com sucesso! o pagamento está sendo processado:", result);
+    } catch (error: any) {
+      const mensagem =
+        error?.response?.data?.message||
+        error?.message ||
+        "Erro ao processar o pagamento. Tente novamente.";
+
+      toast.error(mensagem, { duration: 3000 });
+      console.error("Erro ao processar pagamento:", error);
+      throw error;
     } finally {
       reset();
     }
@@ -159,12 +178,12 @@ export default function BuyVoucher() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <InputSelect
-              name="select"
+              name="nomePropriedade"
               label="Selecionar propriedade"
               placeholder="Selecione propriedade"
               control={control}
               options={propriedades.map((prop) => ({
-                value: String(prop.id),
+                value: prop.idSolicitacaoElegibilidade,
                 label: `${prop.nomePropriedade} - ${prop.carFederal}`,
               }))}
             />
