@@ -66,11 +66,11 @@ export const RegisterFarmLayout = () => {
 
   useEffect(() => {
     if (farm) {
-      setValue("cep", farm?.endereco?.cep);
-      setValue("logradouro", farm?.endereco?.logradouro);
-      setValue("complemento", farm?.endereco?.complemento);
-      setValue("longitude", farm?.endereco?.longitude);
-      setValue("latitude", farm?.endereco?.latitude);
+      setValue("cep", farm?.endereco?.cep || "");
+      setValue("logradouro", farm?.endereco?.logradouro || "");
+      setValue("complemento", farm?.endereco?.complemento || "");
+      setValue("longitude", farm?.endereco?.longitude || "");
+      setValue("latitude", farm?.endereco?.latitude || "");
 
       if (mainActivity && productionCycle) {
         const atividadePrincipal = mainActivity.find(
@@ -81,18 +81,18 @@ export const RegisterFarmLayout = () => {
         );
 
         setValue("atividadePrincipal", {
-          value: farm.idAtividadePrincipal,
-          label: atividadePrincipal?.descricao,
+          value: farm.idAtividadePrincipal || "",
+          label: atividadePrincipal?.descricao || "",
         });
 
         setValue("cicloProducao", {
-          value: farm.idClicloProducao,
-          label: cicloProducao?.descricao,
+          value: farm.idClicloProducao || "",
+          label: cicloProducao?.descricao || "",
         });
       }
 
-      setValue("tamanhoPropriedade", farm.tamanhoPropriedade);
-      setValue("numeroProprietarios", farm.numeroProprietarios);
+      setValue("tamanhoPropriedade", farm.tamanhoPropriedade || "");
+      setValue("numeroProprietarios", farm.numeroProprietarios || "");
 
       const existingDocs =
         farm.documentos?.map((doc) => ({
@@ -118,19 +118,19 @@ export const RegisterFarmLayout = () => {
         idPropriedade: farmStore?.id,
         data: {
           endereco: {
-            cep: data.cep,
-            logradouro: data.logradouro,
-            complemento: data.complemento,
+            cep: data.cep || "",
+            logradouro: data.logradouro || "",
+            complemento: data.complemento || "",
             municipio: farmStore?.cidade,
             estado: "MT",
-            codigoPostal: data.codigoPostal,
-            longitude: Number(data.longitude),
-            latitude: Number(data.latitude),
+            codigoPostal: data.codigoPostal || "",
+            longitude: data.longitude ? Number(data.longitude) : 0,
+            latitude: data.latitude ? Number(data.latitude) : 0,
           },
-          idCicloProducao: data.cicloProducao?.value,
-          idAtividadePrincipal: data.atividadePrincipal?.value,
-          tamanhoPropriedade: data.tamanhoPropriedade,
-          numeroProprietarios: data.numeroProprietarios,
+          idCicloProducao: data.cicloProducao?.value || null,
+          idAtividadePrincipal: data.atividadePrincipal?.value || null,
+          tamanhoPropriedade: data.tamanhoPropriedade || null,
+          numeroProprietarios: data.numeroProprietarios || null,
         },
       };
 

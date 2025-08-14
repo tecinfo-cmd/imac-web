@@ -86,6 +86,7 @@ export function useBuyVoucher() {
       setIsLoadingUserData(false);
     }
   }, []);
+
   const pagar = async (dados: PagamentoPayload) => {
     if (!userData) {
       throw new Error("Usuário não autenticado");
@@ -103,12 +104,23 @@ export function useBuyVoucher() {
         }
       );
 
-      const propriedades = propriedadeResponse.data;
-      if (!propriedades || propriedades.length === 0) {
-        throw new Error("Nenhuma propriedade encontrada para o CAR informado.");
+      const lista = Array.isArray(propriedadeResponse.data?.data)
+        ? propriedadeResponse.data.data
+        : propriedadeResponse.data;
+
+      if (!Array.isArray(lista) || lista.length === 0) {
+        throw new Error("Nenhuma propriedade encontrada para o usuário.");
       }
 
-      const idSolicitacao = propriedades[0].solicitacaoElegibilidade?.id;
+      const selectedProperty = lista.find(
+        (p: any) => String(p.id) === String(dados.select)
+      );
+
+      if (!selectedProperty) {
+        throw new Error("Propriedade selecionada não encontrada.");
+      }
+
+      const idSolicitacao = selectedProperty.solicitacaoElegibilidade?.id;
 
       if (!idSolicitacao) {
         throw new Error("ID da solicitação de elegibilidade não encontrado.");

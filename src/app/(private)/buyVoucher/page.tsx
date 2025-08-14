@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useWatch } from "react-hook-form";
@@ -30,11 +30,19 @@ const schema = yup.object({
   complemento: yup.string().required(),
   bairro: yup.string().required("!"),
   cidade: yup.string().required("!"),
-  selecionarPropriedade: yup.string().required("!"),
+  select: yup
+    .mixed()
+    .required("!")
+    .test(
+      "valid-option",
+      "Selecione uma propriedade",
+      (v) => !!(v as any)?.value
+    ),
 });
 
 export default function BuyVoucher() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const methods = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -49,21 +57,48 @@ export default function BuyVoucher() {
       complemento: "",
       bairro: "",
       cidade: "",
-      selecionarPropriedade: "",
     },
+    mode: "onBlur",
   });
 
   const { control, setValue, handleSubmit, reset } = methods;
 
-  const cep = useWatch({
-    control,
-    name: "cep",
-  });
+  const cep = useWatch({ control, name: "cep" });
+
+  const {
+    pagar,
+    isLoading,
+    userData,
+    loadUserData,
+    isLoadingUserData,
+    propriedades,
+    buscarPropriedadesSalvas,
+  } = useBuyVoucher();
+
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
 
   useEffect(() => {
     void buscarPropriedadesSalvas();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const propertyId = searchParams.get("propertyId");
+    if (!propertyId || propriedades.length === 0) return;
+
+    const option = propriedades
+      .map((prop) => ({
+        value: String(prop.id),
+        label: `${prop.nomePropriedade} - ${prop.carFederal}`,
+      }))
+      .find((opt) => opt.value === String(propertyId));
+
+    if (option) {
+      setValue("select", option, { shouldValidate: true, shouldDirty: true });
+    }
+  }, [searchParams, propriedades, setValue]);
 
   useEffect(() => {
     const fetchEndereco = async () => {
@@ -91,19 +126,6 @@ export default function BuyVoucher() {
     fetchEndereco();
   }, [cep, setValue]);
 
-  const {
-    pagar,
-    isLoading,
-    userData,
-    loadUserData,
-    isLoadingUserData,
-    propriedades,
-    buscarPropriedadesSalvas,
-  } = useBuyVoucher();
-  useEffect(() => {
-    loadUserData();
-  }, [loadUserData]);
-
   useEffect(() => {
     if (!isLoadingUserData && !userData) {
       router.push("/register");
@@ -120,7 +142,10 @@ export default function BuyVoucher() {
 
   const onSubmit = async (data: any) => {
     try {
-      const result = await pagar(data);
+      const result = await pagar({
+        ...data,
+        select: data.select?.value,
+      });
       console.log("Pagamento realizado com sucesso:", result);
     } catch (err) {
       console.error("Falha no pagamento:", err);

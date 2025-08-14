@@ -44,6 +44,97 @@ export interface Cidade {
   uf: string;
 }
 
+export interface Territorio {
+  id: number;
+  idPropriedade: number;
+  codigoTerritorio: string;
+  codigoAgents: string;
+  car: string;
+  geometry: string;
+  voucher: string;
+}
+
+
+export interface ResponsavelTecnico {
+  id: number;
+  nome: string;
+  cpf: string;
+  profissao: string;
+  registroCrea: string;
+  telefone: string;
+  email: string;
+  endereco: {
+    id: number;
+    cep: string;
+    longitude: number;
+    latitude: number;
+    municipio: string;
+    estado: string;
+    caixaPostal: string;
+    logradouro: string;
+    complemento: string;
+  };
+}
+
+export interface Deteccao {
+  tipo: string;
+  area_ha: string;
+  idAgrotools: number;
+}
+
+export interface ContestacaoAutorizacaoSupressao {
+  id: number;
+  motivo: string;
+  situacao: string;
+  observacao: string | null;
+  autorizacoesSupressoes: string[];
+  responsavelTecnico: ResponsavelTecnico;
+  documentos: string[];
+}
+
+export interface ContestacaoLaudo {
+  id: number;
+  motivo: string;
+  situacao: string;
+  observacao: string | null;
+  responsavelTecnico: ResponsavelTecnico;
+  documentos: string[];
+}
+
+export interface PlanoAdequacao {
+  id: number;
+  motivo: string;
+  situacao: string;
+  observacao: string | null;
+  documentos: string[];
+  responsavelTecnico: ResponsavelTecnico;
+}
+
+export interface Analise {
+  urlRelatorio: string;
+  areaDesmatadaTotal: number;
+  areaARegenerar: number;
+  moduloFiscal: number;
+  valorMulta: number;
+  descontoPercentual: number;
+  deteccoes: Deteccao[];
+  contestacaoAutorizacaoSupressao: ContestacaoAutorizacaoSupressao | null;
+  contestacaoLaudo: ContestacaoLaudo | null;
+  planoAdequacao: PlanoAdequacao | null;
+  documentos: string[];
+}
+
+export interface RetornoAgrotools {
+  urlCheckout: string;
+  isEligible: boolean;
+  hasDocuments: boolean;
+  errors: string;
+  areas_desmatamento_total: number;
+  modulo_fiscal: string;
+  vlr_multa: number;
+  desconto_perc: number;
+}
+
 export interface SolicitacaoElegibilidade {
   id: number;
   carFederal: string;
@@ -53,44 +144,48 @@ export interface SolicitacaoElegibilidade {
   token: string;
   transactionId: string;
   confirmacaoEmail: string;
+  retornoAgrotools: RetornoAgrotools;
   nomePropriedade: string;
   codigoMunicipio: number;
+  cidade: Cidade;
+  propriedades: string;
   cpfCnpj: string;
-  dataCriacao: string;
-  dataAtualizacao: string;
 }
 
-export interface Documento {
+export interface CicloProducao {
   id: number;
-  nomeArquivo: string;
-  urlArquivo: string;
-  idPropriedade: number;
-  tipo: string;
+  descricao: string;
+}
+
+export interface AtividadePrincipal {
+  id: number;
+  descricao: string;
 }
 
 export interface Farm {
   id: number;
   carFederal: string;
-  nomePropriedade: string;
-  codigoMunicipio: number;
-  idSolicitacaoElegibilidade: number;
-  idClicloProducao: number;
   idAtividadePrincipal: number;
-  geometry: string | null;
+  idClicloProducao: number;
+  proprietarios: Proprietario[];
+  nomePropriedade: string;
+  cidade: Cidade;
+  endereco: Endereco;
+  analise: Analise;
+  solicitacaoElegibilidade: SolicitacaoElegibilidade;
+  cicloProducao: CicloProducao;
+  atividadePrincipal: AtividadePrincipal;
+  geometry: string;
   voucher: string;
   tamanhoPropriedade: number;
   numeroProprietarios: number;
   statusVoucher: boolean;
-  moduloFiscal: string;
-  dataCriacao: string;
-  dataAtualizacao: string;
-  proprietarios: Proprietario[];
-  endereco: Endereco;
-  cidade: Cidade;
-  solicitacaoElegibilidade: SolicitacaoElegibilidade;
-  documentos: Documento[];
+  moduloFiscal: number;
   etapa: string;
   status: string;
+  documentos: string[];
+  territorios: Territorio[];
+  retornoAnalises: Analise[];
 }
 
 export const getFarmById = async (id: number | undefined) => {

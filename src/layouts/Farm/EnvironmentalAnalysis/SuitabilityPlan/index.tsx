@@ -1,72 +1,71 @@
-import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FiEye, FiUpload } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
-import { IoTrashSharp } from "react-icons/io5";
 
-import { Input } from "@/components/Input";
-import { Table } from "@/components/Table";
+import { DocumentTable } from "../Contestation/components/DocumentTable";
+import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
 import { TableInformation } from "@/components/TableInformation";
 import { TextArea } from "@/components/TextArea";
+import { Button } from "@/components/ui/button";
 
+import { yup } from "@/config/yup";
+import { useCreateSuitabilityPlan } from "@/hooks/useEnvironmentalAnalysis/useCreateSuitabilityPlan";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
-import { maskCep } from "@/utils/maskCEP";
-import { maskCPF } from "@/utils/maskCPF";
-import { maskPhone } from "@/utils/maskPhone";
+import { useTechnicalResponsibleSuitabilityPlanStore } from "@/store/useTechnicalResponsibleSuitabilityPlanStore";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
+
+import { Document, DOCUMENT_LABEL_MAP, INITIAL_DOCUMENTS } from "./types";
 
 interface SuitabilityPlanProps {
   farmId: number;
+  analysisId: number;
 }
 
-interface Document {
-  type: string;
-  checked: boolean;
-  file?: File;
-  uploadDate?: string;
-  nomeArquivo?: string;
-  urlArquivo?: string;
-}
+const suitabilityPlanSchema = yup.object({
+  motivo: yup.string().required("Justificativa é obrigatória"),
+});
 
-const initialDocuments: Document[] = [
-  {
-    type: "LAUDO",
-    checked: false,
-    file: undefined,
-    uploadDate: undefined,
-  },
-  {
-    type: "ART",
-    checked: false,
-    file: undefined,
-    uploadDate: undefined,
-  },
-  {
-    type: "RECIBO CAR",
-    checked: false,
-    file: undefined,
-    uploadDate: undefined,
-  },
-  {
-    type: "ARQUIVO KML",
-    checked: false,
-    file: undefined,
-    uploadDate: undefined,
-  },
-];
+type SuitabilityPlanFormData = yup.InferType<typeof suitabilityPlanSchema>;
 
-const labelMap: Record<string, string> = {
-  LAUDO: "Laudo Técnico",
-  ART: "ART",
-  "RECIBO CAR": "Recibo CAR",
-  "ARQUIVO KML": "Arquivo kml/shape",
-};
-
-export const SuitabilityPlan = ({ farmId }: SuitabilityPlanProps) => {
+export const SuitabilityPlan = ({
+  farmId,
+  analysisId,
+}: SuitabilityPlanProps) => {
   const { data: farm } = useGetFarmById(farmId);
-  const { control } = useForm();
+  const createSuitabilityPlan = useCreateSuitabilityPlan();
+  const { technicalResponsible } =
+    useTechnicalResponsibleSuitabilityPlanStore();
 
-  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+  const { control, handleSubmit } = useForm<SuitabilityPlanFormData>({
+    resolver: yupResolver(suitabilityPlanSchema),
+    defaultValues: {
+      motivo: "",
+    },
+  });
+
+  const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
+  const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
+    null
+  );
+
+  const hasValidParams = farmId && analysisId;
+  const hasSuitabilityPlanInProgress = farm?.analise?.planoAdequacao;
+
+  const canAccess = hasValidParams || hasSuitabilityPlanInProgress;
+
+  if (!canAccess) {
+    return (
+      <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
+        <GoAlertFill size={35} color="#F12929" />
+        <p className="text-[#0A3503]">
+          Esta página só pode ser acessada quando houver um plano de adequação
+          em andamento ou quando os parâmetros necessários estiverem
+          disponíveis.
+        </p>
+      </div>
+    );
+  }
 
   const handleCheckboxChange = (index: number) => {
     setDocuments((prevDocuments) => {
@@ -76,7 +75,6 @@ export const SuitabilityPlan = ({ farmId }: SuitabilityPlanProps) => {
         }
         return doc;
       });
-
       return updatedDocuments;
     });
   };
@@ -99,6 +97,57 @@ export const SuitabilityPlan = ({ farmId }: SuitabilityPlanProps) => {
       updatedDocuments[index].uploadDate = undefined;
       return updatedDocuments;
     });
+  };
+
+  const handleProposeNewAreaChange = (value: "yes" | "no") => {
+    setProposeNewArea(value);
+  };
+
+  const handleSaveDocuments = async (data: SuitabilityPlanFormData) => {
+    // Verificar se o usuário escolheu uma opção para nova área
+    if (proposeNewArea === null) {
+      toast.error("Selecione se deseja propor uma nova área para regeneração!");
+      return;
+    }
+
+    // Verificar se há documentos com arquivos
+    const documentsWithFiles = documents.filter((doc) => doc.file);
+
+    if (documentsWithFiles.length === 0) {
+      toast.error("Adicione pelo menos um documento!");
+      return;
+    }
+
+    if (!technicalResponsible) {
+      toast.error("Primeiro cadastre um responsável técnico!");
+      return;
+    }
+
+    // Criar array de parâmetros para os arquivos
+    const params = documentsWithFiles.map((doc) => ({
+      nome: doc.file!.name,
+      tipo: doc.type,
+    }));
+
+    // Extrair arquivos dos documentos
+    const files = documentsWithFiles.map((doc) => doc.file!);
+
+    try {
+      await createSuitabilityPlan.mutateAsync({
+        farmId,
+        analysisId: analysisId,
+        data: {
+          parametros: JSON.stringify(params),
+          arquivos: files,
+          motivo: data.motivo,
+          idResponsavelTecnico: Number(technicalResponsible.id),
+        },
+      });
+
+      toast.success("Plano de adequação salvo com sucesso!");
+    } catch {
+      toast.error("Erro ao salvar plano de adequação. Tente novamente.");
+    }
   };
 
   return (
@@ -160,11 +209,14 @@ export const SuitabilityPlan = ({ farmId }: SuitabilityPlanProps) => {
               <TableInformation.Value>
                 <input
                   type="checkbox"
-                  id="propor-sim"
-                  name="proporNovaArea"
-                  value="sim"
+                  id="propose-yes"
+                  name="proposeNewArea"
+                  value="yes"
+                  checked={proposeNewArea === "yes"}
+                  onChange={() => handleProposeNewAreaChange("yes")}
+                  className="accent-[#21801A]"
                 />
-                <label htmlFor="propor-sim" className="ml-2 cursor-pointer">
+                <label htmlFor="propose-yes" className="ml-2 cursor-pointer">
                   Sim
                 </label>
               </TableInformation.Value>
@@ -173,249 +225,73 @@ export const SuitabilityPlan = ({ farmId }: SuitabilityPlanProps) => {
               <TableInformation.Value>
                 <input
                   type="checkbox"
-                  id="propor-nao"
-                  name="proporNovaArea"
-                  value="nao"
+                  id="propose-no"
+                  name="proposeNewArea"
+                  value="no"
+                  checked={proposeNewArea === "no"}
+                  onChange={() => handleProposeNewAreaChange("no")}
+                  className="accent-[#21801A]"
                 />
-                <label htmlFor="propor-nao" className="ml-2 cursor-pointer">
+                <label htmlFor="propose-no" className="ml-2 cursor-pointer">
                   Não
                 </label>
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-
-        <TableInformation.Section title="Estratégia de Adequação" showArrow>
-          <TableInformation.Row columnsPerRow={1}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Disponibilize o projeto da proposta de Estratégia de Adequação
-                na nova área para regeneração
-              </TableInformation.Title>
-              <TableInformation.Value>
-                <div>
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Input
-                      name="nome"
-                      label="Nome"
-                      placeholder="Digite o seu Nome ou Razão Social"
-                      control={control}
-                    />
-                    <Input
-                      name="cpf"
-                      label="CPF"
-                      placeholder="_ _ _ . _ _ _ . _ _ _ - _ _"
-                      control={control}
-                      mask={maskCPF}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Input
-                      name="profissao"
-                      label="Profissão"
-                      placeholder="Digite sua profissão"
-                      control={control}
-                    />
-                    <Input
-                      name="registroCREA"
-                      label="Registro CREA"
-                      placeholder="Digite o registro CREA"
-                      control={control}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Input
-                      name="telefone"
-                      label="Telefone"
-                      placeholder="(00) 0 0000-0000"
-                      control={control}
-                      mask={maskPhone}
-                    />
-                    <Input
-                      name="email"
-                      label="E-mail"
-                      placeholder="Digite o e-mail"
-                      control={control}
-                      type="email"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <Input
-                      name="cep"
-                      label="CEP"
-                      placeholder="_ _ - _ _ _"
-                      control={control}
-                      mask={maskCep}
-                    />
-                    <Input
-                      name="logradouro"
-                      label="Logradouro*"
-                      placeholder="Digite o Logradouro"
-                      control={control}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    <Input
-                      name="uf"
-                      label="UF"
-                      placeholder="Digite a UF"
-                      control={control}
-                    />
-                    <Input
-                      name="municipio"
-                      label="Município"
-                      placeholder="Digite o município"
-                      control={control}
-                    />
-                    <Input
-                      name="complemento"
-                      label="Complemento (Opcional)"
-                      placeholder="Digite complemento"
-                      control={control}
-                    />
-                  </div>
-                </div>
               </TableInformation.Value>
             </TableInformation.Column>
           </TableInformation.Row>
         </TableInformation.Section>
 
         <TableInformation.Section
-          title="Motivo da Estratégia de Adequação"
+          title="Estratégia de Adequação"
           showArrow
+          disabled={proposeNewArea !== "yes"}
+          defaultOpen={false}
         >
           <TableInformation.Row columnsPerRow={1}>
             <TableInformation.Column>
               <TableInformation.Title>
-                Justificativa: Explique de forma breve o objetivo do laudo,
-                indicando o que se pretende comprovar.
+                Disponibilize o projeto da proposta de Estratégia de Adequação
+                na nova área para regeneração
               </TableInformation.Title>
-              <TableInformation.Value>
-                <TextArea
-                  control={control}
-                  name="justify"
-                  placeholder="Justifique aqui."
-                />
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-        <TableInformation.Section title="Anotação de responsabilidade técnica">
-          <TableInformation.Row columnsPerRow={1}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Anexe o Laudo Técnico e ART devidamente assinados e Recibo do
-                CAR da propriedade.
-              </TableInformation.Title>
-              <TableInformation.Value>
-                <Table.Container>
-                  <Table.Header noBackground>
-                    <Table.Title className="text-[#21801A] font-semibold">
-                      Descrição do arquivo
-                    </Table.Title>
-                    <Table.Title className="text-[#21801A] font-semibold">
-                      Nome do arquivo
-                    </Table.Title>
-                    <Table.Title className="text-[#21801A] font-semibold">
-                      Data de upload
-                    </Table.Title>
-                    <Table.Title className="text-[#21801A] font-semibold">
-                      {""}
-                    </Table.Title>
-                  </Table.Header>
-                  <Table.Body>
-                    {documents.map((doc, index) => (
-                      <Table.Row key={index}>
-                        <Table.Cell className="border-none text-gray-900">
-                          <label className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              className="accent-[#21801A]"
-                              checked={doc.checked}
-                              onChange={() => handleCheckboxChange(index)}
-                            />
-                            {labelMap[doc.type] || "Documento"}
-                          </label>
-                        </Table.Cell>
-                        <Table.Cell className="border-none">
-                          {doc.nomeArquivo || doc.file?.name || "-"}
-                        </Table.Cell>
-                        <Table.Cell className="border-none">
-                          {doc.uploadDate || "-"}
-                        </Table.Cell>
-                        <Table.Cell className="border-none flex gap-2 items-center">
-                          {doc.urlArquivo ? (
-                            <Link
-                              href={doc.urlArquivo}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              title="Visualizar documento"
-                            >
-                              <FiEye size={18} />
-                            </Link>
-                          ) : doc.checked && !doc.file ? (
-                            <label className="cursor-pointer">
-                              <FiUpload size={18} />
-                              <input
-                                type="file"
-                                className="hidden"
-                                onChange={(e) =>
-                                  e.target.files &&
-                                  handleFileChange(index, e.target.files[0])
-                                }
-                              />
-                            </label>
-                          ) : null}
+              <br />
+              <TechnicalResponsibleSection />
 
-                          {doc.file && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveFile(index)}
-                              className="text-red-600"
-                            >
-                              <IoTrashSharp size={18} />
-                            </button>
-                          )}
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table.Container>
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-        <TableInformation.Section title="Deseja solicitar o Plano de Adequação?">
-          <TableInformation.Row columnsPerRow={2}>
-            <TableInformation.Column>
-              <TableInformation.Value>
-                <input
-                  type="checkbox"
-                  id="propor-sim"
-                  name="proporNovaArea"
-                  value="sim"
+              <form onSubmit={handleSubmit(handleSaveDocuments)}>
+                <div className="mt-6">
+                  <p className="text-[#0A3503] mb-4">
+                    Justificativa: Explique de forma breve o objetivo do laudo,
+                    indicando o que se pretende comprovar.
+                  </p>
+                  <TextArea
+                    name="motivo"
+                    label="Justificativa"
+                    placeholder="Digite a justificativa..."
+                    control={control}
+                  />
+                </div>
+
+                <DocumentTable
+                  documents={documents}
+                  onCheckboxChange={handleCheckboxChange}
+                  onFileChange={handleFileChange}
+                  onRemoveFile={handleRemoveFile}
+                  labelMap={DOCUMENT_LABEL_MAP}
                 />
-                <label htmlFor="propor-sim" className="ml-2 cursor-pointer">
-                  Sim
-                </label>
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Value>
-                <input
-                  type="checkbox"
-                  id="propor-nao"
-                  name="proporNovaArea"
-                  value="nao"
-                />
-                <label htmlFor="propor-nao" className="ml-2 cursor-pointer">
-                  Não
-                </label>
-              </TableInformation.Value>
+
+                <div className="my-6 flex justify-end">
+                  <Button
+                    type="submit"
+                    disabled={
+                      createSuitabilityPlan.isPending || !technicalResponsible
+                    }
+                    variant="green"
+                    className="w-[320px]"
+                  >
+                    {createSuitabilityPlan.isPending
+                      ? "Salvando..."
+                      : "Solicitar Plano de Adequação"}
+                  </Button>
+                </div>
+              </form>
             </TableInformation.Column>
           </TableInformation.Row>
         </TableInformation.Section>

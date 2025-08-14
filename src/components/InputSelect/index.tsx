@@ -52,10 +52,8 @@ export const InputSelect = ({
           <div className="relative w-full">
             <DynamicSelect
               {...field}
-              onChange={(selectedOption: any) =>
-                field.onChange(selectedOption)
-              }
-              value={field.value}
+              onChange={(selectedOption: any) => field.onChange(selectedOption)}
+              value={field.value || null}
               options={options}
               isSearchable={isSearchable}
               placeholder={placeholder}

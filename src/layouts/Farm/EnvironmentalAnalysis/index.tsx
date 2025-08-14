@@ -3,8 +3,6 @@ import { useParams } from "next/navigation";
 import { JSX, useState } from "react";
 import {
   FaFileAlt,
-  FaFileContract,
-  FaRegFilePdf,
   FaLeaf,
   FaExclamation,
   FaClipboardCheck,
@@ -20,47 +18,13 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 
 import { CommercializationAuthorization } from "./CommercializationAuthorization";
+import { Contestation } from "./Contestation";
+import { EnvironmentalAnalysisPDF } from "./EnvironmentalAnalysisPDF";
 import { FarmOverview } from "./FarmOverview";
 import { Fines } from "./Fines";
 import { Inspection } from "./Inspection";
 import { SuitabilityPlan } from "./SuitabilityPlan";
 import { SuitabilityTerm } from "./SuitabilityTerm";
-
-const menuItems = [
-  { label: "Resumo da Propriedade", icon: FaFileAlt, key: "overview" },
-  {
-    label: "Documentos da Propriedade",
-    icon: FaFileContract,
-  },
-  { label: "Modelos de Documentos", icon: FaRegFilePdf },
-  { label: "Análise Ambiental", icon: FaLeaf },
-  {
-    label: "Contestação",
-    icon: FaExclamation,
-    disabled: true,
-  },
-  {
-    label: "Plano de Adequação",
-    icon: FaClipboardCheck,
-    key: "suitabilityPlan",
-  },
-  {
-    label: "Termo de Adequação",
-    icon: FaFileSignature,
-    key: "suitabilityTerm",
-  },
-  { label: "Multas", icon: FaGavel, key: "fines" },
-  {
-    label: "Autovistoria",
-    icon: FaSearch,
-    key: "inspection",
-  },
-  {
-    label: "Autorização de Comercialização",
-    icon: FaStore,
-    key: "commercializationAuthorization",
-  },
-];
 
 export const EnvironmentalAnalysisLayout = () => {
   const params = useParams();
@@ -68,18 +32,103 @@ export const EnvironmentalAnalysisLayout = () => {
 
   const { data: farm } = useGetFarmById(farmId);
 
+  const menuItems: MenuItem[] = [
+    { label: "Resumo da Propriedade", icon: FaFileAlt, key: "overview" },
+    // {
+    //   label: "Documentos da Propriedade",
+    //   icon: FaFileContract,
+    // },
+    // { label: "Modelos de Documentos", icon: FaRegFilePdf },
+    {
+      label: "Análise Ambiental",
+      icon: FaLeaf,
+      key: "environmentalAnalysisPDF",
+      disabled: !farm?.retornoAnalises?.length,
+    },
+    {
+      label: "Contestação",
+      icon: FaExclamation,
+      key: "contestation",
+    },
+    {
+      label: "Plano de Adequação",
+      icon: FaClipboardCheck,
+      key: "suitabilityPlan",
+    },
+    {
+      label: "Termo de Adequação",
+      icon: FaFileSignature,
+      key: "suitabilityTerm",
+      disabled: true,
+    },
+    { label: "Multas", icon: FaGavel, key: "fines", disabled: true },
+    {
+      label: "Autovistoria",
+      icon: FaSearch,
+      key: "inspection",
+    },
+    {
+      label: "Autorização de Comercialização",
+      icon: FaStore,
+      key: "commercializationAuthorization",
+      disabled: true,
+    },
+  ];
+
+  type MenuItem = {
+    label: string;
+    icon: any;
+    key?: string;
+    disabled?: boolean;
+  };
+
   const [activeScreen, setActiveScreen] = useState<null | string | undefined>(
     null
   );
+  const [contestationParams, setContestationParams] = useState<{
+    farmId: number;
+    analysisId: number;
+  } | null>(null);
+
+  const handleNavigateToContestation = (farmId: number, analysisId: number) => {
+    setContestationParams({ farmId, analysisId });
+    setActiveScreen("contestation");
+  };
+
+  const handleNavigateToSuitabilityPlan = (
+    farmId: number,
+    analysisId: number
+  ) => {
+    setContestationParams({ farmId, analysisId });
+    setActiveScreen("suitabilityPlan");
+  };
 
   const componentMap: Record<string, JSX.Element> = {
     overview: <FarmOverview farmId={farmId} />,
     suitabilityTerm: <SuitabilityTerm farmId={farmId} />,
-    suitabilityPlan: <SuitabilityPlan farmId={farmId} />,
+    environmentalAnalysisPDF: (
+      <EnvironmentalAnalysisPDF
+        farmId={farmId}
+        onNavigateToContestation={handleNavigateToContestation}
+        onNavigateToSuitabilityPlan={handleNavigateToSuitabilityPlan}
+      />
+    ),
+    suitabilityPlan: (
+      <SuitabilityPlan
+        farmId={farmId}
+        analysisId={contestationParams?.analysisId || 0}
+      />
+    ),
     fines: <Fines farmId={farmId} />,
     inspection: <Inspection farmId={farmId} />,
     commercializationAuthorization: (
       <CommercializationAuthorization farmId={farmId} />
+    ),
+    contestation: (
+      <Contestation
+        farmId={farmId}
+        analysisId={contestationParams?.analysisId}
+      />
     ),
   };
 
@@ -139,7 +188,7 @@ export const EnvironmentalAnalysisLayout = () => {
             </div>
           </div>
         </div>
-          <div className="col-span-2 mt-4">
+        <div className="col-span-2 mt-4">
           <div className="grid grid-cols-2">
             <div>
               <h2 className="text-[#21801A]">Etapa Atual</h2>
@@ -147,7 +196,7 @@ export const EnvironmentalAnalysisLayout = () => {
             </div>
             <div>
               <h2 className="text-[#21801A]">Status</h2>
-            <p>{farm?.status}</p>
+              <p>{farm?.status}</p>
             </div>
           </div>
         </div>
@@ -156,6 +205,7 @@ export const EnvironmentalAnalysisLayout = () => {
         {menuItems.map(({ label, icon: Icon, disabled, key }) => (
           <button
             key={label}
+            disabled={disabled}
             onClick={() => setActiveScreen(key)}
             className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 transition-colors ${
               disabled
