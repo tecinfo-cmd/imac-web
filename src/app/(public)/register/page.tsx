@@ -20,12 +20,20 @@ import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { setCookie } from "nookies";
 
+function validarTelefone(telefone: string): boolean {
+  const regex = /^(?:(?:\+|00)?(55)\s?)?(?:([1-9][1-9]))?\s?(?:9?\d{4})-?(\d{4})$/;
+  return regex.test(telefone);
+}
+
 const schema = yup.object({
   nome: yup.string().required(),
   data: yup.string().required(),
   cpf: yup.string().required(),
   email: yup.string().email().required(),
-  telefone: yup.string().required(),
+  telefone: yup.string().required().test(
+      "validar-telefone",
+      "Número de telefone inválido",
+      (value) => !!value && validarTelefone(value.replace(/\D/g, ""))),
   cep: yup.string().required(),
   uf: yup.string().required("!"),
   logradouro: yup.string().required(),
@@ -118,10 +126,10 @@ export default function Register() {
     const rawCEP = cep?.replace(/\D/g, "");
 
     if (
-      errors.cep && 
-      rawCEP && 
-      previousCepRef.current && 
-      rawCEP !== previousCepRef.current 
+      errors.cep &&
+      rawCEP &&
+      previousCepRef.current &&
+      rawCEP !== previousCepRef.current
     ) {
       clearErrors("cep");
     }
@@ -233,7 +241,7 @@ export default function Register() {
 
             <Input
               name="telefone"
-              label="Telefone"
+              label="Celular"
               placeholder="Digite seu numero de telefone"
               control={control}
               mask={maskPhone}
