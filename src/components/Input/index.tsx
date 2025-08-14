@@ -40,7 +40,7 @@ export const Input = ({
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <div className="flex flex-col">
+        <div className={`flex flex-col ${className}`}>
           <div className="flex justify-between mx-1 my-1">
             {label && (
               <label
@@ -67,7 +67,7 @@ export const Input = ({
               type={inputType}
               placeholder={placeholder}
               {...rest}
-              className={`w-full h-[48px] p-4 rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] placeholder:text-[#D7D6D7] ${className}`}
+              className="w-full h-[48px] p-4 rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] placeholder:text-[#D7D6D7]"
             />
 
             {isDateInput && (

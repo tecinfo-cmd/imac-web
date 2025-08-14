@@ -13,20 +13,34 @@ interface SectionProps {
   title: string;
   children: ReactNode;
   showArrow?: boolean;
+  defaultOpen?: boolean;
+  disabled?: boolean;
 }
 
 TableInformation.Section = function Section({
   title,
   children,
   showArrow = false,
+  defaultOpen = true,
+  disabled = false,
 }: SectionProps) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
+
+  const handleClick = () => {
+    if (!disabled && showArrow) {
+      setOpen(!open);
+    }
+  };
 
   return (
     <div className="mb-6">
       <div
-        className="bg-[#21801A] text-[#D7EADD] font-semibold px-4 py-2 flex items-center justify-between cursor-pointer"
-        onClick={() => showArrow && setOpen(!open)}
+        className={`font-semibold px-4 py-2 flex items-center justify-between ${
+          disabled
+            ? "bg-gray-400 text-gray-600 cursor-not-allowed"
+            : "bg-[#21801A] text-[#D7EADD] cursor-pointer"
+        }`}
+        onClick={handleClick}
       >
         <span>{title}</span>
         {showArrow && (

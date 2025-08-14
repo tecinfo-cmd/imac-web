@@ -1,4 +1,4 @@
-import { api } from "@/api/index";
+import { api } from "@/api";
 
 export function useRecoverPassword() {
   const recoverPassword = async (

@@ -2,6 +2,8 @@ import Image from "next/image";
 import { GoAlertFill } from "react-icons/go";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { useGetAutoInspection } from "@/hooks/useGetElegibilities/useGetAutoVistoria";
+import { formatDate } from "@/utils/formatters/formatDate";
 
 interface InspectionProps {
   farmId: number;
@@ -9,6 +11,12 @@ interface InspectionProps {
 
 export const Inspection = ({ farmId }: InspectionProps) => {
   const { data: farm } = useGetFarmById(farmId);
+  const { data: autoInspection, isLoading } = useGetAutoInspection();
+
+  if (isLoading) return <p>Carregando dados da vistoria...</p>;
+
+  const currentInspection = autoInspection?.[0];
+
   return (
     <>
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
@@ -52,11 +60,11 @@ export const Inspection = ({ farmId }: InspectionProps) => {
           <div className="grid grid-cols-2">
             <div>
               <h2 className="text-[#21801A]">Etapa Atual</h2>
-              <p>-</p>
+              <p>{farm?.etapa || "-"}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Status</h2>
-              <p>-</p>
+              <p>{farm?.status || "-"}</p>
             </div>
           </div>
         </div>
@@ -68,18 +76,23 @@ export const Inspection = ({ farmId }: InspectionProps) => {
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Data final limite da vistoria:</h2>
-            <p>25/06/2025</p>
+            <p>
+              {currentInspection
+                ? formatDate(currentInspection.endDate)
+                : "Não informado"}
+            </p>
           </div>
           <div className="flex gap-2">
-            <h2 className="text-[#21801A]">Status da vistoria: </h2>
-            <p>Não realizada</p>
+            <h2 className="text-[#21801A]">Status da vistoria:</h2>
+            <p>{currentInspection?.inspectionStatus || "Não realizada"}</p>
           </div>
           <div className="flex gap-2">
-            <h2 className="text-[#21801A]">Resultado da vistoria: </h2>
-            <p>Aguardando vistoria</p>
+            <h2 className="text-[#21801A]">Resultado da vistoria:</h2>
+            <p>{currentInspection?.inspection || "Aguardando vistoria"}</p>
           </div>
         </div>
       </div>
+
       <span className="font-semibold mt-6 block">Baixe o GIX</span>
       <div className="flex gap-4">
         <Image

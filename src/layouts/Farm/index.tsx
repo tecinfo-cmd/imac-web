@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FaDollarSign } from "react-icons/fa";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
@@ -23,7 +24,7 @@ export const FarmLayout = () => {
   return (
     <LayoutContainer title="Minhas Propriedades">
       <FilterFarm />
-      <span>Total de propriedades: {data?.length}</span>
+      <span>Total de propriedades: {data?.length || 0}</span>
       <Table.Container>
         <Table.Header>
           <Table.Title>Nome da Propriedade</Table.Title>
@@ -43,17 +44,42 @@ export const FarmLayout = () => {
                   <span
                     className="w-2 h-2 rounded-full"
                     style={{
-                      backgroundColor: farm.voucher ? "#21801A" : "#F44336",
+                      backgroundColor: farm.statusVoucher
+                        ? "#21801A"
+                        : "#F44336",
                     }}
                   />
-                  <span style={{ color: farm.voucher ? "#21801A" : "#F44336" }}>
-                    {farm.voucher ? "Ativo" : "Inativo"}
+                  <span
+                    style={{
+                      color: farm.statusVoucher ? "#21801A" : "#F44336",
+                    }}
+                  >
+                    {farm.statusVoucher ? "Ativo" : "Inativo"}
                   </span>
                 </div>
               </Table.Cell>
 
               <Table.Cell>
                 <div className="flex items-center gap-3">
+                  {farm.statusVoucher === false ? (
+                    <Tooltip
+                      message="Comprar voucher"
+                      id={`Comprar voucher ${farm.id}`}
+                    >
+                      <Link href={`/buyVoucher?propertyId=${farm.id}`}>
+                        <FaDollarSign size={20} color="#21801A" />
+                      </Link>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip
+                      message="Voucher já ativo"
+                      id={`Voucher ativo ${farm.id}`}
+                    >
+                      <div className="opacity-40 cursor-not-allowed">
+                        <FaDollarSign size={20} color="#21801A" />
+                      </div>
+                    </Tooltip>
+                  )}
                   <Tooltip
                     message="Visualizar ou editar dados"
                     id={`Visualizar ou editar dados ${farm.id}`}
@@ -74,14 +100,17 @@ export const FarmLayout = () => {
                       <Eye />
                     </Link>
                   </Tooltip>
-                  <Tooltip message="Análise ambiental" id={`Análise ambiental ${farm.id}`}>
+                  <Tooltip
+                    message="Análise ambiental"
+                    id={`Análise ambiental ${farm.id}`}
+                  >
                     <Link href={`/analise-ambiental/${farm.id}`}>
                       <Monitor />
                     </Link>
                   </Tooltip>
                   <Tooltip
                     message="Inativar propriedade"
-                    id="Inativar propriedade"
+                    id={`Inativar propriedade ${farm.id}`}
                   >
                     <X />
                   </Tooltip>

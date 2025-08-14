@@ -84,8 +84,34 @@ export function useBuyVoucher() {
     try {
       const [month, year] = dados.validade.split("/");
 
-      const idSolicitacao = Number(dados.nomePropriedade);
-      if (!idSolicitacao || Number.isNaN(idSolicitacao)) {
+      const propriedadeResponse = await api.get(
+        "propriedade-prem/proprietario",
+        {
+          params: {
+            email: email,
+          },
+        }
+      );
+
+      const lista = Array.isArray(propriedadeResponse.data?.data)
+        ? propriedadeResponse.data.data
+        : propriedadeResponse.data;
+
+      if (!Array.isArray(lista) || lista.length === 0) {
+        throw new Error("Nenhuma propriedade encontrada para o usuário.");
+      }
+
+      const selectedProperty = lista.find(
+        (p: any) => String(p.id) === String(dados.select)
+      );
+
+      if (!selectedProperty) {
+        throw new Error("Propriedade selecionada não encontrada.");
+      }
+
+      const idSolicitacao = selectedProperty.solicitacaoElegibilidade?.id;
+
+      if (!idSolicitacao) {
         throw new Error("ID da solicitação de elegibilidade não encontrado.");
       }
 
