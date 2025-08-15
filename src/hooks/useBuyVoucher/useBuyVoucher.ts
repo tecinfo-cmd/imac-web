@@ -7,6 +7,7 @@ interface Propriedade {
   carFederal: string;
   id: number;
   nomePropriedade: string;
+  idSolicitacaoElegibilidade?: number;
 }
 
 type PagamentoPayload = {

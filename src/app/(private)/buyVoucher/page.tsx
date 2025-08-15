@@ -17,7 +17,6 @@ import { LogoWhite } from "@/icons/LogoWhite";
 import { maskCard, maskCVV, maskValidade } from "@/utils/maskCard";
 import { maskCep } from "@/utils/maskCEP";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const schema = yup.object({
   nomeCompleto: yup.string().required(),
@@ -28,7 +27,7 @@ const schema = yup.object({
   pais: yup.string().required("!"),
   endereco: yup.string().required(),
   numero: yup.string().required("!"),
-  complemento: yup.string(),
+  complemento: yup.string().required(),
   bairro: yup.string().required("!"),
   cidade: yup.string().required("!"),
   select: yup
@@ -181,47 +180,47 @@ function BuyVoucherForm() {
               <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
             </div>
 
-          <form
-            className="flex flex-col gap-3 w-full"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <InputSelect
-              name="nomePropriedade"
-              label="Selecionar propriedade"
-              placeholder="Selecione propriedade"
-              control={control}
-              options={propriedades.map((prop) => ({
-                value: prop.idSolicitacaoElegibilidade,
-                label: `${prop.nomePropriedade} - ${prop.carFederal}`,
-              }))}
-            />
-            <Input
-              name="nomeCompleto"
-              label="Nome Completo"
-              placeholder="Insira seu nome completo"
-              control={control}
-            />
-            <div className="w-[260px] flex flex-col gap-3">
-              <Input
-                name="numeroCartao"
-                type="text"
-                label="Número do cartão de crédito"
-                placeholder="_ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _"
-                mask={maskCard}
-                control={control}
-              />
-            </div>
-            <div className="flex flex-row items-center gap-3">
-              <div className="flex flex-col w-[115px] gap-3">
-                <Input
-                  name="validade"
-                  type="text"
-                  label="Validade"
-                  placeholder="mm/aaaa"
-                  mask={maskValidade}
+            <form
+                className="flex flex-col gap-3 w-full"
+                onSubmit={handleSubmit(onSubmit)}
+            >
+              <InputSelect
+                  name="select"
+                  label="Selecionar propriedade"
+                  placeholder="Selecione propriedade"
                   control={control}
+                  options={propriedades.map((prop) => ({
+                    value: String(prop.id),
+                    label: `${prop.nomePropriedade} - ${prop.carFederal}`,
+                  }))}
+              />
+              <Input
+                  name="nomeCompleto"
+                  label="Nome Completo"
+                  placeholder="Insira seu nome completo"
+                  control={control}
+              />
+              <div className="w-[260px] flex flex-col gap-3">
+                <Input
+                    name="numeroCartao"
+                    type="text"
+                    label="Número do cartão de crédito"
+                    placeholder="_ _ _ _  _ _ _ _  _ _ _ _  _ _ _ _"
+                    mask={maskCard}
+                    control={control}
                 />
               </div>
+              <div className="flex flex-row items-center gap-3">
+                <div className="flex flex-col w-[115px] gap-3">
+                  <Input
+                      name="validade"
+                      type="text"
+                      label="Validade"
+                      placeholder="mm/aaaa"
+                      mask={maskValidade}
+                      control={control}
+                  />
+                </div>
 
                 <div className="flex flex-col w-[115px] gap-3 ml-4">
                   <Input
