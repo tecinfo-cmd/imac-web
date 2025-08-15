@@ -1,12 +1,16 @@
 import { useState } from "react";
 
 import { api } from "@/api/index";
+import { parseCookies } from "nookies";
 
 interface Propriedade {
   id: string;
   nome: string;
   carFederal: string;
 }
+
+const cookies = parseCookies();
+const email = cookies.email;
 
 export function useValidVoucher() {
   const [loading, setLoading] = useState(false);
@@ -19,30 +23,26 @@ export function useValidVoucher() {
     setError(null);
 
     try {
-      const response = await api.get("propriedade-prem?statusVoucher=false");
+      const response = await api.get("propriedade-prem/proprietario", {
+        params: { email },
+      });
 
-      const data = response.data.data;
-
-      if (Array.isArray(data) && data.length > 0) {
-        const props: Propriedade[] = data.map((item) => ({
-          id: item.id,
-          nome: item.nomePropriedade,
+      const props = response.data
+        .filter(
+          (item: any) =>
+            item.solicitacaoElegibilidade?.status === "APROVADO" &&
+            item.statusVoucher === false
+        )
+        .map((item: any) => ({
+          idSolicitacaoElegibilidade: item.idSolicitacaoElegibilidade,
+          nomePropriedade: item.nomePropriedade,
           carFederal: item.carFederal,
-
         }));
-        setPropriedades(props);
-        return props;
-      } else {
-        setError("Nenhuma propriedade encontrada para o CAR.");
-        setPropriedades([]);
-        return [];
-      }
-    } catch (err: any) {
-      console.error("Erro ao buscar propriedades:", err);
-      setError("Erro ao buscar propriedades.");
-      return [];
-    } finally {
-      setLoading(false);
+      setPropriedades(props);
+
+      console.log("Propriedades carregadas:", props);
+    } catch (error) {
+      console.error("Erro ao buscar propriedades:", error);
     }
   }
 

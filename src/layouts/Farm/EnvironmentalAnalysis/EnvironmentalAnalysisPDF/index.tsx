@@ -19,7 +19,6 @@ export const EnvironmentalAnalysisPDF = ({
 
   const pdfUrl = farm?.retornoAnalises?.[0]?.urlRelatorio;
   const analysisId = farm?.retornoAnalises?.[0]?.id;
-  console.log(farm?.retornoAnalises[0]);
 
   if (!pdfUrl) {
     return <p>Nenhuma análise socioambiental disponível.</p>;

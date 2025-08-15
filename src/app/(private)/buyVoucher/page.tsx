@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
@@ -32,16 +32,17 @@ const schema = yup.object({
   bairro: yup.string().required("!"),
   cidade: yup.string().required("!"),
   select: yup
-    .mixed()
-    .required("!")
-    .test(
-      "valid-option",
-      "Selecione uma propriedade",
-      (v) => !!(v as any)?.value
-    ),
+      .mixed()
+      .required("!")
+      .test(
+          "valid-option",
+          "Selecione uma propriedade",
+          (v) => !!(v as any)?.value
+      ),
 });
 
-export default function BuyVoucher() {
+
+function BuyVoucherForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const methods = useForm({
@@ -90,11 +91,11 @@ export default function BuyVoucher() {
     if (!propertyId || propriedades.length === 0) return;
 
     const option = propriedades
-      .map((prop) => ({
-        value: String(prop.id),
-        label: `${prop.nomePropriedade} - ${prop.carFederal}`,
-      }))
-      .find((opt) => opt.value === String(propertyId));
+        .map((prop) => ({
+          value: String(prop.id),
+          label: `${prop.nomePropriedade} - ${prop.carFederal}`,
+        }))
+        .find((opt) => opt.value === String(propertyId));
 
     if (option) {
       setValue("select", option, { shouldValidate: true, shouldDirty: true });
@@ -156,29 +157,29 @@ export default function BuyVoucher() {
   };
 
   return (
-    <FormProvider {...methods}>
-      <header className="w-full h-[120px] bg-[#23811C] flex items-center p-4 md:p-6 lg:p-8">
-        <LogoWhite width={87} height={87} />
-        <p className="text-[#ffffff] ml-4 sm:text-[20px] md:text-[22px] lg:text-[23px]">
-          Programa de Reinserção <br /> e Monitoramento
-        </p>
-      </header>
-      <div className="bg-[#ffffff] min-h-screen w-full flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 right-[-1500] flex items-center justify-center opacity-20">
-          <LogoGreen width={900} height={900} />
-        </div>
-        <div className="relative z-10 bg-[#DFEEE5] w-full max-w-[400px] rounded-xl shadow-lg p-5 flex flex-col justify-center items-center">
-          <h1 className="text-[#0A3503] text-center text-uppercase font-inter font-bold text-2xl leading-[37px] tracking-[0.1em] md:text-[24px] md:leading-[37px] mb-8 mt-5">
-            COMPRAR VOUCHER
-          </h1>
+      <FormProvider {...methods}>
+        <header className="w-full h-[120px] bg-[#23811C] flex items-center p-4 md:p-6 lg:p-8">
+          <LogoWhite width={87} height={87} />
+          <p className="text-[#ffffff] ml-4 sm:text-[20px] md:text-[22px] lg:text-[23px]">
+            Programa de Reinserção <br /> e Monitoramento
+          </p>
+        </header>
+        <div className="bg-[#ffffff] min-h-screen w-full flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 right-[-1500] flex items-center justify-center opacity-20">
+            <LogoGreen width={900} height={900} />
+          </div>
+          <div className="relative z-10 bg-[#DFEEE5] w-full max-w-[400px] rounded-xl shadow-lg p-5 flex flex-col justify-center items-center">
+            <h1 className="text-[#0A3503] text-center text-uppercase font-inter font-bold text-2xl leading-[37px] tracking-[0.1em] md:text-[24px] md:leading-[37px] mb-8 mt-5">
+              COMPRAR VOUCHER
+            </h1>
 
-          <div className="flex items-center w-full mb-4">
-            <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
-            <span className="px-4 text-lg text-[#0A3503]">
+            <div className="flex items-center w-full mb-4">
+              <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
+              <span className="px-4 text-lg text-[#0A3503]">
               Cartão de Crédito
             </span>
-            <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
-          </div>
+              <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
+            </div>
 
           <form
             className="flex flex-col gap-3 w-full"
@@ -222,104 +223,112 @@ export default function BuyVoucher() {
                 />
               </div>
 
-              <div className="flex flex-col w-[115px] gap-3 ml-4">
-                <Input
-                  name="CVV"
-                  label="CVV"
-                  placeholder="---"
-                  control={control}
-                  mask={maskCVV}
-                />
+                <div className="flex flex-col w-[115px] gap-3 ml-4">
+                  <Input
+                      name="CVV"
+                      label="CVV"
+                      placeholder="---"
+                      control={control}
+                      mask={maskCVV}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center w-full mb-4">
-              <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
-              <span className="px-4 text-lg text-[#0A3503]">
+              <div className="flex items-center w-full mb-4">
+                <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
+                <span className="px-4 text-lg text-[#0A3503]">
                 Endereço de Cobrança
               </span>
-              <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
-            </div>
-            <div className="flex flex-row gap-4 items-start">
-              <div className="flex flex-col w-[130px] gap-3">
-                <Input
-                  name="cep"
+                <div className="flex-1 border-t border-[#CAC4D0] border-solid"></div>
+              </div>
+              <div className="flex flex-row gap-4 items-start">
+                <div className="flex flex-col w-[130px] gap-3">
+                  <Input
+                      name="cep"
+                      type="text"
+                      label="CEP"
+                      placeholder="_ _ _ _ _ - _ _ _"
+                      control={control}
+                      mask={maskCep}
+                  />
+                </div>
+                <div className="flex flex-col w-[130px] gap-3 ml-4">
+                  <Input
+                      name="pais"
+                      label="País"
+                      placeholder="País"
+                      control={control}
+                  />
+                </div>
+              </div>
+              <Input
+                  name="endereco"
                   type="text"
-                  label="CEP"
-                  placeholder="_ _ _ _ _ - _ _ _"
+                  label="Endereço"
+                  placeholder="Digite seu endereço"
                   control={control}
-                  mask={maskCep}
-                />
+              />
+              <div className="flex flex-row gap-4 items-start">
+                <div className="flex flex-col w-[68px] gap-3">
+                  <Input
+                      name="numero"
+                      type="text"
+                      label="Número"
+                      placeholder=""
+                      control={control}
+                  />
+                </div>
+                <div className="flex flex-col w-[260px] gap-3 ml-4">
+                  <Input
+                      name="complemento"
+                      type="text"
+                      label="Complemento"
+                      placeholder="(Opicional)"
+                      control={control}
+                  />
+                </div>
               </div>
-              <div className="flex flex-col w-[130px] gap-3 ml-4">
-                <Input
-                  name="pais"
-                  label="País"
-                  placeholder="País"
-                  control={control}
-                />
+              <div className="flex flex-row gap-4 items-start">
+                <div className="flex flex-col w-[130px] gap-3">
+                  <Input
+                      name="bairro"
+                      label="Bairro"
+                      placeholder="Bairro"
+                      control={control}
+                  />
+                </div>
+                <div className="flex flex-col w-[130px] gap-3 ml-4 mb-4">
+                  <Input
+                      name="cidade"
+                      label="Cidade"
+                      placeholder="Cidade"
+                      control={control}
+                  />
+                </div>
               </div>
-            </div>
-            <Input
-              name="endereco"
-              type="text"
-              label="Endereço"
-              placeholder="Digite seu endereço"
-              control={control}
-            />
-            <div className="flex flex-row gap-4 items-start">
-              <div className="flex flex-col w-[68px] gap-3">
-                <Input
-                  name="numero"
-                  type="text"
-                  label="Número"
-                  placeholder=""
-                  control={control}
-                />
-              </div>
-              <div className="flex flex-col w-[260px] gap-3 ml-4">
-                <Input
-                  name="complemento"
-                  type="text"
-                  label="Complemento"
-                  placeholder="(Opicional)"
-                  control={control}
-                />
-              </div>
-            </div>
-            <div className="flex flex-row gap-4 items-start">
-              <div className="flex flex-col w-[130px] gap-3">
-                <Input
-                  name="bairro"
-                  label="Bairro"
-                  placeholder="Bairro"
-                  control={control}
-                />
-              </div>
-              <div className="flex flex-col w-[130px] gap-3 ml-4 mb-4">
-                <Input
-                  name="cidade"
-                  label="Cidade"
-                  placeholder="Cidade"
-                  control={control}
-                />
-              </div>
-            </div>
-            <Button
-              type="submit"
-              className="w-full md:w-[180px] self-center"
-              disabled={isLoading}
-            >
-              {isLoading ? "Finalizando..." : "Finalizar Compra"}
-            </Button>
-          </form>
-          <span className="text-center text-[#21801A] mt-4 text-sm md:text-base">
+              <Button
+                  type="submit"
+                  className="w-full md:w-[180px] self-center"
+                  disabled={isLoading}
+              >
+                {isLoading ? "Finalizando..." : "Finalizar Compra"}
+              </Button>
+            </form>
+            <span className="text-center text-[#21801A] mt-4 text-sm md:text-base">
             <Link href="/" className="underline">
               Voltar ao início
             </Link>
           </span>
+          </div>
         </div>
-      </div>
-    </FormProvider>
+      </FormProvider>
+  );
+}
+
+export default function BuyVoucher() {
+  return (
+      <Suspense fallback={<div>Carregando...</div>}>
+        <BuyVoucherForm />
+      </Suspense>
   );
 }

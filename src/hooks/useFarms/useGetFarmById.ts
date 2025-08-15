@@ -16,6 +16,14 @@ export interface Pessoa {
   rgInscricaoSocial: string | null;
 }
 
+interface Documento {
+  id: number;
+  nomeArquivo: string;
+  nomeArquivoOriginal: string | null;
+  urlArquivo: string;
+  tipo: string;
+}
+
 export interface Proprietario {
   id: number;
   tipoProprietario: "PROPRIETARIO" | "COPROPRIETARIO";
@@ -87,6 +95,7 @@ export interface ContestacaoAutorizacaoSupressao {
   motivo: string;
   situacao: string;
   observacao: string | null;
+  dataCriacao: string | null;
   autorizacoesSupressoes: string[];
   responsavelTecnico: ResponsavelTecnico;
   documentos: string[];
@@ -111,6 +120,7 @@ export interface PlanoAdequacao {
 }
 
 export interface Analise {
+  id: number;
   urlRelatorio: string;
   areaDesmatadaTotal: number;
   areaARegenerar: number;
@@ -183,7 +193,7 @@ export interface Farm {
   moduloFiscal: number;
   etapa: string;
   status: string;
-  documentos: string[];
+  documentos: Documento[];
   territorios: Territorio[];
   retornoAnalises: Analise[];
 }
