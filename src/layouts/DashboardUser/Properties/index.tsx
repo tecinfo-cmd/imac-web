@@ -1,17 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  PiSealCheckLight,
-  PiAlignBottom,
-  PiUser,
-} from "react-icons/pi";
+import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { useGetPropriedades } from "@/hooks/useGetProperties/userGetProperties";
+import { Analityc } from "@/icons/Analityc";
 import { Monitor } from "@/icons/Monitor";
 import { X } from "@/icons/X";
 
@@ -20,12 +18,13 @@ import { FilterProperties } from "./FilterProperties";
 export const PropertiesLayout = () => {
   const [filters, setFilters] = useState({});
   const { data: properties = [], isLoading } = useGetPropriedades(filters);
+  const router = useRouter();
 
   const customMenuItems = [
     {
       label: "Dashboard",
       href: "/dashboard",
-      icon: <PiAlignBottom size={44} />,
+      icon: <Analityc />,
     },
     {
       label: "Usuários",
@@ -37,12 +36,12 @@ export const PropertiesLayout = () => {
       href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    /*{
+    {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    {
+    /*{
       label: "Multas",
       href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,
@@ -152,7 +151,7 @@ export const PropertiesLayout = () => {
         <Table.Container>
           <Table.Header>
             <Table.Title>Nome da Propriedade </Table.Title>
-            <Table.Title>Produtor</Table.Title>
+            <Table.Title>Município</Table.Title>
             <Table.Title>CAR Federal</Table.Title>
             <Table.Title>Status</Table.Title>
             <Table.Title>Ações</Table.Title>
@@ -162,8 +161,7 @@ export const PropertiesLayout = () => {
             {properties?.map((properties: any) => (
               <Table.Row key={properties.id}>
                 <Table.Cell>{properties.nomePropriedade}</Table.Cell>
-                <Table.Cell>{properties.telefone}</Table.Cell>
-                <Table.Cell>{properties.email}</Table.Cell>
+                <Table.Cell>{properties.cidade?.nome || "-"}</Table.Cell>
                 <Table.Cell>{properties.carFederal}</Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center gap-2">
@@ -188,16 +186,23 @@ export const PropertiesLayout = () => {
                   </div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div className="flex items-center gap-2">
+                  <div className="flex justify-center items-center gap-2">
                     <Tooltip
                       message="Visualizar ou editar dados"
                       id={`view-${properties.id}`}
                     >
-                      <Monitor />
+                      <button
+                        className="flex items-center justify-center p-1 rounded hover:bg-gray-100"
+                        onClick={() =>
+                          router.push(`/dashboard/properties/${properties.id}`)
+                        }
+                      >
+                        <Monitor />
+                      </button>
                     </Tooltip>
                     <Tooltip
                       message="Inativar propriedade"
-                      id={`view-${properties.id}`}
+                      id={`delete-${properties.id}`}
                     >
                       <X />
                     </Tooltip>

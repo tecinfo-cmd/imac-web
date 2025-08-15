@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  PiSealCheckLight,
-  PiAlignBottom,
-  PiUser,
-} from "react-icons/pi";
+import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
 import { ElegibilityDetail } from "@/components/ElegibilityDetail";
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -13,6 +9,7 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { useGetElegibilities } from "@/hooks/useGetElegibilities/useGetElegibilities";
+import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
@@ -46,7 +43,7 @@ export const ElegibilityLayout = () => {
     {
       label: "Dashboard",
       href: "/dashboard",
-      icon: <PiAlignBottom size={44} />,
+      icon: <Analityc />,
     },
     {
       label: "Usuários",
@@ -58,12 +55,12 @@ export const ElegibilityLayout = () => {
       href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    /*{
+    {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    {
+    /*{
       label: "Multas",
       href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,

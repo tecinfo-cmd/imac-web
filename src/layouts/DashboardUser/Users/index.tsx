@@ -2,11 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  PiSealCheckLight,
-  PiAlignBottom,
-  PiUser,
-} from "react-icons/pi";
+import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -15,6 +11,7 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { useDeleteUser } from "@/hooks/useGetUsers/useDeleteUser";
 import { useGetUsers } from "@/hooks/useGetUsers/useGetUsers";
+import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 
 import { FilterUsers } from "./FilterUsers";
@@ -30,7 +27,7 @@ export const UsersLayout = () => {
     {
       label: "Dashboard",
       href: "/dashboard",
-      icon: <PiAlignBottom size={44} />,
+      icon: <Analityc />,
     },
     {
       label: "Usuários",
@@ -42,12 +39,12 @@ export const UsersLayout = () => {
       href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    /*{
+    {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    {
+    /*{
       label: "Multas",
       href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,

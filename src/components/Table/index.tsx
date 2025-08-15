@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 interface TableProps {
   children: React.ReactNode;
   className?: string;
+  colspan?: number;
 }
 
 const TableContainer = ({ children, className }: TableProps) => {
@@ -39,22 +40,22 @@ const TableBody = ({ children, className }: TableProps) => {
   return <tbody className={cn(className)}>{children}</tbody>;
 };
 
-const TableCell = ({ children, className }: TableProps) => {
+const TableCell = ({ children, className, colspan }: TableProps) => {
   return (
     <td
       className={cn(
         "text-[#21801A] px-4 py-2 text-left border-b border-[#DFEEE5]",
         className
-      )}
+      )} colSpan={colspan}
     >
       {children}
     </td>
   );
 };
 
-const TableTitle = ({ children, className }: TableProps) => {
+const TableTitle = ({ children, className, colspan }: TableProps) => {
   return (
-    <th className={cn("text-[#21801A] px-4 py-2 text-left", className)}>
+    <th className={cn("text-[#21801A] px-4 py-2 text-left", className)} colSpan={colspan}>
       {children}
     </th>
   );
