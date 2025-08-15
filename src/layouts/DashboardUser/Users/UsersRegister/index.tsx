@@ -5,6 +5,7 @@ import {
   PiSealCheckLight,
   PiUser,
   PiAlignBottom,
+  PiFarmLight,
 } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
@@ -35,12 +36,12 @@ export const UsersRegisterLayout = () => {
         href: "/dashboard/elegibility",
         icon: <PiSealCheckLight size={44} />,
       },
-      /*{
+      {
         label: "Propriedades",
         href: "/dashboard/properties",
         icon: <PiFarmLight size={44} />,
       },
-      {
+      /*{
         label: "Multas",
         href: "/dashboard/multas",
         icon: <Taxa className="text-current" />,

@@ -17,6 +17,7 @@ import { LogoWhite } from "@/icons/LogoWhite";
 import { maskCard, maskCVV, maskValidade } from "@/utils/maskCard";
 import { maskCep } from "@/utils/maskCEP";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
 
 const schema = yup.object({
   nomeCompleto: yup.string().required(),
@@ -27,7 +28,7 @@ const schema = yup.object({
   pais: yup.string().required("!"),
   endereco: yup.string().required(),
   numero: yup.string().required("!"),
-  complemento: yup.string().required(),
+  complemento: yup.string(),
   bairro: yup.string().required("!"),
   cidade: yup.string().required("!"),
   select: yup
@@ -184,12 +185,12 @@ export default function BuyVoucher() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <InputSelect
-              name="select"
+              name="nomePropriedade"
               label="Selecionar propriedade"
               placeholder="Selecione propriedade"
               control={control}
               options={propriedades.map((prop) => ({
-                value: String(prop.id),
+                value: prop.idSolicitacaoElegibilidade,
                 label: `${prop.nomePropriedade} - ${prop.carFederal}`,
               }))}
             />

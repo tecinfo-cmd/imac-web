@@ -10,22 +10,33 @@ import { useGetCities } from "@/hooks/useAddress/useGetCities";
 type FilterUsersProps = {
   onFilter: (filters: any) => void;
 };
+export const unmaskCPFOrCNPJ = (value: string) => {
+  return value.replace(/\D/g, "");
+};
 
 export const FilterProperties = ({ onFilter }: FilterUsersProps) => {
   const { control, handleSubmit, reset } = useForm();
   const { data: cities } = useGetCities();
 
   const handleFilterFarm = (data: any) => {
+    console.log("Dados do formulário:", data);
     const formattedData = {
       ...data,
+      nomePropriedade: data.nome,
       codigoMunicipio: data.codigoMunicipio?.value,
       status: data.status?.value,
+      carFederal: data.carFederal?.toUpperCase().trim(),
     };
     onFilter(formattedData);
   };
 
   const clearFilter = () => {
-    reset();
+    reset({
+      nome: "",
+      carFederal: "",
+      codigoMunicipio: null,
+      status: null,
+    });
     onFilter({});
   };
 
@@ -36,7 +47,7 @@ export const FilterProperties = ({ onFilter }: FilterUsersProps) => {
     >
       <Input
         name="nome"
-        label="Nome da Propriedade / Produtor"
+        label="Nome da Propriedade"
         placeholder="Digite o nome"
         control={control}
       />
@@ -46,7 +57,7 @@ export const FilterProperties = ({ onFilter }: FilterUsersProps) => {
         label="Município"
         placeholder="Município"
         control={control}
-         options={
+        options={
           cities?.map((city) => ({
             label: city.nome,
             value: city.codigo,

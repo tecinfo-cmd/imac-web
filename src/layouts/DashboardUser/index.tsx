@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import {
-  PiSealCheckLight,
-  PiUser,
-  PiAlignBottom,
-} from "react-icons/pi";
+import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
@@ -15,6 +11,7 @@ import { CardContent } from "@/components/ui/cardContent";
 import DatePicker from "@/components/ui/datePicker";
 
 import { useGetDashboardData } from "@/hooks/useGetDashboardData/useGetDashboardData";
+import { Analityc } from "@/icons/Analityc";
 import {
   LineChart,
   Line,
@@ -136,7 +133,7 @@ export const DashboardUserLayout = () => {
     {
       label: "Dashboard",
       href: "/dashboard",
-      icon: <PiAlignBottom size={44} />,
+      icon: <Analityc />,
     },
     {
       label: "Usuários",
@@ -148,12 +145,12 @@ export const DashboardUserLayout = () => {
       href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    /*{
+    {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    {
+    /*{
       label: "Multas",
       href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,
@@ -261,7 +258,6 @@ export const DashboardUserLayout = () => {
         </div>
 
         <div className="flex flex-col gap-4">
- 
           <Card className="text-center bg-[#F1F7F3]">
             <CardContent>
               <h3 className="text-sm">Nº de Propriedades Não Elegíveis</h3>

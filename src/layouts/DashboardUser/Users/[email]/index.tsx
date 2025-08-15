@@ -1,11 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import {
-  PiSealCheckLight,
-  PiAlignBottom,
-  PiUser,
-} from "react-icons/pi";
+import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
 import { InputSelect } from "@/components/InputSelect";
@@ -13,7 +9,7 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
 import { useUserDetail } from "@/hooks/useGetUsers/useUserDetail";
-
+import { Analityc } from "@/icons/Analityc";
 
 export const UserDetailLayout = () => {
   const { email } = useParams();
@@ -31,7 +27,7 @@ export const UserDetailLayout = () => {
     {
       label: "Dashboard",
       href: "/dashboard",
-      icon: <PiAlignBottom size={44} />,
+      icon: <Analityc />,
     },
     {
       label: "Usuários",
@@ -43,12 +39,12 @@ export const UserDetailLayout = () => {
       href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
-    /*{
+    {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    {
+    /*{
       label: "Multas",
       href: "/dashboard/multas",
       icon: <Taxa className="text-current" />,

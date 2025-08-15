@@ -1,11 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface AnalitycProps extends React.SVGProps<SVGSVGElement> {}
 
-export const Analityc = ({ className, ...props }: AnalitycProps) => {
+type AnalitycProps = {
+  size?: number;
+  className?: string;
+};
+export const Analityc = ({ size = 44, className, ...props }: AnalitycProps) => {
   return (
     <svg
-      width="44"
-      height="44"
+      width={size}
+      height={size}
       viewBox="0 0 48 48"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
