@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { useWatch } from "react-hook-form";
 
@@ -40,7 +40,8 @@ const schema = yup.object({
     ),
 });
 
-export default function BuyVoucher() {
+
+function BuyVoucherForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const methods = useForm({
@@ -320,5 +321,13 @@ export default function BuyVoucher() {
         </div>
       </div>
     </FormProvider>
+  );
+}
+
+export default function BuyVoucher() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <BuyVoucherForm />
+    </Suspense>
   );
 }
