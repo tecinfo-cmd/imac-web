@@ -34,7 +34,7 @@ type FormValues = {
   justificativa: string;
   justificativaPorLauro: string;
   status: string;
-  desconto_perc: string;
+  descontoPercentual: string;
   poligonos: {
     poligono: string;
     idTad: number;
@@ -46,7 +46,7 @@ type FormValues = {
   deteccoes: {
     pdf?: FileList;
     tipo?: string | { label: string; value: string };
-    areaARegenerar?: string; 
+    areaARegenerar?: string;
     polygon?: string;
   }[];
   parecerTecnico: {
@@ -65,10 +65,10 @@ export const ObjectionLayout = () => {
         justificativa: "",
         justificativaPorLauro: "",
         status: "",
-        desconto_perc: "",
+        descontoPercentual: "0",
         poligonos: [],
-        areaHa: "0",
-        valorMulta: "0",
+        areaHa: "",
+        valorMulta: "",
         deteccoes: [],
         parecerTecnico: { pdf: undefined },
       },
@@ -102,10 +102,9 @@ export const ObjectionLayout = () => {
       justificativa: data.justificativaSupressao ?? "",
       justificativaPorLauro: data.justificativaLaudo ?? "",
       status: "",
-      desconto_perc: "",
+      descontoPercentual: "0",
       poligonos: [],
       areaHa: "0",
-      valorMulta: "0",
       deteccoes: (data.deteccoes || []).map(() => ({
         pdf: undefined,
         tipo: undefined,
@@ -133,20 +132,17 @@ export const ObjectionLayout = () => {
     });
   }, [totalAreaHa, setValue]);
 
-  const descontoPerc = watch("desconto_perc");
+  const descontoPerc:any = watch("descontoPercentual");
   const areaHaValue = watch("areaHa");
-  const valorDesconto = watch("valorMulta");
+
+  const valorBaseMulta = useMemo(() => {
+    const area = toNum(areaHaValue);
+    return area * 250;
+  }, [areaHaValue]);
 
   const valorFinalMulta = useMemo(() => {
-    const area = toNum(areaHaValue);
-    const base = !isNaN(area) ? area * 250 : 0;
-    const desconto = toNum(valorDesconto);
-
-    if (descontoPerc === "0") return desconto;
-    if (descontoPerc === "50") return desconto / 2; 
-    if (descontoPerc === "100") return 0;
-    return base;
-  }, [descontoPerc, areaHaValue, valorDesconto]);
+     return valorBaseMulta;
+  }, [valorBaseMulta]);
 
   useEffect(() => {
     setValue("valorMulta", valorFinalMulta.toFixed(2), {
@@ -154,7 +150,7 @@ export const ObjectionLayout = () => {
       shouldValidate: true,
     });
   }, [valorFinalMulta, setValue]);
-
+  
   const [selectedSupressaoDocsIds, setSelectedSupressaoDocsIds] = useState<
     number[]
   >([]);
@@ -284,6 +280,8 @@ export const ObjectionLayout = () => {
 
   const onSubmit = async (formData: FormValues) => {
     try {
+      const valorBruto = valorBaseMulta;
+
       if (!formData.status) {
         alert("Selecione um status do parecer.");
         return;
@@ -295,6 +293,7 @@ export const ObjectionLayout = () => {
         poligono: string;
         idTad: number | string;
         areaARegenerar: number;
+        wkt: string;
       }[] = [];
       const arquivosOut: { pdf: File; tipo: string }[] = [];
 
@@ -326,6 +325,7 @@ export const ObjectionLayout = () => {
           poligono: originalTipo,
           idTad: originalIdAgrotools,
           areaARegenerar: clamped,
+          wkt: original?.wkt || "",
         });
 
         const file = d?.pdf?.[0];
@@ -349,12 +349,19 @@ export const ObjectionLayout = () => {
         return;
       }
 
+      let valorFinal = valorBruto;
+      if (descontoPerc.value === "50") {
+        valorFinal = valorBruto / 2;
+      } else if (descontoPerc.value === "100") {
+        valorFinal = 0;
+      }
+
       await submitObjectionAsync({
         status: formData.status,
-        deteccoes: arquivosOut, 
+        deteccoes: arquivosOut,
         poligonos: poligonosOut,
         parametros,
-        valorDesconto: valorFinalMulta,
+        descontoPercentual: valorFinal,
       });
 
       alert("Parecer enviado com sucesso!");
@@ -730,7 +737,6 @@ export const ObjectionLayout = () => {
                   </span>
                 </Table.Cell>
                 <Table.Cell>
-
                   <input
                     type="file"
                     accept="application/pdf"
@@ -739,7 +745,6 @@ export const ObjectionLayout = () => {
                     {...register("parecerTecnico.pdf" as const)}
                   />
                   <div className="flex items-center gap-2">
-
                     <button
                       type="button"
                       onClick={() =>
@@ -808,7 +813,7 @@ export const ObjectionLayout = () => {
                         rules={{
                           validate: (v: any) => {
                             if (v === "" || v === undefined || v === null)
-                              return true; 
+                              return true;
                             const n = toNum(v);
                             if (isNaN(n)) return "Informe um número válido";
                             if (n < 0) return "Não pode ser negativo";
@@ -929,7 +934,7 @@ export const ObjectionLayout = () => {
                 control={control}
               />
               <InputSelect
-                name="desconto_perc"
+                name="descontoPercentual"
                 label="Valor de desconto PREM"
                 placeholder="Isento"
                 control={control}

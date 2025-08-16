@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   PiSealCheckLight,
   PiUser,
-  PiAlignBottom,
   PiFarmLight,
 } from "react-icons/pi";
 
@@ -14,40 +13,41 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
 import { useUserRegister } from "@/hooks/useUserRegisterForm/useUserRegisterForm";
+import { Analityc } from "@/icons/Analityc";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
 
 export const UsersRegisterLayout = () => {
   const { control, handleSubmit, onSubmit, isLoading } = useUserRegister();
 
-    const customMenuItems = [
-      {
-        label: "Dashboard",
-        href: "/dashboard",
-        icon: <PiAlignBottom size={44} />,
-      },
-      {
-        label: "Usuários",
-        href: "/dashboard/users",
-        icon: <PiUser size={44} />,
-      },
-      {
-        label: "Elegibilidade",
-        href: "/dashboard/elegibility",
-        icon: <PiSealCheckLight size={44} />,
-      },
-      {
-        label: "Propriedades",
-        href: "/dashboard/properties",
-        icon: <PiFarmLight size={44} />,
-      },
-      /*{
+  const customMenuItems = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <Analityc size={44} />,
+    },
+    {
+      label: "Usuários",
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
+    },
+    {
+      label: "Elegibilidade",
+      href: "/dashboard/elegibility",
+      icon: <PiSealCheckLight size={44} />,
+    },
+    {
+      label: "Propriedades",
+      href: "/dashboard/properties",
+      icon: <PiFarmLight size={44} />,
+    },
+    /*{
         label: "Multas",
         href: "/dashboard/multas",
         icon: <Taxa className="text-current" />,
       },
       */
-    ];
+  ];
 
   return (
     <LayoutContainer title="Cadastrar Usuário" menuItems={customMenuItems}>
@@ -116,7 +116,7 @@ export const UsersRegisterLayout = () => {
 
         <div className="col-span-full flex justify-between mt-4">
           <Link
-            href="/dashboardUser/users"
+            href="/dashboard/users"
             className="text-[#21801A] underline"
           >
             Voltar

@@ -75,6 +75,7 @@ interface ObjectionData {
     estado: string;
     etapa: string;
     status: string;
+    descontoPercentual?: number;
   };
 
   justificativaSupressao: string | null;
@@ -97,9 +98,8 @@ interface SubmitObjectionProps {
     areaARegenerar: number | string;
   }[];
   parametros: { nome: string; tipo: string }[];
-  valorDesconto?: number;
+  descontoPercentual?: number;
   idAnalise?: number;
-  valorMulta?: number;
 }
 
 function formatDate(dateString: string | undefined | null): string {
@@ -247,8 +247,8 @@ export const useObjectionData = () => {
         formData.append("poligonos", JSON.stringify(payload.poligonos));
       }
 
-      if (payload.valorDesconto !== undefined) {
-        formData.append("valorDesconto", String(payload.valorDesconto));
+      if (payload.descontoPercentual !== undefined) {
+        formData.append("descontoPercentual", String(payload.descontoPercentual));
       }
 
       const parametrosArray: { nome: string; tipo: string }[] = [];
@@ -294,6 +294,7 @@ export const useObjectionData = () => {
   return {
     ...query,
     submitObjection: mutation.mutate,
+
     submitObjectionAsync: mutation.mutateAsync,
     isSubmitting: mutation.isPending,
   };
