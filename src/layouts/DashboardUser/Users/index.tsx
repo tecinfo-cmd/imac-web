@@ -83,51 +83,58 @@ export const UsersLayout = () => {
           </Table.Header>
 
           <Table.Body>
-            {users.map((user: any) => (
-              <Table.Row key={user.id}>
-                <Table.Cell>{user.pessoa?.nome}</Table.Cell>
-                <Table.Cell>{user.pessoa?.telefone}</Table.Cell>
-                <Table.Cell>{user.email}</Table.Cell>
-                <Table.Cell>{user.roles?.[0]?.nome}</Table.Cell>
-                <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{
-                        backgroundColor:
-                          user.status === "ATIVO" ? "#21801A" : "#F44336",
-                      }}
-                    />
-                    <span
-                      style={{
-                        color: user.status === "ATIVO" ? "#21801A" : "#F44336",
-                      }}
-                    >
-                      {user.status === "ATIVO" ? "Ativo" : "Inativo"}
-                    </span>
-                  </div>
-                </Table.Cell>
-                <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    <Tooltip message="Visualizar" id={`view-${user.id}`}>
-                      <button
-                        onClick={() =>
-                          router.push(`/dashboard/users/${user.email}`)
-                        }
-                      >
-                        <Eye />
-                      </button>
-                    </Tooltip>
-                    <Tooltip message="Inativar" id={`delete-${user.id}`}>
-                      <ConfirmBox
-                        onConfirm={() => deleteUserMutation.mutate(user.id)}
-                        status={user.status}
+            {users
+              .filter(
+                (user: any) =>
+                  user.roles?.[0]?.nome === "ADMINISTRATIVO" ||
+                  user.roles?.[0]?.nome === "ANALISTA"
+              )
+              .map((user: any) => (
+                <Table.Row key={user.id}>
+                  <Table.Cell>{user.pessoa?.nome}</Table.Cell>
+                  <Table.Cell>{user.pessoa?.telefone}</Table.Cell>
+                  <Table.Cell>{user.email}</Table.Cell>
+                  <Table.Cell>{user.roles?.[0]?.nome}</Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor:
+                            user.status === "ATIVO" ? "#21801A" : "#F44336",
+                        }}
                       />
-                    </Tooltip>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-            ))}
+                      <span
+                        style={{
+                          color:
+                            user.status === "ATIVO" ? "#21801A" : "#F44336",
+                        }}
+                      >
+                        {user.status === "ATIVO" ? "Ativo" : "Inativo"}
+                      </span>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      <Tooltip message="Visualizar" id={`view-${user.id}`}>
+                        <button
+                          onClick={() =>
+                            router.push(`/dashboard/users/${user.email}`)
+                          }
+                        >
+                          <Eye />
+                        </button>
+                      </Tooltip>
+                      <Tooltip message="Inativar" id={`delete-${user.id}`}>
+                        <ConfirmBox
+                          onConfirm={() => deleteUserMutation.mutate(user.id)}
+                          status={user.status}
+                        />
+                      </Tooltip>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
           </Table.Body>
         </Table.Container>
       )}
