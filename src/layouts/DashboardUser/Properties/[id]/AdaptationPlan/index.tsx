@@ -13,6 +13,7 @@ import {
 } from "react-icons/pi";
 
 import { InfoGrid } from "@/components/InfoGrid";
+import { Input } from "@/components/Input";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Radio } from "@/components/RadioBox";
 import { Table } from "@/components/Table";
@@ -26,6 +27,7 @@ import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
 //import { Taxa } from "@/icons/Taxa";
 import { X } from "@/icons/X";
+import { toast } from "sonner";
 
 type Parecer =
   | "deferido"
@@ -35,11 +37,10 @@ type Parecer =
   | "";
 
 interface FormValues {
-  novaAreaRegeneracao: "sim" | "nao" | "";
   justificativa: string;
   parecer: Parecer;
-  parecerTecnicoFile: FileList | null;
-  wktFile: FileList | null;
+  parecerTecnicoFile: File | null;
+  wkt: string;
 }
 
 export const PlanoAdequacaoLayout = () => {
@@ -50,26 +51,41 @@ export const PlanoAdequacaoLayout = () => {
   const [selectedDocsIds, setSelectedDocsIds] = useState<number[]>([]);
   const [openSection, setOpenSection] = useState({ tecnico: true });
 
-  const { data, isLoading, isError, error, submitObjectionAsync } =
+  const { data, isLoading, isError, error, submitPlanoAdequacaoAsync } =
     useObjectionData();
 
   const form = useForm<FormValues>({
     defaultValues: {
-      novaAreaRegeneracao: "",
       justificativa: "",
       parecer: "",
       parecerTecnicoFile: null,
-      wktFile: null,
+      wkt: "",
     },
   });
-  const { control, handleSubmit, setValue, reset } = form;
 
+  const PARECER_LABEL = "Parecer Técnico da Contestação";
+
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { control, handleSubmit, setValue, reset, watch } = form;
+
+  const selectedFile = watch("parecerTecnicoFile");
+
+  const openFilePicker = () => fileInputRef.current?.click();
+
+  const onFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const file = e.target.files?.[0] ?? null;
+    setValue("parecerTecnicoFile", file, { shouldValidate: true });
+  };
+
+  const clearFile = () => {
+    setValue("parecerTecnicoFile", null, { shouldValidate: true });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
   React.useEffect(() => {
     if (data?.planoAdequacao?.motivo) {
       setValue("justificativa", data.planoAdequacao.motivo);
     }
   }, [data?.planoAdequacao?.motivo, setValue]);
-
 
   if (isLoading) return <p>Carregando dados...</p>;
   if (isError) return <p>Erro: {(error as Error).message}</p>;
@@ -136,50 +152,100 @@ export const PlanoAdequacaoLayout = () => {
       .forEach((d) => d.url && d.url !== "#" && window.open(d.url, "_blank"));
   };
 
+  function sanitizeWKT(input?: string) {
+    if (!input) return "";
+    let s = input.trim();
+    s = s.replace(/^SRID=\d+;?/i, "");
+    s = s.replace(/(\d),(?=\d)/g, "$1.");
+    s = s.replace(/\s+/g, " ");
+    return s;
+  }
+
+  function isValidPolygonWKT(raw?: string) {
+    if (!raw) return false;
+    const wkt = sanitizeWKT(raw).toUpperCase();
+
+    if (!wkt.startsWith("POLYGON") && !wkt.startsWith("MULTIPOLYGON")) {
+      return false;
+    }
+    let bal = 0;
+    for (const ch of wkt) {
+      if (ch === "(") bal++;
+      else if (ch === ")") bal--;
+      if (bal < 0) return false;
+    }
+    if (bal !== 0) return false;
+    if (wkt.startsWith("POLYGON")) {
+      const ringMatch = wkt.match(/POLYGON\s*\(\(\s*([^)]+)\s*\)\)/i);
+      if (ringMatch) {
+        const coords = ringMatch[1]
+          .split(",")
+          .map((p) => p.trim().split(/\s+/).map(Number))
+          .filter(
+            (pair) =>
+              pair.length >= 2 &&
+              !Number.isNaN(pair[0]) &&
+              !Number.isNaN(pair[1])
+          );
+
+        if (coords.length < 4) return false;
+
+        const first = coords[0];
+        const last = coords[coords.length - 1];
+        const isClosed =
+          Math.abs(first[0] - last[0]) < 1e-12 &&
+          Math.abs(first[1] - last[1]) < 1e-12;
+        if (!isClosed) return false;
+      }
+    }
+
+    return true;
+  }
+
   const onSubmit = async (values: FormValues) => {
     try {
-      const parecerFile =
-        values.parecerTecnicoFile && values.parecerTecnicoFile.length > 0
-          ? values.parecerTecnicoFile[0]
-          : null;
-
-      const wktFile =
-        values.wktFile && values.wktFile.length > 0 ? values.wktFile[0] : null;
-
-      if (!parecerFile && !wktFile) {
-        alert(
-          "Anexe pelo menos o Parecer Técnico ou o arquivo WKT para enviar."
-        );
-        return;
-      }
-
-      if (!values.parecer) {
+      if (!values.parecerTecnicoFile) {
         alert("Selecione o parecer da análise da contestação.");
         return;
       }
 
+      const cleanedWkt = sanitizeWKT(values.wkt);
+
+      if (!isValidPolygonWKT(cleanedWkt)) {
+        alert("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.");
+        return;
+      }
+
+      if (!values.parecerTecnicoFile) {
+        alert("Selecione o parecer da análise da contestação.");
+        return;
+      }
+
+      const file = values.parecerTecnicoFile;
+
+      const parametros = [
+        { nome: file.name, tipo: "Parecer Técnico da Contestação" },
+      ];
+
       const payload: any = {
         status: values.parecer,
-        deteccoes: [] as { pdf: File; tipo: string }[],
-        poligonos: [] as {
-          tipo: string;
-          poligono: string;
-          idTad: number | string;
-          areaARegenerar: number | string;
-        }[],
-        parametros: [] as { nome: string; tipo: string }[],
+        parametros,
+        arquivo: file,
+        wkt: values.wkt,
       };
 
-      if (parecerFile) payload.parecerTecnico = { pdf: parecerFile };
-      if (wktFile) payload.deteccoes.push({ pdf: wktFile, tipo: wktFile.name });
-
-      await submitObjectionAsync(payload);
-      alert("Parecer enviado com sucesso!");
+      await submitPlanoAdequacaoAsync(payload);
+      toast.success("Parecer enviado com sucesso!", { duration: 3000 });
       reset();
       setSelectedDocsIds([]);
     } catch (err: any) {
       console.error(err);
-      alert(err?.message ?? "Falha ao enviar o parecer.");
+      const apiMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Falha ao enviar o parecer.";
+
+      toast.error(apiMessage, { duration: 3000 });
     }
   };
 
@@ -216,25 +282,6 @@ export const PlanoAdequacaoLayout = () => {
       <InfoGrid rows={farmInfoRows} data={[]} />
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <section>
-          <div className="bg-[#4A4A4A] text-white px-4 py-2 font-semibold">
-            Deseja propor uma nova área de regeneração?
-          </div>
-          <div className="flex gap-24 mt-2 pl-5">
-            <Radio
-              name="novaAreaRegeneracao"
-              value="sim"
-              label="Sim"
-              control={control}
-            />
-            <Radio
-              name="novaAreaRegeneracao"
-              value="nao"
-              label="Não"
-              control={control}
-            />
-          </div>
-        </section>
         <section className="border rounded-md shadow bg-white mt-4">
           <div className="bg-[#4A4A4A] text-white px-4 py-2 font-semibold">
             Estratégia de Adequação
@@ -381,7 +428,7 @@ export const PlanoAdequacaoLayout = () => {
               <Table.Row>
                 <Table.Cell>
                   <Radio
-                    name="deferido"
+                    name="parecer"
                     value="deferido"
                     label="Deferido"
                     control={control}
@@ -389,7 +436,7 @@ export const PlanoAdequacaoLayout = () => {
                 </Table.Cell>
                 <Table.Cell>
                   <Radio
-                    name="deferido_parcial"
+                    name="parecer"
                     value="deferido_parcial"
                     label="Deferido Parcialmente"
                     control={control}
@@ -397,7 +444,7 @@ export const PlanoAdequacaoLayout = () => {
                 </Table.Cell>
                 <Table.Cell>
                   <Radio
-                    name="indeferido"
+                    name="parecer"
                     value="indeferido"
                     label="Indeferido"
                     control={control}
@@ -405,7 +452,7 @@ export const PlanoAdequacaoLayout = () => {
                 </Table.Cell>
                 <Table.Cell>
                   <Radio
-                    name="comPendencias"
+                    name="parecer"
                     value="comPendencias"
                     label="Com Pendencias"
                     control={control}
@@ -419,6 +466,13 @@ export const PlanoAdequacaoLayout = () => {
           <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
             Faça o upload do parecer da analise da contestação?
           </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            onChange={onFileChange}
+          />
           <Table.Container className="!pt-0">
             <Table.Header>
               <Table.Title colspan={3}>Descrição do documento</Table.Title>
@@ -426,32 +480,47 @@ export const PlanoAdequacaoLayout = () => {
             <Table.Body>
               <Table.Row>
                 <Table.Cell>
-                  <Radio
-                    name="parecer"
-                    value="parecer"
-                    label="Parecer Técnico da Contestação"
-                    control={control}
-                  />
+                  <div className="flex items-center gap-2">
+                    <span>{PARECER_LABEL}</span>
+                    {selectedFile && (
+                      <span className="text-xs text-gray-600 italic">
+                        ({selectedFile.name})
+                      </span>
+                    )}
+                  </div>
                 </Table.Cell>
                 <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    <DownloadIcon /> <X />
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={openFilePicker}
+                      className="inline-flex items-center gap-2 hover:underline"
+                      title="Selecionar arquivo (PDF)"
+                    >
+                      <DownloadIcon />
+                    </button>
+                    {/* Limpar */}
+                    <button
+                      type="button"
+                      onClick={clearFile}
+                      className="inline-flex items-center gap-2 hover:underline disabled:opacity-50"
+                      title="Remover arquivo"
+                      disabled={!selectedFile}
+                    >
+                      <X />
+                    </button>
                   </div>
                 </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.Cell>
-                  <Radio
-                    name="arquivo"
-                    value="arquivo"
-                    label="Arquivo wkt da área de regeneração final"
+                  <Input
+                    label="Wkt"
                     control={control}
+                    placeholder="POLYGON (())"
+                    name="wkt"
+                    className="text-black"
                   />
-                </Table.Cell>
-                <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    <DownloadIcon /> <X />
-                  </div>
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
