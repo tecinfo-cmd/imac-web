@@ -33,6 +33,13 @@ interface SuppressionData {
   nomeArquivos: string[];
 }
 
+ const convertToAmericanDate = (date: string | null) => {
+  if (!date) return "";
+  const [day, month, year] = date.split("/");
+  return `${year}-${month}-${day}`;
+};
+
+
 const suppressionSchema = yup.object({
   dataEmissao: yup.string().required("Data de emissão é obrigatória"),
   dataValidade: yup.string().required("Data de validade é obrigatória"),
@@ -108,8 +115,8 @@ export const SuppressionAuthorizationSection = ({
 
   const handleAddSuppressionData = (data: SuppressionFormData) => {
     const newSuppressionData: SuppressionData = {
-      dataEmissao: data.dataEmissao,
-      dataValidade: data.dataValidade,
+      dataEmissao: convertToAmericanDate(data.dataEmissao),
+      dataValidade: convertToAmericanDate(data.dataValidade),
       tipo: data.tipo as { value: number; label: string } | null,
       orgaoEmissor: data.orgaoEmissor as {
         value: number;
@@ -120,9 +127,9 @@ export const SuppressionAuthorizationSection = ({
       arquivos: data.arquivos as File[],
       nomeArquivos: (data.arquivos as File[]).map((file) => file.name),
     };
-
+  
     setSuppressionDataList((prev) => [...prev, newSuppressionData]);
-
+    
     setUploadedFiles([]);
     setValue("arquivos", []);
     reset();
