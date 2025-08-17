@@ -85,7 +85,7 @@ interface ObjectionData {
   deteccoes: Deteccao[];
   idAnalise?: number;
   planoAdequacao?: PlanoAdequacao | null;
-  documentosPlano: DocumentoTecnicoData[]; // mapeados para a tabela
+  documentosPlano: DocumentoTecnicoData[];
 }
 
 interface SubmitObjectionProps {
@@ -100,6 +100,13 @@ interface SubmitObjectionProps {
   parametros: { nome: string; tipo: string }[];
   descontoPercentual?: number;
   idAnalise?: number;
+}
+
+interface SubmitPlanoAdequacaoProps {
+  status: string;
+  parametros: { nome: string; tipo: string }[];
+  wkt: string;
+  arquivo: File;
 }
 
 function formatDate(dateString: string | undefined | null): string {
@@ -172,7 +179,6 @@ export const useObjectionData = () => {
         status: data.status || "-",
       };
 
-
       const tecnicoFromPlano = planoAdequacao?.responsavelTecnico
         ? {
             nome: planoAdequacao.responsavelTecnico.nome,
@@ -223,7 +229,6 @@ export const useObjectionData = () => {
         deteccoes,
         idAnalise,
 
-
         planoAdequacao,
         documentosPlano,
       } as ObjectionData;
@@ -248,7 +253,10 @@ export const useObjectionData = () => {
       }
 
       if (payload.descontoPercentual !== undefined) {
-        formData.append("descontoPercentual", String(payload.descontoPercentual));
+        formData.append(
+          "descontoPercentual",
+          String(payload.descontoPercentual)
+        );
       }
 
       const parametrosArray: { nome: string; tipo: string }[] = [];
@@ -291,11 +299,48 @@ export const useObjectionData = () => {
     },
   });
 
+  const planoAdequacaoMutation = useMutation({
+    mutationFn: async (payload: SubmitPlanoAdequacaoProps) => {
+      const idAnalise = query.data?.idAnalise;
+      const idPlanoAdequacao = query.data?.planoAdequacao?.id;
+
+      if (!idPropriedade || !idAnalise || !idPlanoAdequacao) {
+        throw new Error("IDs obrigatórios não informados");
+      }
+      
+      const formData = new FormData();
+      formData.append("status", payload.status);
+      formData.append("wkt", payload.wkt);
+      formData.append("parametros", JSON.stringify(payload.parametros));
+      formData.append("arquivos", payload.arquivo); // arquivo binário
+
+      // 🔍 DEBUG
+      console.log("--- DADOS A SEREM ENVIADOS (Plano Adequação) ---");
+      for (const [key, value] of (formData as any).entries()) {
+        if (value instanceof File) {
+          console.log(
+            `${key}: File { name: ${value.name}, type: ${value.type}, size: ${value.size} }`
+          );
+        } else {
+          console.log(`${key}:`, value);
+        }
+      }
+      console.log("------------------------------------------------");
+
+      const url = `propriedade-prem/${idPropriedade}/analise-socioambiental/${idAnalise}/parecer-plano-adequacao/${idPlanoAdequacao}`;
+      const response = await api.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return response.data;
+    },
+  });
+
   return {
     ...query,
     submitObjection: mutation.mutate,
 
     submitObjectionAsync: mutation.mutateAsync,
     isSubmitting: mutation.isPending,
+    submitPlanoAdequacaoAsync: planoAdequacaoMutation.mutateAsync,
   };
 };

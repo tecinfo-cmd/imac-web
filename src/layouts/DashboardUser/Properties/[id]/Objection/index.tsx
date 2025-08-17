@@ -27,6 +27,7 @@ import { Analityc } from "@/icons/Analityc";
 import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
 import { X } from "@/icons/X";
+import { toast } from "sonner";
 
 type SelectOption = { label: string; value: string } | string | undefined;
 
@@ -364,9 +365,14 @@ export const ObjectionLayout = () => {
         descontoPercentual: valorFinal,
       });
 
-      alert("Parecer enviado com sucesso!");
-    } catch (e: any) {
-      alert(e?.message || "Erro ao enviar parecer.");
+      toast.success("Parecer enviado com sucesso!", { duration: 3000 });
+    } catch (err: any) {
+      console.error(err);
+      const apiMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Falha ao enviar o parecer.";
+      toast.error(apiMessage, { duration: 3000 });
     }
   };
 
