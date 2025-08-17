@@ -37,19 +37,17 @@ export const PropertySummaryLayout = () => {
 
   const handleDownloadSelected = () => {
     if (selectedDocs.length === 0) {
-      alert("Selecione ao menos um documento para baixar.");
+      alert("Selecione ao menos um documento para abrir.");
       return;
     }
 
-    selectedDocs.forEach((docName) => {
-      const doc = data?.documentos.find((d) => d.descricao === docName);
-      if (doc?.url) {
-        const link = document.createElement("a");
-        link.href = doc.url;
-        link.download = `${doc.descricao}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    const docsToOpen = data?.documentos.filter((d) =>
+      selectedDocs.includes(d.descricao)
+    );
+
+    docsToOpen?.forEach((doc) => {
+      if (doc.url) {
+        window.open(doc.url, "_blank");
       }
     });
   };

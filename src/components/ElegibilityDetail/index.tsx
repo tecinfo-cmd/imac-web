@@ -84,47 +84,49 @@ export const ElegibilityDetail: FC<Props> = ({
                 CAR: <span className="text-black">{carFederal}</span>
               </li>
             )}
-            <li>
-              {retorno.deteccoes && retorno.deteccoes.length > 0 ? (
-                retorno.deteccoes.map((detec: any) => (
-                  <li key={detec.id}>
-                    {detec.tipo}: <strong className="text-black">{detec.area_ha}</strong>
-                  </li>
-                ))
-              ) : (
+            {retorno.deteccoes && retorno.deteccoes.length > 0 ? (
+              retorno.deteccoes.map((detec: any) => (
+                <li key={detec.id}>
+                  {detec.tipo}:{" "}
+                  <strong className="text-black">{detec.area_ha}</strong>
+                </li>
+              ))
+            ) : (
+              <li>
                 <span className="text-black ml-2">N/A</span>
-              )}
-            </li>
+              </li>
+            )}
+
             <li>
-              Sobreposição com área de RL ou APP:{" "}
+              Sobreposição com área de RL ou APP:
               <span className="text-black">
                 {retorno?.hasDocuments === false ? "Não" : "Sim"}
               </span>
             </li>
             <li>
-              Propriedade:{" "}
+              Propriedade:
               <strong>
                 <span className="text-black">
-                  {item.status === "APROVADO" ? "ELEGÍVEL " : "NÃO ELEGÍVEL "}
+                  {retorno.isEligible === true ? " ELEGÍVEL " : " NÃO ELEGÍVEL "}
                 </span>
               </strong>
               <span>a participar do PREM</span>
             </li>
             <li>
-              Área de desmatamento total:{" "}
+              Área de desmatamento total:
               <span className="text-black">
                 {retorno?.areas_desmatamento_total ?? "N/A"}
               </span>
             </li>
             <li>
-              Número de Módulos Fiscais:{" "}
+              Número de Módulos Fiscais:
               <span className="text-black">
                 {retorno?.modulo_fiscal ?? "N/A"}
               </span>
             </li>
             <li>
               <strong>
-                Valor da multa indenizatória: R${" "}
+                Valor da multa indenizatória: R$
                 <span className="text-black">
                   {retorno?.vlr_multa !== undefined
                     ? retorno.vlr_multa.toLocaleString("pt-BR", {
