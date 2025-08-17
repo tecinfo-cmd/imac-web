@@ -4,13 +4,14 @@ import { api } from "@/api";
 import { parseCookies } from "nookies";
 
 interface Propriedade {
-  idSolicitacaoElegibilidade: string;
-  nomePropriedade: string;
   carFederal: string;
+  id: number;
+  nomePropriedade: string;
+  idSolicitacaoElegibilidade?: number;
 }
 
 type PagamentoPayload = {
-  nomePropriedade: number;
+  select: string;
   nomeCompleto: string;
   numeroCartao: string;
   validade: string;
@@ -29,32 +30,44 @@ export function useBuyVoucher() {
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [propriedades, setPropriedades] = useState<Propriedade[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const cookies = parseCookies();
   const email = cookies.email;
 
-  const buscarPropriedadesSalvas = useCallback(async () => {
-    if (!email) return;
+  const buscarPropriedadesSalvas = useCallback(async (): Promise<
+      Propriedade[]
+  > => {
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const response = await api.get("propriedade-prem/proprietario", {
-        params: { email },
-      });
+      const response = await api.get("propriedade-prem?statusVoucher=false");
 
-      const props = response.data
-        .filter((item: any) => item.solicitacaoElegibilidade?.status === "APROVADO" && item.statusVoucher === false)
-        .map((item: any) => ({
-          idSolicitacaoElegibilidade: item.idSolicitacaoElegibilidade,
+      const data = response.data.data;
+
+      if (Array.isArray(data) && data.length > 0) {
+        const props: Propriedade[] = data.map((item: any) => ({
+          id: item.id,
           nomePropriedade: item.nomePropriedade,
           carFederal: item.carFederal,
         }));
-      setPropriedades(props);
 
-      console.log("Propriedades carregadas:", props);
-    } catch (error) {
-      console.error("Erro ao buscar propriedades:", error);
+        setPropriedades(props);
+        return props;
+      } else {
+        setError("Nenhuma propriedade encontrada para o CAR.");
+        setPropriedades([]);
+        return [];
+      }
+    } catch (err: any) {
+      console.error("Erro ao buscar propriedades:", err);
+      setError("Erro ao buscar propriedades.");
+      return [];
+    } finally {
+      setIsLoading(false);
     }
-  }, [email]);
+  }, []);
 
   const loadUserData = useCallback(async () => {
     setIsLoadingUserData(true);
@@ -79,30 +92,29 @@ export function useBuyVoucher() {
     if (!userData) {
       throw new Error("Usuário não autenticado");
     }
-
     setIsLoading(true);
     try {
       const [month, year] = dados.validade.split("/");
 
       const propriedadeResponse = await api.get(
-        "propriedade-prem/proprietario",
-        {
-          params: {
-            email: email,
-          },
-        }
+          "propriedade-prem/proprietario",
+          {
+            params: {
+              email: email,
+            },
+          }
       );
 
       const lista = Array.isArray(propriedadeResponse.data?.data)
-        ? propriedadeResponse.data.data
-        : propriedadeResponse.data;
+          ? propriedadeResponse.data.data
+          : propriedadeResponse.data;
 
       if (!Array.isArray(lista) || lista.length === 0) {
         throw new Error("Nenhuma propriedade encontrada para o usuário.");
       }
 
       const selectedProperty = lista.find(
-        (p: any) => String(p.id) === String(dados.select)
+          (p: any) => String(p.id) === String(dados.select)
       );
 
       if (!selectedProperty) {
@@ -117,6 +129,7 @@ export function useBuyVoucher() {
 
       const payload = {
         buyer: {
+          select: dados.select,
           name: userData.pessoa.nome,
           email: userData.pessoa.email,
           phone: userData.pessoa.telefone,
@@ -148,8 +161,8 @@ export function useBuyVoucher() {
       };
 
       const response = await api.post(
-        `agrotools/voucher/pagamento/${idSolicitacao}`,
-        payload
+          `agrotools/voucher/pagamento/${idSolicitacao}`,
+          payload
       );
       return response.data;
     } catch (error: any) {
@@ -167,6 +180,7 @@ export function useBuyVoucher() {
     userData,
     isLoadingUserData,
     propriedades,
+    error,
     buscarPropriedadesSalvas,
   };
 }
