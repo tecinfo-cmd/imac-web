@@ -33,12 +33,11 @@ interface SuppressionData {
   nomeArquivos: string[];
 }
 
- const convertToAmericanDate = (date: string | null) => {
+const convertToISO8601 = (date: string | null) => {
   if (!date) return "";
   const [day, month, year] = date.split("/");
   return `${year}-${month}-${day}`;
 };
-
 
 const suppressionSchema = yup.object({
   dataEmissao: yup.string().required("Data de emissão é obrigatória"),
@@ -115,8 +114,8 @@ export const SuppressionAuthorizationSection = ({
 
   const handleAddSuppressionData = (data: SuppressionFormData) => {
     const newSuppressionData: SuppressionData = {
-      dataEmissao: convertToAmericanDate(data.dataEmissao),
-      dataValidade: convertToAmericanDate(data.dataValidade),
+      dataEmissao: data.dataEmissao,
+      dataValidade: data.dataValidade,
       tipo: data.tipo as { value: number; label: string } | null,
       orgaoEmissor: data.orgaoEmissor as {
         value: number;
@@ -127,9 +126,9 @@ export const SuppressionAuthorizationSection = ({
       arquivos: data.arquivos as File[],
       nomeArquivos: (data.arquivos as File[]).map((file) => file.name),
     };
-  
+
     setSuppressionDataList((prev) => [...prev, newSuppressionData]);
-    
+
     setUploadedFiles([]);
     setValue("arquivos", []);
     reset();
@@ -191,8 +190,8 @@ export const SuppressionAuthorizationSection = ({
 
       const autorizacoesSupressoes = JSON.stringify(
         suppressionDataList.map((suppression) => ({
-          dataEmissao: suppression.dataEmissao,
-          dataValidade: suppression.dataValidade,
+          dataEmissao: convertToISO8601(suppression.dataEmissao),
+          dataValidade: convertToISO8601(suppression.dataValidade),
           idTipo: suppression.tipo?.value || 0,
           idOrgaoEmissor: suppression.orgaoEmissor?.value || 0,
           areaAutorizadaParaSupressaoHa: suppression.areaAutorizada,
