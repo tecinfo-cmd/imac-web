@@ -5,6 +5,7 @@ import { useState } from "react";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
+import { Pagination } from "@/components/Pagination";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
@@ -16,9 +17,20 @@ import { X } from "@/icons/X";
 import { FilterProperties } from "./FilterProperties";
 
 export const PropertiesLayout = () => {
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [filters, setFilters] = useState({});
-  const { data: properties = [], isLoading } = useGetPropriedades(filters);
+  const { data, isLoading } = useGetPropriedades({
+    ...filters,
+    page,
+    size: limit,
+  });
+
+  const properties = data?.data ?? [];
+  const totalItems = data?.total ?? 0;
   const router = useRouter();
+  
+
 
   const customMenuItems = [
     {
@@ -143,75 +155,85 @@ export const PropertiesLayout = () => {
   return (
     <LayoutContainer title="Propriedades" menuItems={customMenuItems}>
       <FilterProperties onFilter={setFilters} />
-      <span>Total de propriedades: {properties?.length || 0}</span>
+      <span>Total de propriedades: {totalItems || 0}</span>
 
       {isLoading ? (
         <p>Carregando usuários...</p>
       ) : (
-        <Table.Container>
-          <Table.Header>
-            <Table.Title>Nome da Propriedade </Table.Title>
-            <Table.Title>Município</Table.Title>
-            <Table.Title>CAR Federal</Table.Title>
-            <Table.Title>Status</Table.Title>
-            <Table.Title>Ações</Table.Title>
-          </Table.Header>
+        <>
+          <Table.Container>
+            <Table.Header>
+              <Table.Title>Nome da Propriedade </Table.Title>
+              <Table.Title>Município</Table.Title>
+              <Table.Title>CAR Federal</Table.Title>
+              <Table.Title>Status</Table.Title>
+              <Table.Title>Ações</Table.Title>
+            </Table.Header>
 
-          <Table.Body>
-            {properties?.map((properties: any) => (
-              <Table.Row key={properties.id}>
-                <Table.Cell>{properties.nomePropriedade}</Table.Cell>
-                <Table.Cell>{properties.cidade?.nome || "-"}</Table.Cell>
-                <Table.Cell>{properties.carFederal}</Table.Cell>
-                <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    {(() => {
-                      const statusObj = statusOptions.find(
-                        (opt) => opt.value === properties.status
-                      );
-                      return (
-                        <>
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{
-                              backgroundColor: statusObj?.color,
-                            }}
-                          />
-                          <span style={{ color: statusObj?.color }}>
-                            {statusObj?.label || properties.status}
-                          </span>
-                        </>
-                      );
-                    })()}
-                  </div>
-                </Table.Cell>
-                <Table.Cell>
-                  <div className="flex justify-center items-center gap-2">
-                    <Tooltip
-                      message="Visualizar ou editar dados"
-                      id={`view-${properties.id}`}
-                    >
-                      <button
-                        className="flex items-center justify-center p-1 rounded hover:bg-gray-100"
-                        onClick={() =>
-                          router.push(`/dashboard/properties/${properties.id}`)
-                        }
+            <Table.Body>
+              {properties?.map((properties: any) => (
+                <Table.Row key={properties.id}>
+                  <Table.Cell>{properties.nomePropriedade}</Table.Cell>
+                  <Table.Cell>{properties.cidade?.nome || "-"}</Table.Cell>
+                  <Table.Cell>{properties.carFederal}</Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      {(() => {
+                        const statusObj = statusOptions.find(
+                          (opt) => opt.value === properties.status
+                        );
+                        return (
+                          <>
+                            <span
+                              className="w-2 h-2 rounded-full"
+                              style={{
+                                backgroundColor: statusObj?.color,
+                              }}
+                            />
+                            <span style={{ color: statusObj?.color }}>
+                              {statusObj?.label || properties.status}
+                            </span>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex justify-center items-center gap-2">
+                      <Tooltip
+                        message="Visualizar ou editar dados"
+                        id={`view-${properties.id}`}
                       >
-                        <Monitor />
-                      </button>
-                    </Tooltip>
-                    <Tooltip
-                      message="Inativar propriedade"
-                      id={`delete-${properties.id}`}
-                    >
-                      <X />
-                    </Tooltip>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Container>
+                        <button
+                          className="flex items-center justify-center p-1 rounded hover:bg-gray-100"
+                          onClick={() =>
+                            router.push(
+                              `/dashboard/properties/${properties.id}`
+                            )
+                          }
+                        >
+                          <Monitor />
+                        </button>
+                      </Tooltip>
+                      <Tooltip
+                        message="Inativar propriedade"
+                        id={`delete-${properties.id}`}
+                      >
+                        <X />
+                      </Tooltip>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Container>
+          <Pagination
+            totalItems={totalItems}
+            pageSize={limit}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </LayoutContainer>
   );

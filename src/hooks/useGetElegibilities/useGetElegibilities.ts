@@ -6,10 +6,11 @@ export const useGetElegibilities = (filters: any) => {
     queryKey: ["elegibilities", filters],
     queryFn: async () => {
       const response = await api.get("elegibilidades/listar");
-      const all = response.data?.data ?? [];
+      const all = response.data ?? { data: [], total: 0, page: 1, size: 10 };
 
       const { carFederal, nomePropriedade, cpfCnpj, status, email } = filters;
-      return all.filter((item: any) => {
+
+      const filteredData = (all.data ?? []).filter((item: any) => {
         const matchCAR = carFederal
           ? item.carFederal?.trim().toUpperCase() ===
             carFederal.trim().toUpperCase()
@@ -31,6 +32,12 @@ export const useGetElegibilities = (filters: any) => {
 
         return matchCAR && matchNome && matchCPF && matchStatus && matchEmail;
       });
+
+      return {
+        ...all,
+        data: filteredData,
+        total: filteredData.length,
+      };
     },
     enabled: true,
   });

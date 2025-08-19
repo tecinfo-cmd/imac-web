@@ -6,6 +6,7 @@ import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
 import { LayoutContainer } from "@/components/LayoutContainer";
+import { Pagination } from "@/components/Pagination";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
@@ -17,8 +18,23 @@ import { Eye } from "@/icons/Eye";
 import { FilterUsers } from "./FilterUsers";
 
 export const UsersLayout = () => {
+  const [page, setPage] = useState(1);
+  const limit = 10;
   const [filters, setFilters] = useState({});
-  const { data: users, isLoading, error } = useGetUsers(filters);
+  const { data, isLoading, error } = useGetUsers({
+    ...filters,
+    page,
+    size: limit,
+  });
+  const users = data?.data ?? [];
+
+  const filteredUsers = users.filter(
+    (user: any) =>
+      user.roles?.[0]?.nome === "ADMINISTRATIVO" ||
+      user.roles?.[0]?.nome === "ANALISTA"
+  );
+
+  const totalFiltered = filteredUsers.length;
   const router = useRouter();
 
   const deleteUserMutation = useDeleteUser();
@@ -55,7 +71,7 @@ export const UsersLayout = () => {
   return (
     <LayoutContainer title="Usuarios" menuItems={customMenuItems}>
       <FilterUsers onFilter={setFilters} />
-      <span>Total de usuários: {users?.length || 0}</span>
+      <span>Total de usuários: {totalFiltered || 0}</span>
 
       {isLoading && <p>Carregando usuários...</p>}
 
@@ -72,71 +88,73 @@ export const UsersLayout = () => {
       )}
 
       {!isLoading && !error && users && users.length > 0 && (
-        <Table.Container>
-          <Table.Header>
-            <Table.Title>Nome</Table.Title>
-            <Table.Title>Telefone</Table.Title>
-            <Table.Title>Email</Table.Title>
-            <Table.Title>Perfil</Table.Title>
-            <Table.Title>Status</Table.Title>
-            <Table.Title>Ações</Table.Title>
-          </Table.Header>
+        <>
+          <Table.Container>
+            <Table.Header>
+              <Table.Title>Nome</Table.Title>
+              <Table.Title>Telefone</Table.Title>
+              <Table.Title>Email</Table.Title>
+              <Table.Title>Perfil</Table.Title>
+              <Table.Title>Status</Table.Title>
+              <Table.Title>Ações</Table.Title>
+            </Table.Header>
 
-          <Table.Body>
-            {users
-              .filter(
-                (user: any) =>
-                  user.roles?.[0]?.nome === "ADMINISTRATIVO" ||
-                  user.roles?.[0]?.nome === "ANALISTA"
-              )
-              .map((user: any) => (
-                <Table.Row key={user.id}>
-                  <Table.Cell>{user.pessoa?.nome}</Table.Cell>
-                  <Table.Cell>{user.pessoa?.telefone}</Table.Cell>
-                  <Table.Cell>{user.email}</Table.Cell>
-                  <Table.Cell>{user.roles?.[0]?.nome}</Table.Cell>
-                  <Table.Cell>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{
-                          backgroundColor:
-                            user.status === "ATIVO" ? "#21801A" : "#F44336",
-                        }}
-                      />
-                      <span
-                        style={{
-                          color:
-                            user.status === "ATIVO" ? "#21801A" : "#F44336",
-                        }}
-                      >
-                        {user.status === "ATIVO" ? "Ativo" : "Inativo"}
-                      </span>
-                    </div>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <div className="flex items-center gap-2">
-                      <Tooltip message="Visualizar" id={`view-${user.id}`}>
-                        <button
-                          onClick={() =>
-                            router.push(`/dashboard/users/${user.email}`)
-                          }
-                        >
-                          <Eye />
-                        </button>
-                      </Tooltip>
-                      <Tooltip message="Inativar" id={`delete-${user.id}`}>
-                        <ConfirmBox
-                          onConfirm={() => deleteUserMutation.mutate(user.id)}
-                          status={user.status}
+            <Table.Body>
+              {filteredUsers.map((user: any) => (
+                  <Table.Row key={user.id}>
+                    <Table.Cell>{user.pessoa?.nome}</Table.Cell>
+                    <Table.Cell>{user.pessoa?.telefone}</Table.Cell>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.roles?.[0]?.nome}</Table.Cell>
+                    <Table.Cell>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{
+                            backgroundColor:
+                              user.status === "ATIVO" ? "#21801A" : "#F44336",
+                          }}
                         />
-                      </Tooltip>
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-          </Table.Body>
-        </Table.Container>
+                        <span
+                          style={{
+                            color:
+                              user.status === "ATIVO" ? "#21801A" : "#F44336",
+                          }}
+                        >
+                          {user.status === "ATIVO" ? "Ativo" : "Inativo"}
+                        </span>
+                      </div>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <div className="flex items-center gap-2">
+                        <Tooltip message="Visualizar" id={`view-${user.id}`}>
+                          <button
+                            onClick={() =>
+                              router.push(`/dashboard/users/${user.email}`)
+                            }
+                          >
+                            <Eye />
+                          </button>
+                        </Tooltip>
+                        <Tooltip message="Inativar" id={`delete-${user.id}`}>
+                          <ConfirmBox
+                            onConfirm={() => deleteUserMutation.mutate(user.id)}
+                            status={user.status}
+                          />
+                        </Tooltip>
+                      </div>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+            </Table.Body>
+          </Table.Container>
+          <Pagination
+            totalItems={totalFiltered}
+            pageSize={limit}
+            currentPage={page}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </LayoutContainer>
   );
