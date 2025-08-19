@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { api } from "@/api";
+import { setUnauthorizedCallback } from "@/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 import { jwtDecode } from "jwt-decode";
@@ -36,6 +37,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const { setUserData, clearSession } = useAuthStore();
   const { setRole, clearRole } = useUserRoleStore();
   const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    setUnauthorizedCallback(() => {
+      destroyCookie(undefined, "@IMAC:T");
+      clearSession();
+      clearRole();
+      router.push("/auth");
+    });
+  }, [clearRole, clearSession, router]);
 
   useEffect(() => {
     const { "@IMAC:T": accessToken } = parseCookies();
@@ -77,7 +87,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
         api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
         const decoded = jwtDecode<DecodedToken>(accessToken);
-        
 
         const role = decoded.roles?.[0]?.toUpperCase();
         setRole(role);
