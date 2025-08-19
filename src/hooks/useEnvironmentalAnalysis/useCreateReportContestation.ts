@@ -6,6 +6,7 @@ interface ReportContestationData {
   parametros: string;
   motivo: string;
   arquivos: File[];
+  idResponsavelTecnico: number;
 }
 
 const createReportContestationRequest = async (
@@ -21,6 +22,7 @@ const createReportContestationRequest = async (
 
   formData.append("parametros", data.parametros);
   formData.append("motivo", data.motivo);
+  formData.append("idResponsavelTecnico", data.idResponsavelTecnico.toString());
 
   const response = await api.post(
     `/propriedade-prem/${farmId}/analise-socioambiental/${analysisId}/contestacao-laudo`,

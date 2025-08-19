@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
 import { useCreateReportContestation } from "@/hooks/useEnvironmentalAnalysis/useCreateReportContestation";
+import { useTechnicalResponsibleContestationStore } from "@/store/useTechnicalResponsibleContestationStore";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
@@ -34,6 +35,7 @@ export const ReportContestationSection = ({
   const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
   const { mutateAsync: createReportContestation, isPending } =
     useCreateReportContestation(farmId, analysisId);
+  const { technicalResponsible } = useTechnicalResponsibleContestationStore();
 
   const { control, watch } = useForm<ReportFormData>({
     resolver: yupResolver(reportSchema),
@@ -108,6 +110,11 @@ export const ReportContestationSection = ({
         return;
       }
 
+      if (!technicalResponsible?.id) {
+        toast.error("Responsável técnico não encontrado!");
+        return;
+      }
+
       const parametros = JSON.stringify(
         documentsWithFiles.map((doc) => ({
           nome: doc.file?.name || "",
@@ -124,6 +131,7 @@ export const ReportContestationSection = ({
           parametros,
           arquivos,
           motivo: motivo || "",
+          idResponsavelTecnico: parseInt(technicalResponsible.id),
         },
         {
           onSuccess: () => {
@@ -161,7 +169,6 @@ export const ReportContestationSection = ({
             ocorreu, porém, antes da data limite estabelecida. (data 22/07/2008)
           </TableInformation.Title>
           <TableInformation.Value>
-            {/* Motivo da Contestação */}
             <div className="mt-6">
               <p className="text-[#0A3503] mb-4">
                 Justificativa: Explique de forma breve o objetivo do laudo,
@@ -175,7 +182,6 @@ export const ReportContestationSection = ({
               />
             </div>
 
-            {/* Anotação de responsabilidade técnica */}
             <div className="mt-8">
               <h3 className="text-[#21801A] font-medium mb-4">
                 Anotação de responsabilidade técnica
