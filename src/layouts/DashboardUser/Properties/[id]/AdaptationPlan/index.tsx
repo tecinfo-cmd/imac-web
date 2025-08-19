@@ -235,7 +235,7 @@ export const PlanoAdequacaoLayout = () => {
       };
 
       await submitPlanoAdequacaoAsync(payload);
-      toast.success("Parecer enviado com sucesso!", { duration: 3000 });
+      toast.success("Parecer enviado com sucesso!", { duration: 5000 });
       reset();
       setSelectedDocsIds([]);
     } catch (err: any) {
@@ -245,7 +245,7 @@ export const PlanoAdequacaoLayout = () => {
         err?.message ||
         "Falha ao enviar o parecer.";
 
-      toast.error(apiMessage, { duration: 3000 });
+      toast.error(apiMessage, { duration: 5000 });
     }
   };
 
@@ -416,12 +416,12 @@ export const PlanoAdequacaoLayout = () => {
         </section>
         <section className="border rounded-md shadow bg-white mt-4">
           <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
-            Parecer da Plano de Adequação
+            Parecer do Plano de Adequação
           </div>
           <Table.Container className="!pt-0">
             <Table.Header>
               <Table.Title colspan={4}>
-                Qual é o parecer da analise da contestação?
+                Qual é o parecer da analise do Plano de Adequação?
               </Table.Title>
             </Table.Header>
             <Table.Body>
@@ -464,7 +464,7 @@ export const PlanoAdequacaoLayout = () => {
         </section>
         <section className="border rounded-md shadow bg-white mt-4">
           <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
-            Faça o upload do parecer da analise da contestação?
+            Faça o upload do parecer da analise do Plano de Adequação?
           </div>
 
           <input

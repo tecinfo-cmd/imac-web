@@ -9,7 +9,7 @@ export const useGetUsers = (filters: any) => {
         params: filters,
       });
 
-      return response.data.data ?? []; 
+      return response.data ?? { data: [], total: 0, page: 1, size: 10 };
     },
     enabled: true,
   });

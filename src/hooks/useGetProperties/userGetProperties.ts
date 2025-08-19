@@ -13,7 +13,7 @@ export const useGetPropriedades = (filters: any) => {
       const response = await api.get("propriedade-prem", {
         params: cleanFilters,
       });
-      return response.data?.data ?? [];
+      return response.data ?? { data: [], total: 0, page: 1, size: 10 };
     },
     enabled: true, 
   });

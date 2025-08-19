@@ -48,7 +48,7 @@ type FormValues = {
     pdf?: FileList;
     tipo?: string | { label: string; value: string };
     areaARegenerar?: string;
-    polygon?: string;
+    wkt?: string;
   }[];
   parecerTecnico: {
     pdf?: FileList;
@@ -110,7 +110,7 @@ export const ObjectionLayout = () => {
         pdf: undefined,
         tipo: undefined,
         areaARegenerar: "",
-        polygon: "",
+        wkt: "",
       })),
       parecerTecnico: { pdf: undefined },
     });
@@ -133,7 +133,7 @@ export const ObjectionLayout = () => {
     });
   }, [totalAreaHa, setValue]);
 
-  const descontoPerc:any = watch("descontoPercentual");
+  const descontoPerc: any = watch("descontoPercentual");
   const areaHaValue = watch("areaHa");
 
   const valorBaseMulta = useMemo(() => {
@@ -142,7 +142,7 @@ export const ObjectionLayout = () => {
   }, [areaHaValue]);
 
   const valorFinalMulta = useMemo(() => {
-     return valorBaseMulta;
+    return valorBaseMulta;
   }, [valorBaseMulta]);
 
   useEffect(() => {
@@ -151,7 +151,7 @@ export const ObjectionLayout = () => {
       shouldValidate: true,
     });
   }, [valorFinalMulta, setValue]);
-  
+
   const [selectedSupressaoDocsIds, setSelectedSupressaoDocsIds] = useState<
     number[]
   >([]);
@@ -279,6 +279,56 @@ export const ObjectionLayout = () => {
       .forEach((item) => handleDownloadFile(item.url));
   };
 
+  function sanitizeWKT(input?: string) {
+    if (!input) return "";
+    let s = input.trim();
+    s = s.replace(/^SRID=\d+;?/i, "");
+    s = s.replace(/(\d),(?=\d)/g, "$1.");
+    s = s.replace(/\s+/g, " ");
+    return s;
+  }
+
+  function isValidPolygonWKT(raw?: string) {
+    if (!raw) return false;
+    const wkt = sanitizeWKT(raw).toUpperCase();
+
+    if (!wkt.startsWith("POLYGON") && !wkt.startsWith("MULTIPOLYGON")) {
+      return false;
+    }
+    let bal = 0;
+    for (const ch of wkt) {
+      if (ch === "(") bal++;
+      else if (ch === ")") bal--;
+      if (bal < 0) return false;
+    }
+    if (bal !== 0) return false;
+    if (wkt.startsWith("POLYGON")) {
+      const ringMatch = wkt.match(/POLYGON\s*\(\(\s*([^)]+)\s*\)\)/i);
+      if (ringMatch) {
+        const coords = ringMatch[1]
+          .split(",")
+          .map((p) => p.trim().split(/\s+/).map(Number))
+          .filter(
+            (pair) =>
+              pair.length >= 2 &&
+              !Number.isNaN(pair[0]) &&
+              !Number.isNaN(pair[1])
+          );
+
+        if (coords.length < 4) return false;
+
+        const first = coords[0];
+        const last = coords[coords.length - 1];
+        const isClosed =
+          Math.abs(first[0] - last[0]) < 1e-12 &&
+          Math.abs(first[1] - last[1]) < 1e-12;
+        if (!isClosed) return false;
+      }
+    }
+
+    return true;
+  }
+
   const onSubmit = async (formData: FormValues) => {
     try {
       const valorBruto = valorBaseMulta;
@@ -287,6 +337,14 @@ export const ObjectionLayout = () => {
         alert("Selecione um status do parecer.");
         return;
       }
+
+      (formData.deteccoes || []).forEach((d, index) => {
+        const cleanedWkt = sanitizeWKT(d.wkt);
+        if (!isValidPolygonWKT(cleanedWkt)) {
+          alert(`Informe um WKT válido no polígono ${index + 1}`);
+          throw new Error("WKT inválido");
+        }
+      });
 
       const parametros: { nome: string; tipo: string }[] = [];
       const poligonosOut: {
@@ -365,14 +423,14 @@ export const ObjectionLayout = () => {
         descontoPercentual: valorFinal,
       });
 
-      toast.success("Parecer enviado com sucesso!", { duration: 3000 });
+      toast.success("Parecer enviado com sucesso!", { duration: 5000 });
     } catch (err: any) {
       console.error(err);
       const apiMessage =
         err?.response?.data?.message ||
         err?.message ||
         "Falha ao enviar o parecer.";
-      toast.error(apiMessage, { duration: 3000 });
+      toast.error(apiMessage, { duration: 5000 });
     }
   };
 
@@ -905,8 +963,9 @@ export const ObjectionLayout = () => {
                     <Table.Cell>
                       <Input
                         control={control}
-                        name={`deteccoes.${index}.polygon`}
+                        name={`deteccoes.${index}.wkt`}
                         className="text-black"
+                        placeholder="POLYGON (())"
                       />
                     </Table.Cell>
                   </Table.Row>
