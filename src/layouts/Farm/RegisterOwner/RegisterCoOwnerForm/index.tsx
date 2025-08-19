@@ -40,7 +40,7 @@ const coOwnerSchema = yup.object().shape({
   ),
 });
 
- const convertToAmericanDate = (date: string | null) => {
+const convertToAmericanDate = (date: string | null) => {
   if (!date) return "";
   const [day, month, year] = date.split("/");
   return `${year}-${month}-${day}`;
@@ -106,8 +106,8 @@ export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
   };
 
   useEffect(() => {
-    if (farmData?.numeroProprietarios) {
-      const count = farmData.numeroProprietarios;
+    if (farmData?.numeroProprietarios && farmData.numeroProprietarios > 1) {
+      const count = farmData.numeroProprietarios - 1;
       const initialFields = Array.from({ length: count }, () => ({
         setAsMainOwner: false,
         nome: "",
@@ -119,8 +119,27 @@ export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
       }));
 
       replace(initialFields);
+    } else {
+      replace([]);
     }
   }, [farmData?.numeroProprietarios, replace]);
+
+
+  if (!farmData?.numeroProprietarios || farmData.numeroProprietarios <= 1) {
+    return (
+      <div className="flex flex-col gap-4 p-4">
+        <div className="flex flex-col items-start gap-2 pt-4">
+          <h2 className="text-[#1A6415] text-xl font-bold">
+            Cadastro de Co-proprietários
+          </h2>
+        </div>
+        <div className="bg-[#FFFBE6] text-[#1F1F1C] border border-[#FFE58F] rounded-md p-3 flex gap-2 text-sm">
+          <GoAlertFill size={16} color="#ffbc42" />
+          Esta fazenda não possui co-proprietários para cadastrar.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form
