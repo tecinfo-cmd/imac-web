@@ -384,6 +384,7 @@ export const ObjectionLayout = () => {
       const maxVal = Math.max(0, toNum(original?.area_ha ?? original?.ara_ha ?? 0) || 0);
       const clamped = Number.isFinite(areaNum) ? Math.min(Math.max(areaNum, 0), maxVal) : 0;
 
+
       poligonosOut.push({
         tipo: hasTipo ? String(selectedValue) : "",
         poligono: originalTipo,
@@ -404,10 +405,9 @@ export const ObjectionLayout = () => {
       return;
     }
 
-    const area = toNum(formData.areaHa);
-    const valorBruto = (Number.isFinite(area) ? area : 0) * 250;
-    const desconto = (formData.descontoPercentual as "0" | "50" | "100") || "0";
-    const valorFinalMulta = desconto === "100" ? 0 : desconto === "50" ? valorBruto / 2 : valorBruto;
+    const valorBruto = toNum(areaHaValue) * 250;
+    const desconto: any = (formData.descontoPercentual);
+    const valorFinalMulta = desconto.value === "100" ? 0 : desconto.value === "50" ? valorBruto / 2 : valorBruto;
 
     const payload: any = {
       status: formData.status,
