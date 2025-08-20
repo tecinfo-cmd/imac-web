@@ -27,7 +27,7 @@ export const TextAreaCard = ({
       {title && (
         <div className="bg-[#4A4A4A] text-white px-4 py-2 font-semibold flex justify-between items-center ">
           {title}
-          className
+          {className}
         </div>
       )}
       <div className="bg-[#EBE3F3] text-[#21801A] font-semibold px-4 py-2 !m-0 text-sm">
