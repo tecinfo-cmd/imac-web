@@ -84,7 +84,6 @@ export const ObjectionLayout = () => {
     isSubmitting,
   } = useObjectionData();
 
-  const PARECER_LABEL = "Parecer Técnico da Contestação";
 
   function toLabelValue(sel: SelectOption) {
     if (!sel) return { label: "", value: "" };
@@ -133,7 +132,6 @@ export const ObjectionLayout = () => {
     });
   }, [totalAreaHa, setValue]);
 
-  const descontoPerc: any = watch("descontoPercentual");
   const areaHaValue = watch("areaHa");
 
   const valorBaseMulta = useMemo(() => {
@@ -330,109 +328,105 @@ export const ObjectionLayout = () => {
   }
 
   const onSubmit = async (formData: FormValues) => {
-    try {
-      const valorBruto = valorBaseMulta;
+  try {
+    const erros: string[] = [];
 
-      if (!formData.status) {
-        alert("Selecione um status do parecer.");
-        return;
+    if (!formData.status) erros.push("Selecione um status do parecer.");
+    if (!formData.parecerTecnico.pdf || formData.parecerTecnico.pdf.length === 0) erros.push("Anexe o parecer técnico da contestação."); 
+
+    (formData.deteccoes || []).forEach((d, i) => {
+      const w = (d?.wkt ?? "").trim();
+      if (w && !isValidPolygonWKT(sanitizeWKT(w))) {
+        erros.push(`Polígono ${i + 1}: WKT inválido.`);
       }
+    });
 
-      (formData.deteccoes || []).forEach((d, index) => {
-        const cleanedWkt = sanitizeWKT(d.wkt);
-        if (!isValidPolygonWKT(cleanedWkt)) {
-          alert(`Informe um WKT válido no polígono ${index + 1}`);
-          throw new Error("WKT inválido");
-        }
-      });
-
-      const parametros: { nome: string; tipo: string }[] = [];
-      const poligonosOut: {
-        tipo: string;
-        poligono: string;
-        idTad: number | string;
-        areaARegenerar: number;
-        wkt: string;
-      }[] = [];
-      const arquivosOut: { pdf: File; tipo: string }[] = [];
-
-      const originalList = data?.deteccoes ?? [];
-
-      (formData.deteccoes || []).forEach((d, index) => {
-        const original = (originalList[index] ?? {}) as any;
-
-        const originalTipo = String(original?.tipo ?? "");
-        const originalIdAgrotools = original?.idAgrotools ?? original?.id ?? "";
-        const originalMaxArea = toNum(
-          original?.area_ha ?? original?.ara_ha ?? 0
-        );
-        const maxVal = isNaN(originalMaxArea) ? 0 : originalMaxArea;
-
-        const { label: selectedLabel, value: selectedValue } = toLabelValue(
-          d?.tipo
-        );
-
-        const userAreaRaw = d?.areaARegenerar ?? "";
-        const userArea = toNum(userAreaRaw);
-        // aplica clamp por segurança no payload
-        const clamped = isNaN(userArea)
-          ? 0
-          : Math.max(0, Math.min(userArea, maxVal));
-
-        poligonosOut.push({
-          tipo: String(selectedValue ?? ""),
-          poligono: originalTipo,
-          idTad: originalIdAgrotools,
-          areaARegenerar: clamped,
-          wkt: original?.wkt || "",
-        });
-
-        const file = d?.pdf?.[0];
-        if (file instanceof File) {
-          parametros.push({
-            nome: selectedLabel || "(sem-label)",
-            tipo: file.name,
-          });
-          arquivosOut.push({ pdf: file, tipo: file.name });
-        }
-      });
-
-      const parecerFile = formData.parecerTecnico?.pdf?.[0];
-      if (parecerFile instanceof File) {
-        parametros.push({ nome: PARECER_LABEL, tipo: parecerFile.name });
-        arquivosOut.push({ pdf: parecerFile, tipo: parecerFile.name });
-      }
-
-      if (arquivosOut.length === 0) {
-        alert("Nenhum arquivo foi enviado (parecer ou detecções).");
-        return;
-      }
-
-      let valorFinal = valorBruto;
-      if (descontoPerc.value === "50") {
-        valorFinal = valorBruto / 2;
-      } else if (descontoPerc.value === "100") {
-        valorFinal = 0;
-      }
-
-      await submitObjectionAsync({
-        status: formData.status,
-        deteccoes: arquivosOut,
-        poligonos: poligonosOut,
-        parametros,
-        descontoPercentual: valorFinal,
-      });
-
-      toast.success("Parecer enviado com sucesso!", { duration: 5000 });
-    } catch (err: any) {
-      console.error(err);
-      const apiMessage =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Falha ao enviar o parecer.";
-      toast.error(apiMessage, { duration: 5000 });
+    if (erros.length) {
+      toast.error(erros.join("\n"), { duration: 6000 });
+      return;
     }
-  };
+
+    const parametros: { nome: string; tipo: string }[] = [];
+    const poligonosOut: {
+      tipo: string;
+      poligono: string;
+      idTad: number | string;
+      areaARegenerar: number;
+      wkt: string;
+    }[] = [];
+    const arquivosOut: { pdf: File; tipo: string }[] = [];
+
+    const originalList = data?.deteccoes ?? [];
+
+    (formData.deteccoes || []).forEach((d, index) => {
+      const original = (originalList[index] ?? {}) as any;
+
+      const { label: selectedLabel, value: selectedValue } = toLabelValue(d?.tipo);
+      const wktRaw = (d?.wkt ?? "").trim();
+      const areaNum = toNum(d?.areaARegenerar);
+
+      const hasTipo = !!(selectedValue && String(selectedValue).trim());
+      const hasWKT = wktRaw.length > 0;
+      const hasArea = Number.isFinite(areaNum) && areaNum > 0;
+      const hasPdf = !!(d?.pdf && d.pdf[0] instanceof File);
+
+      if (hasPdf) {
+        const file = d!.pdf![0] as File;
+        parametros.push({ nome: selectedLabel || "(sem-label)", tipo: "PDF" });
+        arquivosOut.push({ pdf: file, tipo: file.name });
+      }
+
+      const hasPolygonData = hasTipo || hasWKT || hasArea;
+      if (!hasPolygonData) return; 
+
+      const originalTipo = String(original?.tipo ?? "");
+      const originalIdAgrotools = original?.idAgrotools ?? original?.id ?? "";
+      const maxVal = Math.max(0, toNum(original?.area_ha ?? original?.ara_ha ?? 0) || 0);
+      const clamped = Number.isFinite(areaNum) ? Math.min(Math.max(areaNum, 0), maxVal) : 0;
+
+
+      poligonosOut.push({
+        tipo: hasTipo ? String(selectedValue) : "",
+        poligono: originalTipo,
+        idTad: originalIdAgrotools,
+        areaARegenerar: hasArea ? clamped : 0, 
+        wkt: hasWKT ? sanitizeWKT(wktRaw) : "",
+      });
+    });
+
+    const parecerFile = formData.parecerTecnico?.pdf?.[0];
+    if (parecerFile instanceof File) {
+      parametros.push({ nome: "Parecer Técnico da Contestação", tipo: "PDF" });
+      arquivosOut.push({ pdf: parecerFile, tipo: parecerFile.name });
+    }
+
+    if (arquivosOut.length === 0 && poligonosOut.length === 0) {
+      toast.error("Nada para enviar: preencha pelo menos um polígono ou anexe um arquivo.", { duration: 4000 });
+      return;
+    }
+
+    const valorBruto = toNum(areaHaValue) * 250;
+    const desconto: any = (formData.descontoPercentual);
+    const valorFinalMulta = desconto.value === "100" ? 0 : desconto.value === "50" ? valorBruto / 2 : valorBruto;
+
+    const payload: any = {
+      status: formData.status,
+      parametros,
+      descontoPercentual: valorFinalMulta,
+    };
+    if (arquivosOut.length) payload.deteccoes = arquivosOut;
+    if (poligonosOut.length) payload.poligonos = poligonosOut;
+
+    await submitObjectionAsync(payload);
+    toast.success("Parecer enviado com sucesso!", { duration: 5000 });
+  } catch (err: any) {
+    console.error(err);
+    const apiMessage =
+      err?.response?.data?.message || err?.message || "Falha ao enviar o parecer.";
+    toast.error(apiMessage, { duration: 5000 });
+  }
+};
+
 
   const fileValue = watch("parecerTecnico.pdf");
   const hasParecer = !!(fileValue && fileValue.length > 0);
