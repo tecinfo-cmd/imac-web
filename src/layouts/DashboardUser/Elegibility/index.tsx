@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
 import { ElegibilityDetail } from "@/components/ElegibilityDetail";
@@ -28,6 +28,11 @@ export const ElegibilityLayout = () => {
 
   const elegibilities = data?.data ?? [];
   const totalItems = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
+
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [page, totalPages]);
 
   const [selectedData, setSelectedData] = useState<{
     id: number;
@@ -79,7 +84,12 @@ export const ElegibilityLayout = () => {
       title="Acompanhamento de Elegibilidade"
       menuItems={customMenuItems}
     >
-      <FilterElegibility onFilter={setFilters} />
+      <FilterElegibility
+        onFilter={(f) => {
+          setFilters(f);
+          setPage(1);
+        }}
+      />
       <span>Total de solicitações: {totalItems || 0}</span>
 
       {isLoading && <p>Carregando solicitações...</p>}

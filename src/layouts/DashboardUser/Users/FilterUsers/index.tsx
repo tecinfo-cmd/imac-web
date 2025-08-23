@@ -52,7 +52,8 @@ export const FilterUsers = ({ onFilter }: FilterUsersProps) => {
         placeholder="Administrador"
         control={control}
         options={[{ label: "Administrativo", value: "ADMINISTRATIVO" },
-          { label: "Analista", value: "ANALISTA" }
+          { label: "Analista", value: "ANALISTA" },
+          { label: "Produtor", value: "PRODUTOR", color: "#F44336" },
         ]}
       />
 
