@@ -62,6 +62,7 @@ export const ObjectionLayout = () => {
 
   const { control, handleSubmit, reset, register, setValue, watch } =
     useForm<FormValues>({
+      mode: "onChange",
       defaultValues: {
         justificativa: "",
         justificativaPorLauro: "",
@@ -84,6 +85,19 @@ export const ObjectionLayout = () => {
     isSubmitting,
   } = useObjectionData();
 
+  const canSendParecer = (() => {
+    if (!data) return false;
+    const validStatus = ["Em Análise", "COM_PENDENCIAS"];
+    const supressaoStatus = data?.contestacaoAutorizacaoSupressao?.situacao;
+    const laudoStatus = data?.contestacaoLaudo?.situacao;
+    if (
+      (supressaoStatus && validStatus.includes(supressaoStatus)) ||
+      (laudoStatus && validStatus.includes(laudoStatus))
+    ) {
+      return true;
+    }
+    return false;
+  })();
 
   function toLabelValue(sel: SelectOption) {
     if (!sel) return { label: "", value: "" };
@@ -328,105 +342,130 @@ export const ObjectionLayout = () => {
   }
 
   const onSubmit = async (formData: FormValues) => {
-  try {
-    const erros: string[] = [];
+    try {
+      const erros: string[] = [];
 
-    if (!formData.status) erros.push("Selecione um status do parecer.");
-    if (!formData.parecerTecnico.pdf || formData.parecerTecnico.pdf.length === 0) erros.push("Anexe o parecer técnico da contestação."); 
+      if (!formData.status) erros.push("Selecione um status do parecer.");
+      if (
+        !formData.parecerTecnico.pdf ||
+        formData.parecerTecnico.pdf.length === 0
+      )
+        erros.push("Anexe o parecer técnico da contestação.");
 
-    (formData.deteccoes || []).forEach((d, i) => {
-      const w = (d?.wkt ?? "").trim();
-      if (w && !isValidPolygonWKT(sanitizeWKT(w))) {
-        erros.push(`Polígono ${i + 1}: WKT inválido.`);
-      }
-    });
-
-    if (erros.length) {
-      toast.error(erros.join("\n"), { duration: 6000 });
-      return;
-    }
-
-    const parametros: { nome: string; tipo: string }[] = [];
-    const poligonosOut: {
-      tipo: string;
-      poligono: string;
-      idTad: number | string;
-      areaARegenerar: number;
-      wkt: string;
-    }[] = [];
-    const arquivosOut: { pdf: File; tipo: string }[] = [];
-
-    const originalList = data?.deteccoes ?? [];
-
-    (formData.deteccoes || []).forEach((d, index) => {
-      const original = (originalList[index] ?? {}) as any;
-
-      const { label: selectedLabel, value: selectedValue } = toLabelValue(d?.tipo);
-      const wktRaw = (d?.wkt ?? "").trim();
-      const areaNum = toNum(d?.areaARegenerar);
-
-      const hasTipo = !!(selectedValue && String(selectedValue).trim());
-      const hasWKT = wktRaw.length > 0;
-      const hasArea = Number.isFinite(areaNum) && areaNum > 0;
-      const hasPdf = !!(d?.pdf && d.pdf[0] instanceof File);
-
-      if (hasPdf) {
-        const file = d!.pdf![0] as File;
-        parametros.push({ nome: selectedLabel || "(sem-label)", tipo: "PDF" });
-        arquivosOut.push({ pdf: file, tipo: file.name });
-      }
-
-      const hasPolygonData = hasTipo || hasWKT || hasArea;
-      if (!hasPolygonData) return; 
-
-      const originalTipo = String(original?.tipo ?? "");
-      const originalIdAgrotools = original?.idAgrotools ?? original?.id ?? "";
-      const maxVal = Math.max(0, toNum(original?.area_ha ?? original?.ara_ha ?? 0) || 0);
-      const clamped = Number.isFinite(areaNum) ? Math.min(Math.max(areaNum, 0), maxVal) : 0;
-
-
-      poligonosOut.push({
-        tipo: hasTipo ? String(selectedValue) : "",
-        poligono: originalTipo,
-        idTad: originalIdAgrotools,
-        areaARegenerar: hasArea ? clamped : 0, 
-        wkt: hasWKT ? sanitizeWKT(wktRaw) : "",
+      (formData.deteccoes || []).forEach((d, i) => {
+        const w = (d?.wkt ?? "").trim();
+        if (w && !isValidPolygonWKT(sanitizeWKT(w))) {
+          erros.push(`Polígono ${i + 1}: WKT inválido.`);
+        }
       });
-    });
 
-    const parecerFile = formData.parecerTecnico?.pdf?.[0];
-    if (parecerFile instanceof File) {
-      parametros.push({ nome: "Parecer Técnico da Contestação", tipo: "PDF" });
-      arquivosOut.push({ pdf: parecerFile, tipo: parecerFile.name });
+      if (erros.length) {
+        toast.error(erros.join("\n"), { duration: 6000 });
+        return;
+      }
+
+      const parametros: { nome: string; tipo: string }[] = [];
+      const poligonosOut: {
+        tipo: string;
+        poligono: string;
+        idTad: number | string;
+        areaARegenerar: number;
+        wkt: string;
+      }[] = [];
+      const arquivosOut: { pdf: File; tipo: string }[] = [];
+
+      const originalList = data?.deteccoes ?? [];
+
+      (formData.deteccoes || []).forEach((d, index) => {
+        const original = (originalList[index] ?? {}) as any;
+
+        const { label: selectedLabel, value: selectedValue } = toLabelValue(
+          d?.tipo
+        );
+        const wktRaw = (d?.wkt ?? "").trim();
+        const areaNum = toNum(d?.areaARegenerar);
+
+        const hasTipo = !!(selectedValue && String(selectedValue).trim());
+        const hasWKT = wktRaw.length > 0;
+        const hasArea = Number.isFinite(areaNum) && areaNum > 0;
+        const hasPdf = !!(d?.pdf && d.pdf[0] instanceof File);
+
+        if (hasPdf) {
+          const file = d!.pdf![0] as File;
+          parametros.push({
+            nome: selectedLabel || "(sem-label)",
+            tipo: "PDF",
+          });
+          arquivosOut.push({ pdf: file, tipo: file.name });
+        }
+
+        const hasPolygonData = hasTipo || hasWKT || hasArea;
+        if (!hasPolygonData) return;
+
+        const originalTipo = String(original?.tipo ?? "");
+        const originalIdAgrotools = original?.idAgrotools ?? original?.id ?? "";
+        const maxVal = Math.max(
+          0,
+          toNum(original?.area_ha ?? original?.ara_ha ?? 0) || 0
+        );
+        const clamped = Number.isFinite(areaNum)
+          ? Math.min(Math.max(areaNum, 0), maxVal)
+          : 0;
+
+        poligonosOut.push({
+          tipo: hasTipo ? String(selectedValue) : "",
+          poligono: originalTipo,
+          idTad: originalIdAgrotools,
+          areaARegenerar: hasArea ? clamped : 0,
+          wkt: hasWKT ? sanitizeWKT(wktRaw) : "",
+        });
+      });
+
+      const parecerFile = formData.parecerTecnico?.pdf?.[0];
+      if (parecerFile instanceof File) {
+        parametros.push({
+          nome: "Parecer Técnico da Contestação",
+          tipo: "PDF",
+        });
+        arquivosOut.push({ pdf: parecerFile, tipo: parecerFile.name });
+      }
+
+      if (arquivosOut.length === 0 && poligonosOut.length === 0) {
+        toast.error(
+          "Nada para enviar: preencha pelo menos um polígono ou anexe um arquivo.",
+          { duration: 4000 }
+        );
+        return;
+      }
+
+      const valorBruto = toNum(areaHaValue) * 250;
+      const desconto: any = formData.descontoPercentual;
+      const valorFinalMulta =
+        desconto.value === "100"
+          ? 0
+          : desconto.value === "50"
+          ? valorBruto / 2
+          : valorBruto;
+
+      const payload: any = {
+        status: formData.status,
+        parametros,
+        descontoPercentual: valorFinalMulta,
+      };
+      if (arquivosOut.length) payload.deteccoes = arquivosOut;
+      if (poligonosOut.length) payload.poligonos = poligonosOut;
+
+      await submitObjectionAsync(payload);
+      toast.success("Parecer enviado com sucesso!", { duration: 5000 });
+    } catch (err: any) {
+      console.error(err);
+      const apiMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Falha ao enviar o parecer.";
+      toast.error(apiMessage, { duration: 5000 });
     }
-
-    if (arquivosOut.length === 0 && poligonosOut.length === 0) {
-      toast.error("Nada para enviar: preencha pelo menos um polígono ou anexe um arquivo.", { duration: 4000 });
-      return;
-    }
-
-    const valorBruto = toNum(areaHaValue) * 250;
-    const desconto: any = (formData.descontoPercentual);
-    const valorFinalMulta = desconto.value === "100" ? 0 : desconto.value === "50" ? valorBruto / 2 : valorBruto;
-
-    const payload: any = {
-      status: formData.status,
-      parametros,
-      descontoPercentual: valorFinalMulta,
-    };
-    if (arquivosOut.length) payload.deteccoes = arquivosOut;
-    if (poligonosOut.length) payload.poligonos = poligonosOut;
-
-    await submitObjectionAsync(payload);
-    toast.success("Parecer enviado com sucesso!", { duration: 5000 });
-  } catch (err: any) {
-    console.error(err);
-    const apiMessage =
-      err?.response?.data?.message || err?.message || "Falha ao enviar o parecer.";
-    toast.error(apiMessage, { duration: 5000 });
-  }
-};
-
+  };
 
   const fileValue = watch("parecerTecnico.pdf");
   const hasParecer = !!(fileValue && fileValue.length > 0);
@@ -519,10 +558,29 @@ export const ObjectionLayout = () => {
                   Nenhum responsável técnico associado a esta contestação.
                 </div>
               )}
+            </>
+          )}
+        </section>
 
-              <div className="bg-[#4A4A4A] text-white px-4 py-2 font-semibold flex justify-between items-center">
-                Autorização de Supressão
-              </div>
+        <section className="border rounded-md shadow bg-white">
+          <div
+            className="bg-[#4A4A4A] text-white px-4 py-2 font-semibold flex justify-between items-center cursor-pointer"
+            onClick={() =>
+              setOpenSection((prev) => ({
+                ...prev,
+                autorizacoes: !prev.autorizacoes,
+              }))
+            }
+          >
+            Autorização de Supressão
+            {openSection.autorizacoes ? (
+              <IoMdArrowDropup className="ml-2" />
+            ) : (
+              <IoMdArrowDropdown className="ml-2" />
+            )}
+          </div>
+          {openSection.autorizacoes && (
+            <>
               <Table.Container className="!pt-0">
                 <Table.Header>
                   <Table.Title>
@@ -874,11 +932,11 @@ export const ObjectionLayout = () => {
                               return true;
                             const n = toNum(v);
                             if (isNaN(n)) return "Informe um número válido";
-                            if (n < 0) return "Não pode ser negativo";
                             const maxN = toNum(
                               d?.area_ha ?? d?.ara_ha ?? d?.areaARegenerar ?? 0
                             );
                             const maxVal = isNaN(maxN) ? 0 : maxN;
+                            if (n < 0) return "Não pode ser negativo";
                             if (n > maxVal)
                               return `Não pode ser maior que ${maxVal}`;
                             return true;
@@ -893,15 +951,21 @@ export const ObjectionLayout = () => {
                           return (
                             <div className="flex flex-col">
                               <input
-                                type="number"
+                                type="text"
                                 inputMode="decimal"
-                                step="any"
-                                min={0}
                                 value={field.value ?? ""}
                                 placeholder="0"
                                 onChange={(e) => {
                                   const raw = e.target.value;
-                                  if (raw === "" || raw === undefined) {
+
+                                  const ok = /^(\d+([.,]\d*)?)?$/.test(raw);
+                                  if (!ok) return;
+
+                                  field.onChange(raw);
+                                }}
+                                onBlur={(e) => {
+                                  const raw = e.target.value;
+                                  if (raw === "") {
                                     field.onChange("");
                                     return;
                                   }
@@ -914,9 +978,10 @@ export const ObjectionLayout = () => {
                                     0,
                                     Math.min(n, maxVal)
                                   );
+
                                   field.onChange(String(clamped));
+                                  field.onBlur();
                                 }}
-                                onBlur={field.onBlur}
                                 className={`w-full h-[48px] p-4 mt-2 text-black rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] placeholder:text-[#D7D6D7] ${
                                   fieldState.error
                                     ? "border-red-500"
@@ -1006,12 +1071,18 @@ export const ObjectionLayout = () => {
             </div>
           </div>
 
-          <div className="flex justify-end px-4 py-2">
+          <div className="flex flex-col items-end px-4 py-2">
+            {!canSendParecer && (
+              <span className="text-red-600 text-sm mb-2">
+                Só é possível enviar o parecer se houver contestação em análise
+                ou com pendências.
+              </span>
+            )}
             <Button
               variant="dark"
               type="submit"
               className="w-36"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !canSendParecer}
             >
               {isSubmitting ? "Enviando..." : "Salvar"}
             </Button>

@@ -67,6 +67,9 @@ interface ObjectionData {
     url: string;
   }[];
 
+  contestacaoAutorizacaoSupressao?: { situacao?: string | null } | null;
+  contestacaoLaudo?: { situacao?: string | null } | null;
+
   farmData: {
     car: string;
     voucher: string;
@@ -231,6 +234,14 @@ export const useObjectionData = () => {
 
         planoAdequacao,
         documentosPlano,
+
+        // Expor status das contestações
+        contestacaoAutorizacaoSupressao: contestacaoSupressao
+          ? { situacao: contestacaoSupressao.situacao ?? null }
+          : null,
+        contestacaoLaudo: contestacaoLaudo
+          ? { situacao: contestacaoLaudo.situacao ?? null }
+          : null,
       } as ObjectionData;
     },
     enabled: !!idPropriedade,
@@ -307,7 +318,7 @@ export const useObjectionData = () => {
       if (!idPropriedade || !idAnalise || !idPlanoAdequacao) {
         throw new Error("IDs obrigatórios não informados");
       }
-      
+
       const formData = new FormData();
       formData.append("status", payload.status);
       formData.append("wkt", payload.wkt);

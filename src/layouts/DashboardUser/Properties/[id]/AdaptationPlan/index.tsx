@@ -91,6 +91,12 @@ export const PlanoAdequacaoLayout = () => {
   if (isError) return <p>Erro: {(error as Error).message}</p>;
   if (!data) return <p>Dados não encontrados.</p>;
 
+  const canSendParecer = (() => {
+    const status = data?.planoAdequacao?.situacao;
+    if (!status) return false;
+    return ["Em Análise", "COM_PENDENCIAS"].includes(status);
+  })();
+
   const { tecnico, farmData, documentosPlano = [], planoAdequacao } = data;
 
   const customMenuItems = [
@@ -526,8 +532,19 @@ export const PlanoAdequacaoLayout = () => {
             </Table.Body>
           </Table.Container>
         </section>
-        <div className="flex justify-end mt-4">
-          <Button variant="dark" type="submit" className="w-36">
+        <div className="flex flex-col items-end mt-4">
+          {!canSendParecer && (
+            <span className="text-red-600 text-sm mb-2">
+              Só é possível enviar o parecer se o Plano de Adequação estiver em
+              análise ou com pendências.
+            </span>
+          )}
+          <Button
+            variant="dark"
+            type="submit"
+            className="w-36"
+            disabled={!canSendParecer}
+          >
             Salvar
           </Button>
         </div>
