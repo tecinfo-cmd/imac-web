@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
@@ -27,15 +27,13 @@ export const UsersLayout = () => {
     size: limit,
   });
   const users = data?.data ?? [];
-
-  const filteredUsers = users.filter(
-    (user: any) =>
-      user.roles?.[0]?.nome === "ADMINISTRATIVO" ||
-      user.roles?.[0]?.nome === "ANALISTA"
-  );
-
-  const totalFiltered = filteredUsers.length;
+  const totalItems = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   const router = useRouter();
+
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [page, totalPages]);
 
   const deleteUserMutation = useDeleteUser();
 
@@ -70,8 +68,13 @@ export const UsersLayout = () => {
 
   return (
     <LayoutContainer title="Usuarios" menuItems={customMenuItems}>
-      <FilterUsers onFilter={setFilters} />
-      <span>Total de usuários: {totalFiltered || 0}</span>
+      <FilterUsers
+        onFilter={(f) => {
+          setFilters(f);
+          setPage(1); 
+        }}
+      />
+      <span>Total de usuários: {totalItems || 0}</span>
 
       {isLoading && <p>Carregando usuários...</p>}
 
@@ -100,56 +103,56 @@ export const UsersLayout = () => {
             </Table.Header>
 
             <Table.Body>
-              {filteredUsers.map((user: any) => (
-                  <Table.Row key={user.id}>
-                    <Table.Cell>{user.pessoa?.nome}</Table.Cell>
-                    <Table.Cell>{user.pessoa?.telefone}</Table.Cell>
-                    <Table.Cell>{user.email}</Table.Cell>
-                    <Table.Cell>{user.roles?.[0]?.nome}</Table.Cell>
-                    <Table.Cell>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-2 h-2 rounded-full"
-                          style={{
-                            backgroundColor:
-                              user.status === "ATIVO" ? "#21801A" : "#F44336",
-                          }}
-                        />
-                        <span
-                          style={{
-                            color:
-                              user.status === "ATIVO" ? "#21801A" : "#F44336",
-                          }}
+              {users.map((user: any) => (
+                <Table.Row key={user.id}>
+                  <Table.Cell>{user.pessoa?.nome}</Table.Cell>
+                  <Table.Cell>{user.pessoa?.telefone}</Table.Cell>
+                  <Table.Cell>{user.email}</Table.Cell>
+                  <Table.Cell>{user.roles?.[0]?.nome}</Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor:
+                            user.status === "ATIVO" ? "#21801A" : "#F44336",
+                        }}
+                      />
+                      <span
+                        style={{
+                          color:
+                            user.status === "ATIVO" ? "#21801A" : "#F44336",
+                        }}
+                      >
+                        {user.status === "ATIVO" ? "Ativo" : "Inativo"}
+                      </span>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      <Tooltip message="Visualizar" id={`view-${user.id}`}>
+                        <button
+                          onClick={() =>
+                            router.push(`/dashboard/users/${user.email}`)
+                          }
                         >
-                          {user.status === "ATIVO" ? "Ativo" : "Inativo"}
-                        </span>
-                      </div>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <div className="flex items-center gap-2">
-                        <Tooltip message="Visualizar" id={`view-${user.id}`}>
-                          <button
-                            onClick={() =>
-                              router.push(`/dashboard/users/${user.email}`)
-                            }
-                          >
-                            <Eye />
-                          </button>
-                        </Tooltip>
-                        <Tooltip message="Inativar" id={`delete-${user.id}`}>
-                          <ConfirmBox
-                            onConfirm={() => deleteUserMutation.mutate(user.id)}
-                            status={user.status}
-                          />
-                        </Tooltip>
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
+                          <Eye />
+                        </button>
+                      </Tooltip>
+                      <Tooltip message="Inativar" id={`delete-${user.id}`}>
+                        <ConfirmBox
+                          onConfirm={() => deleteUserMutation.mutate(user.id)}
+                          status={user.status}
+                        />
+                      </Tooltip>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              ))}
             </Table.Body>
           </Table.Container>
           <Pagination
-            totalItems={totalFiltered}
+            totalItems={totalItems}
             pageSize={limit}
             currentPage={page}
             onPageChange={setPage}

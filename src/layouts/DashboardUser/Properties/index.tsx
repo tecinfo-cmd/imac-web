@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -20,6 +20,7 @@ export const PropertiesLayout = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const [filters, setFilters] = useState({});
+
   const { data, isLoading } = useGetPropriedades({
     ...filters,
     page,
@@ -28,9 +29,12 @@ export const PropertiesLayout = () => {
 
   const properties = data?.data ?? [];
   const totalItems = data?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   const router = useRouter();
-  
 
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [page, totalPages]);
 
   const customMenuItems = [
     {
@@ -154,7 +158,12 @@ export const PropertiesLayout = () => {
 
   return (
     <LayoutContainer title="Propriedades" menuItems={customMenuItems}>
-      <FilterProperties onFilter={setFilters} />
+      <FilterProperties
+        onFilter={(f) => {
+          setFilters(f);
+          setPage(1); 
+        }}
+      />
       <span>Total de propriedades: {totalItems || 0}</span>
 
       {isLoading ? (
