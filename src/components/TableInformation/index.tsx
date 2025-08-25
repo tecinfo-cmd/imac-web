@@ -3,10 +3,11 @@ import { RiArrowDownSFill, RiArrowUpSFill } from "react-icons/ri";
 
 interface TableInformationProps {
   children: ReactNode;
+  className?: string;
 }
 
-export function TableInformation({ children }: TableInformationProps) {
-  return <div>{children}</div>;
+export function TableInformation({ children,className }: TableInformationProps) {
+  return <div className={className}>{children}</div>;
 }
 
 interface SectionProps {
