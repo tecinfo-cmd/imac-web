@@ -60,6 +60,7 @@ export interface Territorio {
   car: string;
   geometry: string;
   voucher: string;
+  imagemAdequacao: string;
 }
 
 
