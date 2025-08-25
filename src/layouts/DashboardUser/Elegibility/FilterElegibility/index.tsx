@@ -22,6 +22,7 @@ export const FilterElegibility = ({ onFilter }: FilterUsersProps) => {
   const handleFilterFarm = (data: any) => {
     const formattedData = {
       ...data,
+      nomePropriedade: data.nomePropriedade?.toUpperCase().trim(),
       status: data.status?.value,
       cpfCnpj: data.cpfCnpj ? unmaskCPFOrCNPJ(data.cpfCnpj) : undefined,
       carFederal: data.carFederal?.toUpperCase().trim(),

@@ -211,19 +211,33 @@ export const PlanoAdequacaoLayout = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       if (!values.parecerTecnicoFile) {
-        alert("Selecione o parecer da análise da contestação.");
+        toast.error("Selecione o parecer da análise da contestação.", { duration: 5000 });
         return;
       }
+      const wktObrigatorio = ["deferido", "deferido_parcial"].includes(
+        values.parecer
+      );
 
       const cleanedWkt = sanitizeWKT(values.wkt);
 
-      if (!isValidPolygonWKT(cleanedWkt)) {
-        alert("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.");
+      if (wktObrigatorio) {
+        if (!cleanedWkt) {
+          toast.error(
+            "O campo WKT é obrigatório para parecer Deferido ou Deferido Parcialmente."
+          , { duration: 5000 });
+          return;
+        }
+        if (!isValidPolygonWKT(cleanedWkt)) {
+          toast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.", { duration: 5000 });
+          return;
+        }
+      } else if (cleanedWkt && !isValidPolygonWKT(cleanedWkt)) {
+        toast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.", { duration: 5000 });
         return;
       }
 
       if (!values.parecerTecnicoFile) {
-        alert("Selecione o parecer da análise da contestação.");
+        toast.error("Selecione o parecer da análise da contestação.", { duration: 5000 });
         return;
       }
 
@@ -237,7 +251,7 @@ export const PlanoAdequacaoLayout = () => {
         status: values.parecer,
         parametros,
         arquivo: file,
-        wkt: values.wkt,
+        wkt: values?.wkt,
       };
 
       await submitPlanoAdequacaoAsync(payload);

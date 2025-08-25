@@ -352,10 +352,20 @@ export const ObjectionLayout = () => {
       )
         erros.push("Anexe o parecer técnico da contestação.");
 
+      const statusWktObrigatorio = ["DEFERIDO", "DEFERIDO_PARCIAL"];
+      const wktObrigatorio = statusWktObrigatorio.includes(formData.status);
       (formData.deteccoes || []).forEach((d, i) => {
         const w = (d?.wkt ?? "").trim();
-        if (w && !isValidPolygonWKT(sanitizeWKT(w))) {
-          erros.push(`Polígono ${i + 1}: WKT inválido.`);
+        if (w) {
+          if (!isValidPolygonWKT(sanitizeWKT(w))) {
+            erros.push(`Polígono ${i + 1}: WKT inválido.`);
+          }
+        } else if (wktObrigatorio) {
+          erros.push(
+            `Polígono ${
+              i + 1
+            }: WKT é obrigatório para status Deferido ou Deferido Parcialmente.`
+          );
         }
       });
 

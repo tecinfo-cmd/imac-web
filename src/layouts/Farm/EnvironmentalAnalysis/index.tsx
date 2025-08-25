@@ -17,6 +17,7 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 
+import { AdequancyTerm } from "./AdequancyTerm";
 import { CommercializationAuthorization } from "./CommercializationAuthorization";
 import { Contestation } from "./Contestation";
 import { EnvironmentalAnalysisPDF } from "./EnvironmentalAnalysisPDF";
@@ -24,7 +25,7 @@ import { FarmOverview } from "./FarmOverview";
 import { Fines } from "./Fines";
 import { Inspection } from "./Inspection";
 import { SuitabilityPlan } from "./SuitabilityPlan";
-import { SuitabilityTerm } from "./SuitabilityTerm";
+//import { SuitabilityTerm } from "./SuitabilityTerm";
 
 export const EnvironmentalAnalysisLayout = () => {
   const params = useParams();
@@ -55,11 +56,18 @@ export const EnvironmentalAnalysisLayout = () => {
       icon: FaClipboardCheck,
       key: "suitabilityPlan",
     },
+    /*
     {
       label: "Termo de Adequação",
       icon: FaFileSignature,
       key: "suitabilityTerm",
       disabled: true,
+    },
+    */
+    {
+      label: "Termo de Adequação",
+      icon: FaFileSignature,
+      key: "AdequancyTerm",
     },
     { label: "Multas", icon: FaGavel, key: "fines", disabled: true },
     {
@@ -85,6 +93,10 @@ export const EnvironmentalAnalysisLayout = () => {
   const [activeScreen, setActiveScreen] = useState<null | string | undefined>(
     null
   );
+
+  const handleNavigateToAdequancyTerm = () => {
+    setActiveScreen("AdequancyTerm");
+  };
   const [contestationParams, setContestationParams] = useState<{
     farmId: number;
     analysisId: number;
@@ -105,7 +117,8 @@ export const EnvironmentalAnalysisLayout = () => {
 
   const componentMap: Record<string, JSX.Element> = {
     overview: <FarmOverview farmId={farmId} />,
-    suitabilityTerm: <SuitabilityTerm farmId={farmId} />,
+    //suitabilityTerm: <SuitabilityTerm farmId={farmId} />,
+    AdequancyTerm: <AdequancyTerm farmId={farmId} />,
     environmentalAnalysisPDF: (
       <EnvironmentalAnalysisPDF
         farmId={farmId}
@@ -116,7 +129,10 @@ export const EnvironmentalAnalysisLayout = () => {
     suitabilityPlan: (
       <SuitabilityPlan
         farmId={farmId}
-        analysisId={contestationParams?.analysisId || 0}
+        analysisId={
+          contestationParams?.analysisId || farm?.retornoAnalises?.[0]?.id || 0
+        }
+        onNavigateToAdequancyTerm={handleNavigateToAdequancyTerm}
       />
     ),
     fines: <Fines farmId={farmId} />,

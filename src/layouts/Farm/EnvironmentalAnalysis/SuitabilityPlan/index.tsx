@@ -20,6 +20,7 @@ import { Document, DOCUMENT_LABEL_MAP, INITIAL_DOCUMENTS } from "./types";
 interface SuitabilityPlanProps {
   farmId: number;
   analysisId: number;
+  onNavigateToAdequancyTerm?: () => void;
 }
 
 const suitabilityPlanSchema = yup.object({
@@ -31,6 +32,7 @@ type SuitabilityPlanFormData = yup.InferType<typeof suitabilityPlanSchema>;
 export const SuitabilityPlan = ({
   farmId,
   analysisId,
+  onNavigateToAdequancyTerm,
 }: SuitabilityPlanProps) => {
   const { data: farm } = useGetFarmById(farmId);
   const createSuitabilityPlan = useCreateSuitabilityPlan();
@@ -229,7 +231,12 @@ export const SuitabilityPlan = ({
                   name="proposeNewArea"
                   value="no"
                   checked={proposeNewArea === "no"}
-                  onChange={() => handleProposeNewAreaChange("no")}
+                  onChange={() => {
+                    handleProposeNewAreaChange("no");
+                    if (onNavigateToAdequancyTerm) {
+                      onNavigateToAdequancyTerm();
+                    }
+                  }}
                   className="accent-[#21801A]"
                 />
                 <label htmlFor="propose-no" className="ml-2 cursor-pointer">
