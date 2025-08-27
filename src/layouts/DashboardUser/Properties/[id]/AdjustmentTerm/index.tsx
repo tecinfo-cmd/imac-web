@@ -1,6 +1,6 @@
 "use client";
-
-import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
+import { useParams } from "next/navigation";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -10,11 +10,12 @@ import {
 
 import { InfoGrid } from "@/components/InfoGrid";
 import { LayoutContainer } from "@/components/LayoutContainer";
-import { Table } from "@/components/Table";
+//import { Table } from "@/components/Table";
 
+import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
 import { Analityc } from "@/icons/Analityc";
-import { Eye } from "@/icons/Eye";
+//import { Eye } from "@/icons/Eye";
 
 const customMenuItems = [
   {
@@ -45,9 +46,13 @@ const customMenuItems = [
 ];
 
 export const AdjustmentTermLayout = () => {
-  const router = useRouter();
+  //const router = useRouter();
   const params = useParams();
   const propriedadeId = params?.id as string;
+  const propriedadeIdNumber = propriedadeId ? Number(propriedadeId) : undefined;
+  const { data: farm } = useGetFarmById(propriedadeIdNumber);
+
+  const imagemBase64 = farm?.territorios?.[0]?.imagemAdequacao;
 
   const { data: propriedade, isLoading } = usePropertyMonitoring(propriedadeId);
 
@@ -103,37 +108,17 @@ export const AdjustmentTermLayout = () => {
       </h1>
       <InfoGrid rows={farmInfoRows} data={[]} />
       <section className="border rounded-md shadow bg-white mt-4">
-        <div className="bg-[#4A4A4A] text-white px-4 py-2 font-semibold flex justify-between items-center">
-          Termo de Adequação Assinado
+        <div className="flex justify-center py-4">
+          {imagemBase64 && (
+            <Image
+              src={`${imagemBase64}`}
+              alt="Área destinada à Regeneração"
+              width={900}
+              height={700}
+              className="max-w-full rounded-[20px] shadow"
+            />
+          )}
         </div>
-        <Table.Container className="!pt-0">
-          <Table.Header>
-            <Table.Title className="bg-[#EBE3F3]">
-              Descrição do documento
-            </Table.Title>
-            <Table.Title className="bg-[#EBE3F3]">Data de Upload</Table.Title>
-            <Table.Title className="bg-[#EBE3F3]">Status</Table.Title>
-            <Table.Title className="bg-[#EBE3F3]">Ações</Table.Title>
-          </Table.Header>
-          <Table.Body>
-            <Table.Row>
-              <Table.Cell>Laudo Técnico</Table.Cell>
-              <Table.Cell>01/05/2022</Table.Cell>
-              <Table.Cell>Não Aprovado</Table.Cell>
-              <Table.Cell>
-                <button
-                  onClick={() =>
-                    router.push(
-                      `/dashboard/properties/${propriedadeId}/adjustmentTerm/rebuttalReport`
-                    )
-                  }
-                >
-                  <Eye />
-                </button>
-              </Table.Cell>
-            </Table.Row>
-          </Table.Body>
-        </Table.Container>
       </section>
     </LayoutContainer>
   );
