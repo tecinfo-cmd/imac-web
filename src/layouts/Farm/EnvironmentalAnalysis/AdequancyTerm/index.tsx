@@ -140,7 +140,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                 {imagemBase64 && (
                   <div className="flex justify-center py-4">
                     <Image
-                      src={`data:image/png;base64,${imagemBase64}`}
+                      src={`${imagemBase64}`}
                       alt="Área destinada à Regeneração"
                       width={900}
                       height={700}
