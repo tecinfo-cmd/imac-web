@@ -171,9 +171,10 @@ export const PlanoAdequacaoLayout = () => {
     if (!raw) return false;
     const wkt = sanitizeWKT(raw).toUpperCase();
 
-    if (!wkt.startsWith("POLYGON") && !wkt.startsWith("MULTIPOLYGON")) {
+    if (!wkt.startsWith("POLYGON") && !wkt.startsWith("GEOMETRYCOLLECTION")) {
       return false;
     }
+
     let bal = 0;
     for (const ch of wkt) {
       if (ch === "(") bal++;
@@ -181,37 +182,57 @@ export const PlanoAdequacaoLayout = () => {
       if (bal < 0) return false;
     }
     if (bal !== 0) return false;
+
     if (wkt.startsWith("POLYGON")) {
-      const ringMatch = wkt.match(/POLYGON\s*\(\(\s*([^)]+)\s*\)\)/i);
-      if (ringMatch) {
-        const coords = ringMatch[1]
-          .split(",")
-          .map((p) => p.trim().split(/\s+/).map(Number))
-          .filter(
-            (pair) =>
-              pair.length >= 2 &&
-              !Number.isNaN(pair[0]) &&
-              !Number.isNaN(pair[1])
-          );
-
-        if (coords.length < 4) return false;
-
-        const first = coords[0];
-        const last = coords[coords.length - 1];
-        const isClosed =
-          Math.abs(first[0] - last[0]) < 1e-12 &&
-          Math.abs(first[1] - last[1]) < 1e-12;
-        if (!isClosed) return false;
-      }
+      return validateSinglePolygon(wkt);
     }
 
-    return true;
+    if (wkt.startsWith("GEOMETRYCOLLECTION")) {
+      const polygons = [];
+      const regex = /POLYGON\s*\(\([^)]+\)\)/g;
+      let match;
+      while ((match = regex.exec(wkt)) !== null) {
+        polygons.push(match[0]);
+      }
+      if (polygons.length === 0) return false;
+
+      return polygons.every(validateSinglePolygon);
+    }
+
+    return false;
+  }
+
+  function validateSinglePolygon(wkt: string) {
+    const ringMatch = wkt.match(/POLYGON\s*\(\(\s*([^)]+)\s*\)\)/i);
+    if (ringMatch) {
+      const coords = ringMatch[1]
+        .split(",")
+        .map((p) => p.trim().split(/\s+/).map(Number))
+        .filter(
+          (pair) =>
+            pair.length >= 2 && !Number.isNaN(pair[0]) && !Number.isNaN(pair[1])
+        );
+
+      if (coords.length < 4) return false;
+
+      const first = coords[0];
+      const last = coords[coords.length - 1];
+      const isClosed =
+        Math.abs(first[0] - last[0]) < 1e-12 &&
+        Math.abs(first[1] - last[1]) < 1e-12;
+      if (!isClosed) return false;
+
+      return true;
+    }
+    return false;
   }
 
   const onSubmit = async (values: FormValues) => {
     try {
       if (!values.parecerTecnicoFile) {
-        toast.error("Selecione o parecer da análise da contestação.", { duration: 5000 });
+        toast.error("Selecione o parecer da análise da contestação.", {
+          duration: 5000,
+        });
         return;
       }
       const wktObrigatorio = ["deferido", "deferido_parcial"].includes(
@@ -223,21 +244,29 @@ export const PlanoAdequacaoLayout = () => {
       if (wktObrigatorio) {
         if (!cleanedWkt) {
           toast.error(
-            "O campo WKT é obrigatório para parecer Deferido ou Deferido Parcialmente."
-          , { duration: 5000 });
+            "O campo WKT é obrigatório para parecer Deferido ou Deferido Parcialmente.",
+            { duration: 5000 }
+          );
           return;
         }
         if (!isValidPolygonWKT(cleanedWkt)) {
-          toast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.", { duration: 5000 });
+          toast.error(
+            "Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.",
+            { duration: 5000 }
+          );
           return;
         }
       } else if (cleanedWkt && !isValidPolygonWKT(cleanedWkt)) {
-        toast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.", { duration: 5000 });
+        toast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.", {
+          duration: 5000,
+        });
         return;
       }
 
       if (!values.parecerTecnicoFile) {
-        toast.error("Selecione o parecer da análise da contestação.", { duration: 5000 });
+        toast.error("Selecione o parecer da análise da contestação.", {
+          duration: 5000,
+        });
         return;
       }
 
