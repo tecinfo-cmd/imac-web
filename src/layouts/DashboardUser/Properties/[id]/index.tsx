@@ -64,11 +64,13 @@ const cards = [
     label: "Multas",
     icon: <FineTracking size={36} />,
     active: false,
+    path: (id: string) => `/dashboard/properties/${id}/fines`,
   },
   {
     label: "Autovistoria",
     icon: <SelfInspection size={36} />,
     active: false,
+    path: (id: string) => `/dashboard/properties/${id}/selfInspection`,
   },
   {
     label: "Autorização de Comercialização",
