@@ -13,15 +13,19 @@ import { yup } from "@/config/yup";
 import { useCadastroUsuario } from "@/hooks/useCadastroUsuario/useCadastroUsuario";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskDate } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { jwtDecode } from "jwt-decode";
 import { setCookie } from "nookies";
 
 function validarTelefone(telefone: string): boolean {
-  const regex = /^(?:(?:\+|00)?(55)\s?)?(?:([1-9][1-9]))?\s?(?:9?\d{4})-?(\d{4})$/;
+  const regex =
+    /^(?:(?:\+|00)?(55)\s?)?(?:([1-9][1-9]))?\s?(?:9?\d{4})-?(\d{4})$/;
   return regex.test(telefone);
 }
 
@@ -30,10 +34,14 @@ const schema = yup.object({
   data: yup.string().required(),
   cpf: yup.string().required(),
   email: yup.string().email().required(),
-  telefone: yup.string().required().test(
+  telefone: yup
+    .string()
+    .required()
+    .test(
       "validar-telefone",
       "Número de telefone inválido",
-      (value) => !!value && validarTelefone(value.replace(/\D/g, ""))),
+      (value) => !!value && validarTelefone(value.replace(/\D/g, ""))
+    ),
   cep: yup.string().required(),
   uf: yup.string().required("!"),
   logradouro: yup.string().required(),
@@ -58,6 +66,8 @@ const schema = yup.object({
 
 export default function Register() {
   const router = useRouter();
+  const { setUserData } = useAuthStore();
+  const { setRole } = useUserRoleStore();
   const { cadastrar, isLoading } = useCadastroUsuario();
   const previousCepRef = useRef("");
 
@@ -176,7 +186,13 @@ export default function Register() {
 
       api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-      router.push("/validVoucher");
+      const userResponse = await api.get(`/usuario/email/${data.email}`);
+      setUserData(userResponse.data);
+
+      const decoded = jwtDecode<{ roles: string[] }>(accessToken);
+      setRole(decoded.roles?.[0]?.toUpperCase());
+
+      router.push("/enrollmentFee");
     } catch (error: any) {
       if (error.response) {
         console.error("Erro no cadastro:", error.response.data);
