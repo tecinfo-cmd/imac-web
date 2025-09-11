@@ -36,6 +36,7 @@ const cards = [
     label: "Documentos da Propriedade",
     icon: <DocPropertie size={36} />,
     active: false,
+    disabled: true
   },
   {
     label: "Contestação",
@@ -65,6 +66,7 @@ const cards = [
     icon: <FineTracking size={36} />,
     active: false,
     path: (id: string) => `/dashboard/properties/${id}/fines`,
+    disabled: true
   },
   {
     label: "Autovistoria",
@@ -76,6 +78,13 @@ const cards = [
     label: "Autorização de Comercialização",
     icon: <SalesPermit size={36} />,
     active: false,
+    disabled: true
+  },
+   {
+    label: "Upload de Car",
+    icon: <SalesPermit size={36} />,
+    active: false,
+    disabled: true
   },
 ];
 
@@ -191,8 +200,9 @@ export const MonitoringLayout = () => {
                   ? "bg-[#F3F3F3] !text-[#21801A] opacity-60"
                   : ""
               }
-  `}
-            onClick={() => handleCardClick(idx)}
+               ${card.disabled ? "bg-[#F3F3F3] !text-[#21801A] cursor-not-allowed pointer-events-none opacity-60" : ""}
+            `}
+            onClick={() => !card.disabled && handleCardClick(idx)}
           >
             <div className="mb-2">{card.icon}</div>
             <span className="text-center text-sm font-semibold">
