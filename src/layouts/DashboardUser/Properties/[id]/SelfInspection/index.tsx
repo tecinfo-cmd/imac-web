@@ -8,7 +8,6 @@ import {
   PiFarmLight,
   PiSealCheckLight,
   PiUserCircleThin,
-  PiWarningFill,
 } from "react-icons/pi";
 
 import { Modal } from "./components/Modal";
@@ -136,19 +135,6 @@ export const SelfInspectionLayout = () => {
       >
         <GoArrowLeft size={28} />
       </button>
-      <div className="flex items-center justify-center">
-        <div className="border-[#CAC4D0] border-[1px] p-4 rounded-md flex justify-center items-center space-x-3 text-sm text-gray-800 w-fit">
-          <PiWarningFill
-            size={36}
-            className="text-red-500 mt-1 text-xl flex-shrink-0"
-          />
-          <p>
-            Para solicitar a Analise Socioambiental é necessário revisar os
-            dados da propriedade e proprietários. Após a solicitação não é
-            possível editar os dados da propriedade e dos proprietários.
-          </p>
-        </div>
-      </div>
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
         Autovistoria
       </h1>

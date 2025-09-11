@@ -9,7 +9,6 @@ import {
   PiFarmLight,
   PiSealCheckLight,
   PiUserCircleThin,
-  PiWarningFill,
 } from "react-icons/pi";
 
 import { InfoGrid } from "@/components/InfoGrid";
@@ -83,6 +82,7 @@ export const ObjectionLayout = () => {
     error,
     submitObjectionAsync,
     isSubmitting,
+    refetch,
   } = useObjectionData();
 
   const canSendParecer = (() => {
@@ -467,6 +467,7 @@ export const ObjectionLayout = () => {
 
       await submitObjectionAsync(payload);
       toast.success("Parecer enviado com sucesso!", { duration: 5000 });
+      if (refetch) await refetch();
     } catch (err: any) {
       console.error(err);
       const apiMessage =
@@ -489,24 +490,6 @@ export const ObjectionLayout = () => {
       >
         <GoArrowLeft size={28} />
       </button>
-      <div className="flex items-center justify-center">
-        <div className="border-[#CAC4D0] border-[1px] p-4 rounded-md flex justify-center items-center space-x-3 text-sm text-gray-800 w-fit">
-          <PiWarningFill
-            size={36}
-            className="text-red-500 mt-1 text-xl flex-shrink-0"
-          />
-          <p>
-            <strong>Para Contestar a Análise Socioambiental</strong>, é
-            necessário enviar os documentos necessários de acordo com o tipo de
-            contestação. Caso tenha mais de um tipo de contestação,
-            certifique-se de preencher o formulário de acordo com o tipo que
-            deseja contestar. <br />
-            Após a solicitação não é possível editar os dados da propriedade e
-            dos proprietários.
-          </p>
-        </div>
-      </div>
-
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
         Contestação de Análise Socioambiental
       </h1>
