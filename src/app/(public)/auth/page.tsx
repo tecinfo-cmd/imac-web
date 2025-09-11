@@ -24,8 +24,8 @@ export default function Auth() {
     resolver: yupResolver(schema),
   });
 
-  const handleSubmitSignIn = (data: SignInCredentials) => {
-    handleSignIn(data);
+  const handleSubmitSignIn = async (data: SignInCredentials) => {
+    await handleSignIn(data);
   };
 
   return (

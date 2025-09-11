@@ -15,6 +15,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 import { jwtDecode } from "jwt-decode";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
+import { toast } from "sonner";
 
 import { SignInCredentials, useSignIn } from "../hooks/useAuth/useSignIn";
 
@@ -73,15 +74,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
       try {
         const data = await signIn({ email, senha });
         const { accessToken } = data;
+        const isProduction = process.env.NODE_ENV === "production";
 
         setCookie(undefined, "email", data.email, {
           maxAge: 60 * 60 * 24 * 7,
           path: "/",
+          secure: isProduction,
+          sameSite: "strict",
         });
 
         setCookie(undefined, "@IMAC:T", accessToken, {
           maxAge: 60 * 60 * 24 * 7,
           path: "/",
+          secure: isProduction,
+          sameSite: "strict",
         });
         setEmail(email);
         api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
@@ -93,6 +99,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         router.push("/dashboard");
       } catch (error) {
         console.error(error);
+        toast.error("Email ou senha inválidos");
       }
     },
     [router, setRole, signIn]

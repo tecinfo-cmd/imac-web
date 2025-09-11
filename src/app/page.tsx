@@ -27,6 +27,7 @@ import Step from "@/components/ui/step";
 
 import { useCAR } from "@/hooks/useCAR";
 import { setCookie } from "nookies";
+import { toast, Toaster } from "sonner";
 
 export default function Home() {
   const [carValue, setCarValue] = useState<string>("");
@@ -197,6 +198,9 @@ export default function Home() {
         setIsModalTwoOpen(true);
       } catch (error) {
         console.error("Erro ao enviar para API:", error);
+        const match = (error as Error).message.match(/"message":"([^"]+)"/);
+        const errorMessage = match ? match[1] : "Erro ao enviar solicitação";
+        toast.error(`${errorMessage}`);
       }
     }
   };
@@ -213,6 +217,7 @@ export default function Home() {
   return (
     <>
       <Header />
+      <Toaster />
       <HeroSection topImage={""} title={""} text={""} />
       <div id="form" className="min-h-screen flex flex-col py-4 px-6">
         <main className="flex-grow container mx-auto px-4 py-8">

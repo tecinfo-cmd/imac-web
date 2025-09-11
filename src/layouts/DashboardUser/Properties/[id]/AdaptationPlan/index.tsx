@@ -9,7 +9,6 @@ import {
   PiFarmLight,
   PiSealCheckLight,
   PiUserCircleThin,
-  PiWarningFill,
 } from "react-icons/pi";
 
 import { InfoGrid } from "@/components/InfoGrid";
@@ -51,7 +50,7 @@ export const PlanoAdequacaoLayout = () => {
   const [selectedDocsIds, setSelectedDocsIds] = useState<number[]>([]);
   const [openSection, setOpenSection] = useState({ tecnico: true });
 
-  const { data, isLoading, isError, error, submitPlanoAdequacaoAsync } =
+  const { data, isLoading, isError, error, submitPlanoAdequacaoAsync, refetch } =
     useObjectionData();
 
   const form = useForm<FormValues>({
@@ -287,6 +286,7 @@ export const PlanoAdequacaoLayout = () => {
       toast.success("Parecer enviado com sucesso!", { duration: 5000 });
       reset();
       setSelectedDocsIds([]);
+      if (refetch) await refetch();
     } catch (err: any) {
       console.error(err);
       const apiMessage =
@@ -306,18 +306,9 @@ export const PlanoAdequacaoLayout = () => {
       >
         <GoArrowLeft size={28} />
       </button>
-      <div className="flex items-center justify-center mb-6">
-        <div className="border-[#CAC4D0] border p-4 rounded-md flex items-center gap-3 text-sm text-gray-800">
-          <PiWarningFill size={36} className="text-red-500" />
-          <p>
-            Para fazer o Aceite da Análise Socioambiental, é necessário
-            solicitar o Termo de Adequação.
-          </p>
-        </div>
-      </div>
-
+      
       {/* Título + Situação do Plano */}
-      <div className="flex items-center justify-between py-6">
+      <div className="flex items-center justify-center py-6">
         <h1 className="text-xl text-[#1A6415] font-semibold">
           Plano de Adequação
         </h1>
