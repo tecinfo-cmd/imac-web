@@ -115,16 +115,16 @@ export const UsersLayout = () => {
                         className="w-2 h-2 rounded-full"
                         style={{
                           backgroundColor:
-                            user.status === "ATIVO" ? "#21801A" : "#F44336",
+                            user.status === "INATIVO" ? "#F44336" : "#21801A",
                         }}
                       />
                       <span
                         style={{
                           color:
-                            user.status === "ATIVO" ? "#21801A" : "#F44336",
+                            user.status === "INATIVO" ? "#F44336" : "#21801A",
                         }}
                       >
-                        {user.status === "ATIVO" ? "Ativo" : "Inativo"}
+                        {(user.status === "ATIVO" || user.status === null) ? "Ativo" : "Inativo"}
                       </span>
                     </div>
                   </Table.Cell>
