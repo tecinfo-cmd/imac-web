@@ -97,7 +97,7 @@ export const RegisterFarmLayout = () => {
       const existingDocs =
         farm.documentos?.map((doc) => ({
           type: doc.tipo,
-          checked: false,
+          checked: true,
           file: undefined,
           uploadDate: new Date().toLocaleDateString("pt-BR"),
           nomeArquivo: doc.nomeArquivo,
@@ -533,11 +533,15 @@ export const RegisterFarmLayout = () => {
             ))}
           </Table.Body>
         </Table.Container>
-        <div className="mt-4 flex justify-end">
-          <Button variant="dark" onClick={handleUploadDocuments}>
-            Enviar documentação
-          </Button>
-        </div>
+        {documents.some(
+          (doc) => doc.checked && !doc.nomeArquivo && !doc.file
+        ) && (
+          <div className="mt-4 flex justify-end">
+            <Button variant="dark" onClick={handleUploadDocuments}>
+              Enviar documentação
+            </Button>
+          </div>
+        )}
       </div>
     </LayoutContainer>
   );

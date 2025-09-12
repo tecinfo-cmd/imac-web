@@ -6,7 +6,6 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { Farm, Proprietario } from "@/hooks/useFarms/useGetFarmById";
 import { formatCPFOrCNPJ } from "@/utils/formatters/formatCPFOrCNPJ";
-import { formatDate } from "@/utils/formatters/formatDate";
 import { formatPhone } from "@/utils/formatters/formatPhone";
 
 import { UpdateCoOwnerForm } from "../UpdateCoOwnerForm";
@@ -81,9 +80,7 @@ export const CoOwnerList = ({ farm }: CoOwnerListProps) => {
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <h2 className="text-[#21801A]">Data de nascimento</h2>
-                <p>
-                  {formatDate(item.pessoa.dataNascimento) || "Não informado"}
-                </p>
+                <p>{item.pessoa.dataNascimento || "Não informado"}</p>
               </div>
               <div>
                 <h2 className="text-[#21801A]">Telefone</h2>
@@ -115,6 +112,10 @@ export const CoOwnerList = ({ farm }: CoOwnerListProps) => {
             <UpdateCoOwnerForm
               farmId={farm.id}
               idProprietario={editingCoOwner?.id}
+              onSuccess={() => {
+                setEditingCoOwner(null);
+                setShowCoOwnerList(true);
+              }}
             />
           </div>
         </>

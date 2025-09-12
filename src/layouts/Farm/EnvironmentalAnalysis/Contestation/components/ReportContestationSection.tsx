@@ -48,8 +48,8 @@ export const ReportContestationSection = ({
 
   if (disabled) {
     return (
-      <div className="bg-white border border-[#CAC4D0] rounded-lg shadow">
-        <div className="bg-[#1A6415] text-white p-4 rounded-t-lg">
+      <div className="bg-white border border-[#CAC4D0] shadow">
+        <div className="bg-[#1A6415] text-white p-4">
           <h2 className="font-semibold text-lg">Contestação por Laudo</h2>
         </div>
         <div className="bg-[#E8F5E8] p-4 border-b border-[#CAC4D0]">
@@ -60,8 +60,7 @@ export const ReportContestationSection = ({
         <div className="p-6">
           <div className="text-center py-8">
             <p className="text-gray-600">
-              Não é possível editar a contestação por laudo enquanto houver uma
-              contestação em andamento.
+              Contestação enviada com sucesso.
             </p>
           </div>
         </div>

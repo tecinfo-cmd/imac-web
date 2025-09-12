@@ -41,7 +41,22 @@ const convertToISO8601 = (date: string | null) => {
 
 const suppressionSchema = yup.object({
   dataEmissao: yup.string().required("Data de emissão é obrigatória"),
-  dataValidade: yup.string().required("Data de validade é obrigatória"),
+  dataValidade: yup
+    .string()
+    .required("Data de validade é obrigatória")
+    .test(
+      "is-after-emission",
+      "Data de validade deve ser posterior à data de emissão",
+      function (value) {
+        const { dataEmissao } = this.parent;
+        if (!dataEmissao || !value) return true;
+
+        const issueDate = new Date(dataEmissao.split("/").reverse().join("-"));
+        const expirationDate = new Date(value.split("/").reverse().join("-"));
+
+        return expirationDate > issueDate;
+      }
+    ),
   tipo: yup.object().nullable().required("Tipo é obrigatório"),
   orgaoEmissor: yup.object().nullable().required("Órgão emissor é obrigatório"),
   areaAutorizada: yup.number().required("Área autorizada é obrigatória"),
@@ -85,8 +100,8 @@ export const SuppressionAuthorizationSection = ({
 
   if (disabled) {
     return (
-      <div className="bg-white border border-[#CAC4D0] rounded-lg shadow">
-        <div className="bg-[#1A6415] text-white p-4 rounded-t-lg">
+      <div className="bg-white border border-[#CAC4D0] shadow">
+        <div className="bg-[#1A6415] text-white p-4">
           <h2 className="font-semibold text-lg">Autorização de Supressão</h2>
         </div>
         <div className="bg-[#E8F5E8] p-4 border-b border-[#CAC4D0]">
@@ -97,8 +112,7 @@ export const SuppressionAuthorizationSection = ({
         <div className="p-6">
           <div className="text-center py-8">
             <p className="text-gray-600">
-              Não é possível editar a autorização de supressão enquanto houver
-              uma contestação em andamento.
+              Autorização enviada com sucesso.
             </p>
           </div>
         </div>

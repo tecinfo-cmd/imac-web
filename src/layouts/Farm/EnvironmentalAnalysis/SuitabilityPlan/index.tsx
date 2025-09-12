@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoAlertFill } from "react-icons/go";
 
@@ -39,7 +39,7 @@ export const SuitabilityPlan = ({
   const { technicalResponsible } =
     useTechnicalResponsibleSuitabilityPlanStore();
 
-  const { control, handleSubmit } = useForm<SuitabilityPlanFormData>({
+  const { control, handleSubmit, setValue } = useForm<SuitabilityPlanFormData>({
     resolver: yupResolver(suitabilityPlanSchema),
     defaultValues: {
       motivo: "",
@@ -50,6 +50,35 @@ export const SuitabilityPlan = ({
   const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
     null
   );
+
+  const existingSuitabilityPlan = farm?.retornoAnalises?.find(
+    (analise) => analise.planoAdequacao
+  )?.planoAdequacao;
+
+  useEffect(() => {
+    if (existingSuitabilityPlan) {
+      setValue("motivo", existingSuitabilityPlan.motivo);
+      setProposeNewArea("yes");
+
+      if (
+        existingSuitabilityPlan.documentos &&
+        existingSuitabilityPlan.documentos.length > 0
+      ) {
+        const updatedDocuments = INITIAL_DOCUMENTS.map((doc) => {
+          const matchingDocument = existingSuitabilityPlan.documentos.find(
+            (d) => d.tipo === doc.type
+          );
+          return {
+            ...doc,
+            checked: !!matchingDocument,
+            nomeArquivo: matchingDocument?.nomeArquivo || "",
+            urlArquivo: matchingDocument?.urlArquivo || "",
+          };
+        });
+        setDocuments(updatedDocuments);
+      }
+    }
+  }, [existingSuitabilityPlan, setValue]);
 
   const hasValidParams = farmId && analysisId;
   const hasSuitabilityPlanInProgress = farm?.analise?.planoAdequacao;
@@ -106,17 +135,26 @@ export const SuitabilityPlan = ({
   };
 
   const handleSaveDocuments = async (data: SuitabilityPlanFormData) => {
-    // Verificar se o usuário escolheu uma opção para nova área
     if (proposeNewArea === null) {
       toast.error("Selecione se deseja propor uma nova área para regeneração!");
       return;
     }
 
-    // Verificar se há documentos com arquivos
-    const documentsWithFiles = documents.filter((doc) => doc.file);
+    const checkedDocuments = documents.filter((doc) => doc.checked);
 
-    if (documentsWithFiles.length === 0) {
-      toast.error("Adicione pelo menos um documento!");
+    if (checkedDocuments.length === 0) {
+      toast.error("Selecione pelo menos um documento obrigatório!");
+      return;
+    }
+
+    const missingFiles = checkedDocuments.filter((doc) => !doc.file);
+    if (missingFiles.length > 0) {
+      const missingTypes = missingFiles
+        .map((doc) => DOCUMENT_LABEL_MAP[doc.type])
+        .join(", ");
+      toast.error(
+        `Adicione os arquivos para os seguintes documentos: ${missingTypes}`
+      );
       return;
     }
 
@@ -125,14 +163,14 @@ export const SuitabilityPlan = ({
       return;
     }
 
-    // Criar array de parâmetros para os arquivos
-    const params = documentsWithFiles.map((doc) => ({
+    const validDocuments = checkedDocuments.filter((doc) => doc.file);
+
+    const params = validDocuments.map((doc) => ({
       nome: doc.file!.name,
       tipo: doc.type,
     }));
 
-    // Extrair arquivos dos documentos
-    const files = documentsWithFiles.map((doc) => doc.file!);
+    const files = validDocuments.map((doc) => doc.file!);
 
     try {
       await createSuitabilityPlan.mutateAsync({
@@ -251,7 +289,7 @@ export const SuitabilityPlan = ({
           title="Estratégia de Adequação"
           showArrow
           disabled={proposeNewArea !== "yes"}
-          defaultOpen={false}
+          defaultOpen={!!existingSuitabilityPlan}
         >
           <TableInformation.Row columnsPerRow={1}>
             <TableInformation.Column>
@@ -273,6 +311,7 @@ export const SuitabilityPlan = ({
                     label="Justificativa"
                     placeholder="Digite a justificativa..."
                     control={control}
+                    disabled={!!existingSuitabilityPlan}
                   />
                 </div>
 
@@ -282,18 +321,23 @@ export const SuitabilityPlan = ({
                   onFileChange={handleFileChange}
                   onRemoveFile={handleRemoveFile}
                   labelMap={DOCUMENT_LABEL_MAP}
+                  disabled={!!existingSuitabilityPlan}
                 />
 
                 <div className="my-6 flex justify-end">
                   <Button
                     type="submit"
                     disabled={
-                      createSuitabilityPlan.isPending || !technicalResponsible
+                      createSuitabilityPlan.isPending ||
+                      !technicalResponsible ||
+                      !!existingSuitabilityPlan
                     }
                     variant="green"
                     className="w-[320px]"
                   >
-                    {createSuitabilityPlan.isPending
+                    {existingSuitabilityPlan
+                      ? "Plano de Adequação já solicitado"
+                      : createSuitabilityPlan.isPending
                       ? "Salvando..."
                       : "Solicitar Plano de Adequação"}
                   </Button>

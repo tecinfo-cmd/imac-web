@@ -5,10 +5,10 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { Farm } from "@/hooks/useFarms/useGetFarmById";
 import { formatCPFOrCNPJ } from "@/utils/formatters/formatCPFOrCNPJ";
-import { formatDate } from "@/utils/formatters/formatDate";
 import { formatPhone } from "@/utils/formatters/formatPhone";
 
 import { UpdateOwnerForm } from "../UpdateOwnerForm";
+import { formatDate } from "@/utils/formatters/formatDate";
 
 interface MainOwnerCardProps {
   farm: Farm | undefined;
@@ -51,7 +51,11 @@ export const MainOwnerCard = ({ farm }: MainOwnerCardProps) => {
       </div>
 
       {isEditing && farm?.id && editingOwnerId ? (
-        <UpdateOwnerForm farmId={farm.id} idProprietario={editingOwnerId} />
+        <UpdateOwnerForm
+          farmId={farm.id}
+          idProprietario={editingOwnerId}
+          onSuccess={() => setIsEditing(false)}
+        />
       ) : (
         <div className="space-y-6">
           {mainOwner && (
@@ -76,10 +80,7 @@ export const MainOwnerCard = ({ farm }: MainOwnerCardProps) => {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <h2 className="text-[#21801A]">Data de nascimento</h2>
-                  <p>
-                    {formatDate(mainOwner.pessoa.dataNascimento) ||
-                      "Não informado"}
-                  </p>
+                  <p>{formatDate(mainOwner.pessoa.dataNascimento) || "Não informado"}</p>
                 </div>
                 <div>
                   <h2 className="text-[#21801A]">Telefone</h2>

@@ -26,6 +26,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
   const { register, watch } = useForm();
   const acceptChecked = watch("accept");
   const [isLoading, setIsLoading] = useState(false);
+  const [analysisRequested, setAnalysisRequested] = useState(false);
 
   if (!farm) return <div>Carregando...</div>;
 
@@ -39,6 +40,8 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
 
   const hasAnalysisResults =
     farm.retornoAnalises && farm.retornoAnalises.length > 0;
+
+  const shouldShowSuccessMessage = hasAnalysisResults || analysisRequested;
 
   const handleSubmitRequest = async () => {
     if (!farm?.territorios?.[0] || !acceptChecked) {
@@ -69,6 +72,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
         protocol,
       });
 
+      setAnalysisRequested(true);
       toast.dismiss(toastId);
 
       toast.custom((t) => (
@@ -335,7 +339,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
         ))}
       </TableInformation>
 
-      {!hasAnalysisResults && (
+      {!shouldShowSuccessMessage && (
         <>
           <div className="flex items-center gap-4 mt-6">
             <input
@@ -355,7 +359,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
             <Button
               variant="green"
               className="w-[253px]"
-              disabled={!acceptChecked || isLoading}
+              disabled={!acceptChecked || isLoading || analysisRequested}
               onClick={handleSubmitRequest}
             >
               {isLoading ? <FiLoader className="animate-spin" /> : "Solicitar"}
@@ -364,7 +368,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
         </>
       )}
 
-      {hasAnalysisResults && (
+      {shouldShowSuccessMessage && (
         <div className="mt-6 p-4 bg-[#DFEEE5] border border-[#0A3503] rounded-lg">
           <p className="text-[#0A3503] text-center">
             Análise socioambiental já foi solicitada e está disponível. Você

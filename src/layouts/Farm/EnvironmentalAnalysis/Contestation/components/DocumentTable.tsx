@@ -13,6 +13,7 @@ interface DocumentTableProps {
   onFileChange: (index: number, file: File) => void;
   onRemoveFile: (index: number) => void;
   labelMap: Record<string, string>;
+  disabled?: boolean;
 }
 
 export const DocumentTable = ({
@@ -21,6 +22,7 @@ export const DocumentTable = ({
   onFileChange,
   onRemoveFile,
   labelMap,
+  disabled = false,
 }: DocumentTableProps) => {
   return (
     <div className="mt-8">
@@ -50,6 +52,7 @@ export const DocumentTable = ({
                     className="accent-[#21801A]"
                     checked={doc.checked}
                     onChange={() => onCheckboxChange(index)}
+                    disabled={disabled}
                   />
                   {labelMap[doc.type] || "Documento"}
                 </label>
@@ -67,7 +70,7 @@ export const DocumentTable = ({
                   >
                     <FiEye size={18} />
                   </Link>
-                ) : doc.checked && !doc.file ? (
+                ) : doc.checked && !doc.file && !disabled ? (
                   <label className="cursor-pointer">
                     <FiUpload size={18} />
                     <input
@@ -76,6 +79,7 @@ export const DocumentTable = ({
                       onChange={(e) =>
                         e.target.files && onFileChange(index, e.target.files[0])
                       }
+                      disabled={disabled}
                     />
                   </label>
                 ) : null}

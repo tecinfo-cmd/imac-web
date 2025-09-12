@@ -116,7 +116,7 @@ export interface PlanoAdequacao {
   motivo: string;
   situacao: string;
   observacao: string | null;
-  documentos: string[];
+  documentos: Documento[];
   responsavelTecnico: ResponsavelTecnico;
 }
 
@@ -124,15 +124,15 @@ export interface Analise {
   id: number;
   urlRelatorio: string;
   areaDesmatadaTotal: number;
+  valorMulta: number;
   areaARegenerar: number;
   moduloFiscal: number;
-  valorMulta: number;
   descontoPercentual: number;
   deteccoes: Deteccao[];
   contestacaoAutorizacaoSupressao: ContestacaoAutorizacaoSupressao | null;
   contestacaoLaudo: ContestacaoLaudo | null;
   planoAdequacao: PlanoAdequacao | null;
-  documentos: string[];
+  documentos: Documento[];
 }
 
 export interface RetornoAgrotools {

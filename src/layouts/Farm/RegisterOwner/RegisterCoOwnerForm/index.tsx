@@ -124,7 +124,6 @@ export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
     }
   }, [farmData?.numeroProprietarios, replace]);
 
-
   if (!farmData?.numeroProprietarios || farmData.numeroProprietarios <= 1) {
     return (
       <div className="flex flex-col gap-4 p-4">
