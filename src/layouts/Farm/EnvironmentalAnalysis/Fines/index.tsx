@@ -197,8 +197,7 @@ export const Fines = ({ farmId }: FinesProps) => {
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Desconto:</h2>
             <p>
-              {discountPercentage}% (R$
-              {discountValue.toFixed(2).replace(".", ",")})
+              R${discountPercentage}
             </p>
           </div>
         </div>
