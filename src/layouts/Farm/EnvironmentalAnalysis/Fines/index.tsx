@@ -39,8 +39,8 @@ export const Fines = ({ farmId }: FinesProps) => {
   const installmentValue2x = totalFineValue / 2;
   const installmentValue3x = totalFineValue / 3;
 
-  const isAccepted = watch("accept");
   const hasPaymentStatus = paymentStatus && paymentStatus.length > 0;
+  const isAccepted = watch("accept") || hasPaymentStatus;
 
   const handlePrintPaymentSlip = async (linhaDigitavel: string) => {
     try {
@@ -208,9 +208,10 @@ export const Fines = ({ farmId }: FinesProps) => {
           id="accept"
           type="checkbox"
           className="accent-[#21801A]"
-          checked={hasPaymentStatus || isAccepted}
           disabled={hasPaymentStatus}
-          {...register("accept")}
+          {...register("accept", {
+            value: hasPaymentStatus || false,
+          })}
         />
         <label className="text-sm text-[#0A3503]" htmlFor="accept">
           Declaro, para todos os fins de direito, e sob penas de lei, que estou
@@ -218,7 +219,7 @@ export const Fines = ({ farmId }: FinesProps) => {
         </label>
       </div>
 
-      {(isAccepted || hasPaymentStatus) && (
+      {isAccepted && (
         <>
           <div className="mt-8">
             <div className="bg-[#21801A] text-white font-semibold p-4 text-center">
@@ -322,15 +323,13 @@ export const Fines = ({ farmId }: FinesProps) => {
                         )}
                       </div>
                       <div className="text-[#0A3503]">
-                        {payment.dataHoraComando
-                          ? new Date(
-                              payment.dataHoraComando
-                            ).toLocaleDateString("pt-BR")
+                        {payment.dataPagamento
+                          ? new Date(payment.dataPagamento).toLocaleDateString(
+                              "pt-BR"
+                            )
                           : "-"}
                       </div>
-                      <div className="text-[#0A3503]">
-                       -
-                      </div>
+                      <div className="text-[#0A3503]">{payment.valor || "-"}</div>
                       <div className="text-[#0A3503]">
                         <span
                           className={`px-2 py-1 rounded text-xs ${

@@ -27,10 +27,11 @@ interface PaymentStatus {
   txId: string;
   posto: string;
   statusComando: string;
-  dataHoraComando: string;
+  dataPagamento: string;
   tipoMensagem: string;
   parcela: number;
   dataVencimento: string;
+  valor: number;
 }
 
 export const useGetPaymentStatus = (farmId: number) => {
