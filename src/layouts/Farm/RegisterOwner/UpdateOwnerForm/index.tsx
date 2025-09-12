@@ -16,15 +16,18 @@ import { maskPhone } from "@/utils/maskPhone";
 import { maskRG } from "@/utils/maskRG";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { formatDate } from "@/utils/formatters/formatDate";
 
 interface UpdateOwnerFormProps {
   farmId: number | undefined;
   idProprietario: number | undefined;
+  onSuccess?: () => void;
 }
 
 export const UpdateOwnerForm = ({
   farmId,
   idProprietario,
+  onSuccess,
 }: UpdateOwnerFormProps) => {
   const queryClient = useQueryClient();
   const { data: farmData, isLoading } = useGetFarmById(farmId);
@@ -51,7 +54,7 @@ export const UpdateOwnerForm = ({
         nome: owner.pessoa.nome,
         cpfCnpj: owner.pessoa.cpfCnpj,
         rgInscricaoSocial: owner.pessoa.rgInscricaoSocial || "",
-        dataNascimento: owner.pessoa.dataNascimento || "",
+        dataNascimento: formatDate(owner.pessoa.dataNascimento) || "",
         telefone: owner.pessoa.telefone || "",
         email: owner.pessoa.email || "",
       });
@@ -75,6 +78,7 @@ export const UpdateOwnerForm = ({
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEY_GET_FARM_BY_ID],
         });
+        onSuccess?.();
       },
       onError: () => {
         toast.error("Erro ao atualizar proprietário.");

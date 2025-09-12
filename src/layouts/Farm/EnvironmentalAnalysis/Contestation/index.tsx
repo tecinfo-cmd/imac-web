@@ -37,9 +37,11 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
     );
   }
 
-  const suppressionContestation = farm?.retornoAnalises?.find(
-    (analise) => analise.contestacaoAutorizacaoSupressao
-  )?.contestacaoAutorizacaoSupressao;
+  const currentAnalysis = farm?.retornoAnalises[0];
+
+  const suppressionContestation =
+    currentAnalysis?.contestacaoAutorizacaoSupressao;
+  const reportContestation = currentAnalysis?.contestacaoLaudo;
 
   return (
     <>
@@ -101,8 +103,8 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
 
       {suppressionContestation && (
         <div className="mb-6">
-          <div className="bg-white border border-[#CAC4D0] rounded-lg shadow">
-            <div className="bg-[#1A6415] text-white p-4 rounded-t-lg">
+          <div className="bg-white border border-[#CAC4D0] shadow">
+            <div className="bg-[#1A6415] text-white p-4">
               <h2 className="text-center font-semibold uppercase">
                 Situação da Contestação
               </h2>
@@ -156,7 +158,7 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
         <ReportContestationSection
           farmId={farmId}
           analysisId={analysisId!}
-          disabled={!!suppressionContestation}
+          disabled={!!reportContestation}
         />
       </div>
     </>

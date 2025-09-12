@@ -20,15 +20,10 @@ import { toast } from "sonner";
 interface UpdateCoOwnerFormProps {
   farmId: number | undefined;
   idProprietario: number | undefined;
+  onSuccess?: () => void;
 }
 
-const formatDateToBR = (dateString?: string) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat("pt-BR").format(date);
-};
-
- const convertToAmericanDate = (date: string | null) => {
+const convertToAmericanDate = (date: string | null) => {
   if (!date) return "";
   const [day, month, year] = date.split("/");
   return `${year}-${month}-${day}`;
@@ -37,6 +32,7 @@ const formatDateToBR = (dateString?: string) => {
 export const UpdateCoOwnerForm = ({
   farmId,
   idProprietario,
+  onSuccess,
 }: UpdateCoOwnerFormProps) => {
   const queryClient = useQueryClient();
   const { data: farmData, isLoading } = useGetFarmById(farmId);
@@ -64,9 +60,7 @@ export const UpdateCoOwnerForm = ({
         nome: coOwner.pessoa.nome,
         cpfCnpj: coOwner.pessoa.cpfCnpj,
         rgInscricaoSocial: coOwner.pessoa.rgInscricaoSocial || "",
-        dataNascimento: coOwner.pessoa.dataNascimento 
-      ? formatDateToBR(coOwner.pessoa.dataNascimento) 
-      : "",
+        dataNascimento: coOwner.pessoa.dataNascimento || "",
         telefone: coOwner.pessoa.telefone || "",
         email: coOwner.pessoa.email || "",
         setAsMainOwner: coOwner.tipoProprietario === "PROPRIETARIO",
@@ -115,6 +109,7 @@ export const UpdateCoOwnerForm = ({
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEY_GET_FARM_BY_ID],
         });
+        onSuccess?.();
       },
       onError: () => {
         toast.error("Erro ao atualizar co-proprietário.");

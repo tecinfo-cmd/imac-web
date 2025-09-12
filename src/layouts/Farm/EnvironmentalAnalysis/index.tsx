@@ -69,7 +69,7 @@ export const EnvironmentalAnalysisLayout = () => {
       icon: FaFileSignature,
       key: "AdequancyTerm",
     },
-    { label: "Multas", icon: FaGavel, key: "fines", disabled: true },
+    { label: "Multas", icon: FaGavel, key: "fines" },
     {
       label: "Autovistoria",
       icon: FaSearch,
