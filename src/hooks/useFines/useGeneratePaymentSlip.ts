@@ -50,7 +50,7 @@ const createPayerFromFarm = (farm: Farm) => {
   const tipoPessoa = documento.length === 14 ? "PESSOA_JURIDICA" : "PESSOA_FISICA";
 
   return {
-    cep: farm.endereco.cep,
+    cep: farm.endereco.cep.replace(/\D/g, ""),
     cidade: farm.cidade.nome,
     documento,
     nome: mainOwner.pessoa.nome,

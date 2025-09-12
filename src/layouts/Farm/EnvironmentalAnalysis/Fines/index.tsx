@@ -5,6 +5,7 @@ import { GoAlertFill } from "react-icons/go";
 
 import { Button } from "@/components/ui/button";
 
+import { api } from "@/api";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import {
   useGeneratePaymentSlip,
@@ -39,20 +40,47 @@ export const Fines = ({ farmId }: FinesProps) => {
   const installmentValue3x = totalFineValue / 3;
 
   const isAccepted = watch("accept");
+  const hasPaymentStatus = paymentStatus && paymentStatus.length > 0;
+
+  const handlePrintPaymentSlip = async (linhaDigitavel: string) => {
+    try {
+      const response = await api.get(`/boletos/imprimir/${linhaDigitavel}`);
+
+      const base64Data = response.data.pdf;
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `boleto-${linhaDigitavel}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Erro ao imprimir boleto:", error);
+    }
+  };
 
   const handleGenerateCashPayment = () => {
     if (!farm) return;
 
-    const pagador = createPayerFromFarm(farm);
+    const payer = createPayerFromFarm(farm);
 
     cashPaymentMutation.mutate(
       {
         farmId,
         payload: {
           parcela: 1,
-          valor: totalFineValue,
+          valor: fineValue,
           boleto: {
-            pagador,
+            pagador: payer,
             informativos: ["Pagamento de multa"],
           },
         },
@@ -70,20 +98,20 @@ export const Fines = ({ farmId }: FinesProps) => {
   const handleGenerateInstallmentPayments = () => {
     if (!farm) return;
 
-    const parcelas = parseInt(selectedInstallments);
-    const valorParcela =
-      parcelas === 2 ? installmentValue2x : installmentValue3x;
+    const installments = parseInt(selectedInstallments);
+    const valueInstallment =
+      installments === 2 ? installmentValue2x : installmentValue3x;
 
-    const pagador = createPayerFromFarm(farm);
+    const payer = createPayerFromFarm(farm);
 
     installmentPaymentMutation.mutate(
       {
         farmId,
         payload: {
-          parcela: parcelas,
-          valor: valorParcela,
+          parcela: installments,
+          valor: valueInstallment,
           boleto: {
-            pagador,
+            pagador: payer,
             informativos: ["Pagamento de multa"],
           },
         },
@@ -173,10 +201,6 @@ export const Fines = ({ farmId }: FinesProps) => {
               {discountValue.toFixed(2).replace(".", ",")})
             </p>
           </div>
-          <div className="flex gap-2">
-            <h2 className="text-[#21801A]">Valor total da multa:</h2>
-            <p>R${totalFineValue.toFixed(2).replace(".", ",")}</p>
-          </div>
         </div>
       </div>
       <div className="flex items-center gap-4 mt-6 px-6">
@@ -184,6 +208,8 @@ export const Fines = ({ farmId }: FinesProps) => {
           id="accept"
           type="checkbox"
           className="accent-[#21801A]"
+          checked={hasPaymentStatus || isAccepted}
+          disabled={hasPaymentStatus}
           {...register("accept")}
         />
         <label className="text-sm text-[#0A3503]" htmlFor="accept">
@@ -192,7 +218,7 @@ export const Fines = ({ farmId }: FinesProps) => {
         </label>
       </div>
 
-      {isAccepted && (
+      {(isAccepted || hasPaymentStatus) && (
         <>
           <div className="mt-8">
             <div className="bg-[#21801A] text-white font-semibold p-4 text-center">
@@ -213,7 +239,7 @@ export const Fines = ({ farmId }: FinesProps) => {
                   variant="dark"
                   className="text-sm"
                   onClick={handleGenerateCashPayment}
-                  disabled={cashPaymentMutation.isPending}
+                  disabled={cashPaymentMutation.isPending || hasPaymentStatus}
                 >
                   {cashPaymentMutation.isPending
                     ? "Gerando..."
@@ -250,7 +276,9 @@ export const Fines = ({ farmId }: FinesProps) => {
                     variant="dark"
                     className="text-sm"
                     onClick={handleGenerateInstallmentPayments}
-                    disabled={installmentPaymentMutation.isPending}
+                    disabled={
+                      installmentPaymentMutation.isPending || hasPaymentStatus
+                    }
                   >
                     {installmentPaymentMutation.isPending
                       ? "Gerando..."
@@ -301,29 +329,34 @@ export const Fines = ({ farmId }: FinesProps) => {
                           : "-"}
                       </div>
                       <div className="text-[#0A3503]">
-                        R$ {totalFineValue.toFixed(2).replace(".", ",")}
+                       -
                       </div>
                       <div className="text-[#0A3503]">
                         <span
                           className={`px-2 py-1 rounded text-xs ${
-                            payment.status === "PAGO"
+                            payment.status === "LIQUIDADO"
                               ? "bg-green-100 text-green-800"
                               : payment.status === "PENDENTE"
                               ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
+                              : payment.status === "VENCIDO"
+                              ? "bg-red-100 text-red-800"
+                              : payment.status === "BAIXADO"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
                           {payment.status}
                         </span>
                       </div>
                       <div className="text-[#0A3503]">
-                        <Button
-                          variant="dark"
-                          className="text-xs px-2 py-1"
-                          disabled={payment.status !== "PAGO"}
+                        <button
+                          onClick={() =>
+                            handlePrintPaymentSlip(payment.linhaDigitavel)
+                          }
+                          title="Imprimir boleto"
                         >
-                          Imprimir
-                        </Button>
+                          <FaBarcode size={20} />
+                        </button>
                       </div>
                     </div>
                   ))}
