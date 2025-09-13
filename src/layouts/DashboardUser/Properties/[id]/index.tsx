@@ -81,7 +81,7 @@ const cards = [
     disabled: true
   },
    {
-    label: "Upload de Car",
+    label: "Car review",
     icon: <SalesPermit size={36} />,
     active: false,
     disabled: true
