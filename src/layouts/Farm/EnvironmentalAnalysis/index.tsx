@@ -52,7 +52,7 @@ export const EnvironmentalAnalysisLayout = () => {
       key: "contestation",
     },
     {
-      label: "Plano de Adequação",
+      label: "Estratégia de Adequação",
       icon: FaClipboardCheck,
       key: "suitabilityPlan",
     },
@@ -65,7 +65,7 @@ export const EnvironmentalAnalysisLayout = () => {
     },
     */
     {
-      label: "Termo de Adequação",
+      label: "Plano de Adequação",
       icon: FaFileSignature,
       key: "AdequancyTerm",
     },

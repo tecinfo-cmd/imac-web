@@ -197,11 +197,11 @@ export const SuitabilityPlan = ({
         <GoAlertFill size={35} color="#F12929" />
         <p className="text-[#0A3503]">
           Para fazer o Aceite da Analise Sócioambiental, é necessário solicitar
-          o Plano <br /> de Adequação.
+          a Estratégia <br /> de Adequação.
         </p>
       </div>
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
-        Plano de Adequação
+        Estratégia de Adequação
       </h1>
       <div className="grid grid-cols-3 gap-8 p-6 border border-[#CAC4D0] rounded shadow mb-6">
         <div>
