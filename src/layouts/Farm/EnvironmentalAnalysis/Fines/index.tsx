@@ -168,11 +168,11 @@ export const Fines = ({ farmId }: FinesProps) => {
           <div className="grid grid-cols-2">
             <div>
               <h2 className="text-[#21801A]">Etapa Atual</h2>
-              <p>-</p>
+              <p>{farm?.etapa}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Status</h2>
-              <p>-</p>
+              <p>{farm?.status}</p>
             </div>
           </div>
         </div>

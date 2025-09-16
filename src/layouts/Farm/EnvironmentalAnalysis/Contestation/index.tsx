@@ -1,9 +1,11 @@
 "use client";
 import { GoAlertFill } from "react-icons/go";
+import { LuFileSearch } from "react-icons/lu";
 
 import { ReportContestationSection } from "./components/ReportContestationSection";
 import { SuppressionAuthorizationSection } from "./components/SuppressionAuthorizationSection";
 import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
+import { Button } from "@/components/ui/button";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { formatDate } from "@/utils/formatters/formatDate";
@@ -143,6 +145,24 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
                   </p>
                 </div>
               </div>
+
+              {currentAnalysis?.documentos &&
+                currentAnalysis.documentos.length > 0 && (
+                  <div className="mt-4 flex justify-start">
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        window.open(
+                          currentAnalysis.documentos[0].urlArquivo,
+                          "_blank"
+                        )
+                      }
+                    >
+                      <LuFileSearch size={20} />
+                      Acessar parecer
+                    </Button>
+                  </div>
+                )}
             </div>
           </div>
         </div>
