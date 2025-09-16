@@ -533,15 +533,11 @@ export const RegisterFarmLayout = () => {
             ))}
           </Table.Body>
         </Table.Container>
-        {documents.some(
-          (doc) => doc.checked && !doc.nomeArquivo && !doc.file
-        ) && (
           <div className="mt-4 flex justify-end">
-            <Button variant="dark" onClick={handleUploadDocuments}>
+            <Button variant="dark" disabled={farm?.documentos.length === 3} onClick={handleUploadDocuments}>
               Enviar documentação
             </Button>
           </div>
-        )}
       </div>
     </LayoutContainer>
   );
