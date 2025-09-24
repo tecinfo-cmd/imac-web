@@ -169,7 +169,7 @@ export const useObjectionData = () => {
         planoAdequacao?.documentos || []
       ).map((doc: PlanoDocumento) => ({
         id: doc.id,
-        descricao: doc.tipo || doc.nomeArquivoOriginal || doc.nomeArquivo,
+        descricao: "ADEQUACAO",
         url: doc.urlArquivo || "#",
       }));
 
@@ -215,14 +215,14 @@ export const useObjectionData = () => {
         documentosSupressao: (contestacaoSupressao?.documentos || []).map(
           (doc: any, index: number) => ({
             id: doc.id || index + 1,
-            descricao: doc.tipo || `Documento ${index + 1}`,
+            descricao: "CONTESTACAO",
             url: doc.urlArquivo || "#",
           })
         ),
         documentosLaudo: (contestacaoLaudo?.documentos || []).map(
           (doc: any, index: number) => ({
             id: doc.id || index + 1,
-            descricao: doc.tipo || `Documento ${index + 1}`,
+            descricao: "CONTESTACAO",
             url: doc.urlArquivo || "#",
           })
         ),
@@ -275,7 +275,7 @@ export const useObjectionData = () => {
 
       payload.deteccoes.forEach((d) => {
         if (d.pdf instanceof File && d.tipo) {
-          parametrosArray.push({ nome: d.pdf.name, tipo: d.tipo });
+          parametrosArray.push({ nome: d.pdf.name, tipo: "CONTESTACAO" });
           formData.append("arquivos", d.pdf);
         }
       });
