@@ -10,6 +10,7 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { useGetPropriedades } from "@/hooks/useGetProperties/userGetProperties";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Monitor } from "@/icons/Monitor";
 import { X } from "@/icons/X";
@@ -63,6 +64,11 @@ export const PropertiesLayout = () => {
       icon: <Taxa className="text-current" />,
     },
     */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   const statusOptions = [
@@ -161,7 +167,7 @@ export const PropertiesLayout = () => {
       <FilterProperties
         onFilter={(f) => {
           setFilters(f);
-          setPage(1); 
+          setPage(1);
         }}
       />
       <span>Total de propriedades: {totalItems || 0}</span>

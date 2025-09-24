@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
@@ -50,8 +51,14 @@ export const PlanoAdequacaoLayout = () => {
   const [selectedDocsIds, setSelectedDocsIds] = useState<number[]>([]);
   const [openSection, setOpenSection] = useState({ tecnico: true });
 
-  const { data, isLoading, isError, error, submitPlanoAdequacaoAsync, refetch } =
-    useObjectionData();
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    submitPlanoAdequacaoAsync,
+    refetch,
+  } = useObjectionData();
 
   const form = useForm<FormValues>({
     defaultValues: {
@@ -114,6 +121,11 @@ export const PlanoAdequacaoLayout = () => {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
+    },
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
     },
   ];
 
@@ -306,7 +318,7 @@ export const PlanoAdequacaoLayout = () => {
       >
         <GoArrowLeft size={28} />
       </button>
-      
+
       {/* Título + Situação do Plano */}
       <div className="flex items-center justify-center py-6">
         <h1 className="text-xl text-[#1A6415] font-semibold">

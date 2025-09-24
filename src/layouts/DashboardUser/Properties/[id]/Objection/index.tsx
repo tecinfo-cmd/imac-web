@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
@@ -195,6 +196,11 @@ export const ObjectionLayout = () => {
       label: "Propriedades",
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
+    },
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
     },
   ];
 
@@ -389,9 +395,7 @@ export const ObjectionLayout = () => {
       (formData.deteccoes || []).forEach((d, index) => {
         const original = (originalList[index] ?? {}) as any;
 
-        const { label: selectedLabel, value: selectedValue } = toLabelValue(
-          d?.tipo
-        );
+        const { value: selectedValue } = toLabelValue(d?.tipo);
         const wktRaw = (d?.wkt ?? "").trim();
         const areaNum = toNum(d?.areaARegenerar);
 
@@ -403,10 +407,13 @@ export const ObjectionLayout = () => {
         if (hasPdf) {
           const file = d!.pdf![0] as File;
           parametros.push({
-            nome: selectedLabel || "(sem-label)",
-            tipo: "PDF",
+            nome: file.name,
+            tipo: "Parecer Técnico da Contestação",
           });
-          arquivosOut.push({ pdf: file, tipo: file.name });
+          arquivosOut.push({
+            pdf: file,
+            tipo: "Parecer Técnico da Contestação",
+          });
         }
 
         const hasPolygonData = hasTipo || hasWKT || hasArea;
@@ -434,8 +441,8 @@ export const ObjectionLayout = () => {
       const parecerFile = formData.parecerTecnico?.pdf?.[0];
       if (parecerFile instanceof File) {
         parametros.push({
-          nome: "Parecer Técnico da Contestação",
-          tipo: "PDF",
+          nome: parecerFile.name,
+          tipo: "Parecer Técnico da Contestação",
         });
         arquivosOut.push({ pdf: parecerFile, tipo: parecerFile.name });
       }
@@ -885,7 +892,7 @@ export const ObjectionLayout = () => {
                       }}
                       className="p-1 hover:scale-110 transition-transform"
                       title="Limpar arquivo"
-                      disabled={!hasParecer}
+                      //disabled={!hasParecer}
                     >
                       <X />
                     </button>

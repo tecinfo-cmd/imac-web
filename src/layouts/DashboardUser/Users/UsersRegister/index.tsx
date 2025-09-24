@@ -1,11 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  PiSealCheckLight,
-  PiUser,
-  PiFarmLight,
-} from "react-icons/pi";
+import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
 import { InputSelect } from "@/components/InputSelect";
@@ -13,6 +9,7 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
 import { useUserRegister } from "@/hooks/useUserRegisterForm/useUserRegisterForm";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
@@ -47,6 +44,11 @@ export const UsersRegisterLayout = () => {
         icon: <Taxa className="text-current" />,
       },
       */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   return (
@@ -115,10 +117,7 @@ export const UsersRegisterLayout = () => {
         />
 
         <div className="col-span-full flex justify-between mt-4">
-          <Link
-            href="/dashboard/users"
-            className="text-[#21801A] underline"
-          >
+          <Link href="/dashboard/users" className="text-[#21801A] underline">
             Voltar
           </Link>
           <Button type="submit" disabled={isLoading}>

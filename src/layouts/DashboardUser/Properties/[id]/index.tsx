@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
 import { usePropertySummary } from "@/hooks/useGetProperties/usePropertySummary";
+import { Abattoir } from "@/icons/Abattoir";
 import { AdjustmentTerm } from "@/icons/AdjustmentTerm";
 import { Analityc } from "@/icons/Analityc";
 import DocPropertie from "@/icons/DocPropertie";
@@ -36,7 +37,7 @@ const cards = [
     label: "Documentos da Propriedade",
     icon: <DocPropertie size={36} />,
     active: false,
-    disabled: true
+    disabled: true,
   },
   {
     label: "Contestação",
@@ -66,7 +67,7 @@ const cards = [
     icon: <FineTracking size={36} />,
     active: false,
     path: (id: string) => `/dashboard/properties/${id}/fines`,
-    disabled: true
+    disabled: true,
   },
   {
     label: "Autovistoria",
@@ -78,13 +79,13 @@ const cards = [
     label: "Autorização de Comercialização",
     icon: <SalesPermit size={36} />,
     active: false,
-    disabled: true
+    disabled: true,
   },
-   {
-    label: "Car review",
+  {
+    label: "Revisão de Car",
     icon: <SalesPermit size={36} />,
     active: false,
-    disabled: true
+    disabled: true,
   },
 ];
 
@@ -126,6 +127,11 @@ export const MonitoringLayout = () => {
       icon: <Taxa />,
     },
     */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   if (isLoading || !propriedade) {
@@ -169,7 +175,6 @@ export const MonitoringLayout = () => {
       if (url) {
         setPdfUrl(url);
       } else {
-
         toast(
           "Relatório socioambiental ainda não está disponível para esta propriedade."
         );
@@ -200,7 +205,11 @@ export const MonitoringLayout = () => {
                   ? "bg-[#F3F3F3] !text-[#21801A] opacity-60"
                   : ""
               }
-               ${card.disabled ? "bg-[#F3F3F3] !text-[#21801A] cursor-not-allowed pointer-events-none opacity-60" : ""}
+               ${
+                 card.disabled
+                   ? "bg-[#F3F3F3] !text-[#21801A] cursor-not-allowed pointer-events-none opacity-60"
+                   : ""
+               }
             `}
             onClick={() => !card.disabled && handleCardClick(idx)}
           >

@@ -49,7 +49,7 @@ const ModalHeader = ({ children, className }: SectionProps) => {
         className
       )}
     >
-      <h2 className="text-lg font-semibold text-white">{children}</h2>
+      <h2 className="text-lg font-semibold">{children}</h2>
     </div>
   );
 };

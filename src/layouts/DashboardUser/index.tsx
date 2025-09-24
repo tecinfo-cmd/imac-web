@@ -11,6 +11,7 @@ import { CardContent } from "@/components/ui/cardContent";
 import DatePicker from "@/components/ui/datePicker";
 
 import { useGetDashboardData } from "@/hooks/useGetDashboardData/useGetDashboardData";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import {
   LineChart,
@@ -156,6 +157,11 @@ export const DashboardUserLayout = () => {
       icon: <Taxa className="text-current" />,
     },
     */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   if (isLoading) {

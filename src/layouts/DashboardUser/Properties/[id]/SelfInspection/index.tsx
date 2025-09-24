@@ -23,6 +23,7 @@ import { yup } from "@/config/yup";
 import { useCreateSelfInspection } from "@/hooks/useGetProperties/useCreateSelfInspection";
 import { useGetSelfInspections } from "@/hooks/useGetProperties/useCreateSelfInspection";
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 import { maskDate } from "@/utils/maskDate";
@@ -45,6 +46,11 @@ const customMenuItems = [
     label: "Propriedades",
     href: "/dashboard/properties",
     icon: <PiFarmLight size={44} />,
+  },
+  {
+    label: "Frigorificos",
+    href: "/dashboard/abattoir-industry",
+    icon: <Abattoir size={44} />,
   },
 ];
 
@@ -200,22 +206,21 @@ export const SelfInspectionLayout = () => {
           <Table.Title>Ações</Table.Title>
         </Table.Header>
         <Table.Body>
-        {selfInspections.map((inspection: any) => (
-          <Table.Row key={inspection.id}>
-            <Table.Cell>{inspection.dataInicio}</Table.Cell>
-            <Table.Cell>{inspection.statusVistoria}</Table.Cell>
-            <Table.Cell>{inspection.vistoria}</Table.Cell>
-            <Table.Cell>
-              <div className="flex items-center gap-2">
-                <Tooltip message="Visualizar" id={`view-${inspection.id}`}>
-
+          {selfInspections.map((inspection: any) => (
+            <Table.Row key={inspection.id}>
+              <Table.Cell>{inspection.dataInicio}</Table.Cell>
+              <Table.Cell>{inspection.statusVistoria}</Table.Cell>
+              <Table.Cell>{inspection.vistoria}</Table.Cell>
+              <Table.Cell>
+                <div className="flex items-center gap-2">
+                  <Tooltip message="Visualizar" id={`view-${inspection.id}`}>
                     <Eye />
-                </Tooltip>
-              </div>
-            </Table.Cell>
-          </Table.Row>
-        ))}
-      </Table.Body>
+                  </Tooltip>
+                </div>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
       </Table.Container>
     </LayoutContainer>
   );

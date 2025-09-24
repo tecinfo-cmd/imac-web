@@ -10,6 +10,7 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { useGetElegibilities } from "@/hooks/useGetElegibilities/useGetElegibilities";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
@@ -77,6 +78,11 @@ export const ElegibilityLayout = () => {
       icon: <Taxa className="text-current" />,
     },
     */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   return (
