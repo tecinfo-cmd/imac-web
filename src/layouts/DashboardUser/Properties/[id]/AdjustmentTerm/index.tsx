@@ -15,6 +15,7 @@ import { TableInformation } from "@/components/TableInformation";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 //import { Eye } from "@/icons/Eye";
 
@@ -44,6 +45,11 @@ const customMenuItems = [
       href: "/multas",
       icon: <Taxa />,
     },*/
+  {
+    label: "Frigorificos",
+    href: "/dashboard/abattoir-industry",
+    icon: <Abattoir size={44} />,
+  },
 ];
 
 export const AdjustmentTermLayout = () => {

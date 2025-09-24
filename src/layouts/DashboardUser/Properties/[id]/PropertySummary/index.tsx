@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 
 import { usePropertySummary } from "@/hooks/useGetProperties/usePropertySummary";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 //import { Taxa } from "@/icons/Taxa";
@@ -72,6 +73,11 @@ export const PropertySummaryLayout = () => {
     /*
     { label: "Multas", href: "/dashboard/multas", icon: <Taxa /> },
      */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   if (isLoading)

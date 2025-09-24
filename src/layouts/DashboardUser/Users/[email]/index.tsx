@@ -9,6 +9,7 @@ import { LayoutContainer } from "@/components/LayoutContainer";
 import { Button } from "@/components/ui/button";
 
 import { useUserDetail } from "@/hooks/useGetUsers/useUserDetail";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 
 export const UserDetailLayout = () => {
@@ -50,6 +51,11 @@ export const UserDetailLayout = () => {
       icon: <Taxa className="text-current" />,
     },
     */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   if (isLoading || !userData) return <p className="p-4">Carregando...</p>;

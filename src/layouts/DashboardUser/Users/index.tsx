@@ -12,6 +12,7 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { useDeleteUser } from "@/hooks/useGetUsers/useDeleteUser";
 import { useGetUsers } from "@/hooks/useGetUsers/useGetUsers";
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 
@@ -64,6 +65,11 @@ export const UsersLayout = () => {
       icon: <Taxa className="text-current" />,
     },
     */
+    {
+      label: "Frigorificos",
+      href: "/dashboard/abattoir-industry",
+      icon: <Abattoir size={44} />,
+    },
   ];
 
   return (
@@ -71,7 +77,7 @@ export const UsersLayout = () => {
       <FilterUsers
         onFilter={(f) => {
           setFilters(f);
-          setPage(1); 
+          setPage(1);
         }}
       />
       <span>Total de usuários: {totalItems || 0}</span>
@@ -124,7 +130,9 @@ export const UsersLayout = () => {
                             user.status === "INATIVO" ? "#F44336" : "#21801A",
                         }}
                       >
-                        {(user.status === "ATIVO" || user.status === null) ? "Ativo" : "Inativo"}
+                        {user.status === "ATIVO" || user.status === null
+                          ? "Ativo"
+                          : "Inativo"}
                       </span>
                     </div>
                   </Table.Cell>

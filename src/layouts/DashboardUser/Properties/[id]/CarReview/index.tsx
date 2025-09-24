@@ -1,4 +1,3 @@
-
 "use client";
 import {
   PiFarmLight,
@@ -9,6 +8,7 @@ import {
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
 
+import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { DownloadIcon } from "@/icons/Download";
 
@@ -55,6 +55,11 @@ const menuItems = [
       icon: <Taxa />,
     },
     */
+  {
+    label: "Frigorificos",
+    href: "/dashboard/abattoir-industry",
+    icon: <Abattoir size={44} />,
+  },
 ];
 
 export const CarReviewLayout = () => {
@@ -78,17 +83,17 @@ export const CarReviewLayout = () => {
         <Table.Body>
           {arquivos.map((arquivo) => (
             <Table.Row key={arquivo.id}>
-                <Table.Cell>{arquivo.dataUpload}</Table.Cell>
-                <Table.Cell>{arquivo.nome}</Table.Cell>
-                <Table.Cell>
-                  <button onClick={() => handleDownload(arquivo.url)}>
-                    <DownloadIcon />
-                  </button>
-                </Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table.Container>
-      </LayoutContainer>
+              <Table.Cell>{arquivo.dataUpload}</Table.Cell>
+              <Table.Cell>{arquivo.nome}</Table.Cell>
+              <Table.Cell>
+                <button onClick={() => handleDownload(arquivo.url)}>
+                  <DownloadIcon />
+                </button>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Container>
+    </LayoutContainer>
   );
 };
