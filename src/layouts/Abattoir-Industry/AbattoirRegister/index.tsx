@@ -3,9 +3,9 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
+import { PiSealCheckLight } from "react-icons/pi";
 
-import { Modal } from "../../Properties/[id]/SelfInspection/components/Modal";
+import { Modal } from "../../DashboardUser/Properties/[id]/SelfInspection/components/Modal";
 import { Input } from "@/components/Input";
 import { InputFileUpload } from "@/components/InputFile";
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -17,7 +17,6 @@ import {
   useCreateUserAbattoir,
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
-import { Analityc } from "@/icons/Analityc";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 import { maskPhone } from "@/utils/maskPhone";
@@ -143,31 +142,10 @@ export const AbattoirRegisterLayout = ({
 
   const customMenuItems = [
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: <Analityc size={44} />,
-    },
-    {
-      label: "Usuários",
-      href: "/dashboard/users",
-      icon: <PiUser size={44} />,
-    },
-    {
       label: "Elegibilidade",
-      href: "/dashboard/elegibility",
+      href: "/dashboard/abattoir-industry/elegibilityAbattoir",
       icon: <PiSealCheckLight size={44} />,
     },
-    {
-      label: "Propriedades",
-      href: "/dashboard/properties",
-      icon: <PiFarmLight size={44} />,
-    },
-    /*{
-        label: "Multas",
-        href: "/dashboard/multas",
-        icon: <Taxa className="text-current" />,
-      },
-      */
     {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
@@ -178,7 +156,7 @@ export const AbattoirRegisterLayout = ({
   const handleAbattoirSubmit = async (data: any) => {
     try {
       const response = await createAbattoir.mutateAsync(data);
-      setCreatedAbattoirId(response?.id); // Supondo que a API retorna o id
+      setCreatedAbattoirId(response?.id);
       resetAbattoirForm();
       toast.success("Frigorífico cadastrado com sucesso!");
     } catch (error) {

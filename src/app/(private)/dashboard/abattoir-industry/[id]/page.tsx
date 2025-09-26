@@ -1,4 +1,4 @@
-import AbattoirEditLayout from "@/layouts/DashboardUser/Abattoir-Industry/[id]";
+import AbattoirEditLayout from "@/layouts/Abattoir-Industry/[id]";
 
 export default function AbattoirEdit() {
   return <AbattoirEditLayout />;

@@ -46,21 +46,14 @@ export const FilterAbattoir = ({ onFilter }: FilterAbattoirProps) => {
         control={control}
       />
 
-      <Input
-        name="email"
-        label="Email"
-        placeholder="Digite o Email"
-        control={control}
-      />
-
       <InputSelect
         name="status"
         label="Status"
         placeholder="Selecione"
         control={control}
         options={[
-          { label: "Ativo", value: "ATIVO", color: "#21801A" },
-          { label: "Inativo", value: "INATIVO", color: "#F44336" },
+          { label: "Aprovado", value: "APROVADO", color: "#21801A" },
+          { label: "Reprovado", value: "REPROVADO", color: "#F44336" },
         ]}
         formatOptionLabel={(option: any) => (
           <div className="flex items-center gap-2">

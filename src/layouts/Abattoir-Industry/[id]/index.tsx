@@ -3,42 +3,25 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import React from "react";
-import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
+import { PiSealCheckLight } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 
 import { useAbattoir } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
-import { Analityc } from "@/icons/Analityc";
 
 const AbattoirEditLayout = () => {
   const { id } = useParams();
   const { data, isLoading, error } = useAbattoir({}, 1);
 
-  // Filtra o frigorífico pelo id selecionado
   const abattoir =
     data?.data?.find((item: any) => String(item.id) === String(id)) || null;
 
   const customMenuItems = [
     {
-      label: "Dashboard",
-      href: "/dashboard",
-      icon: <Analityc size={44} />,
-    },
-    {
-      label: "Usuários",
-      href: "/dashboard/users",
-      icon: <PiUser size={44} />,
-    },
-    {
       label: "Elegibilidade",
-      href: "/dashboard/elegibility",
+      href: "/dashboard/abattoir-industry/elegibilityAbattoir",
       icon: <PiSealCheckLight size={44} />,
-    },
-    {
-      label: "Propriedades",
-      href: "/dashboard/properties",
-      icon: <PiFarmLight size={44} />,
     },
     {
       label: "Frigorificos",
