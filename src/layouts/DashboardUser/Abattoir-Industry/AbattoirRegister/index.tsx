@@ -3,9 +3,9 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { PiSealCheckLight } from "react-icons/pi";
+import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
-import { Modal } from "../../DashboardUser/Properties/[id]/SelfInspection/components/Modal";
+import { Modal } from "../../Properties/[id]/SelfInspection/components/Modal";
 import { Input } from "@/components/Input";
 import { InputFileUpload } from "@/components/InputFile";
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -17,15 +17,16 @@ import {
   useCreateUserAbattoir,
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
+import { Analityc } from "@/icons/Analityc";
 import { maskCep } from "@/utils/maskCEP";
+import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
 function validarTelefone(telefone: string): boolean {
-  const regex =
-    /^(?:(?:\+|00)?(55)\s?)?(?:([1-9][1-9]))?\s?(?:9?\d{4})-?(\d{4})$/;
+  const regex = /^(\(?\d{2}\)?\s?)?(9?\d{4})-?(\d{4})$/;
   return regex.test(telefone);
 }
 
@@ -43,11 +44,7 @@ const schema = yup.object({
   cep: yup.string().required(),
   endereco: yup.string().required(),
   municipio: yup.string().required(),
-  qtuVoucher: yup
-    .number()
-    .typeError("Digite um número válido")
-    .required()
-    .min(1),
+  quantidadeVoucher: yup.number().required(),
   termoCooperacao: yup.mixed().required(),
 });
 
@@ -66,7 +63,7 @@ const defaultValues = {
   cep: "",
   endereco: "",
   municipio: "",
-  qtuVoucher: "",
+  quantidadeVoucher: null,
   termoCooperacao: null,
 };
 
@@ -114,7 +111,7 @@ export const AbattoirRegisterLayout = ({
           }
 
           setValue("endereco", data.logradouro || "");
-          setValue("municipio", `${data.localidade || ""}-${data.uf || ""}`);
+          setValue("municipio", `${data.localidade || ""}`);
         } catch (error) {
           console.error("Erro ao buscar o CEP:", error);
         }
@@ -142,10 +139,31 @@ export const AbattoirRegisterLayout = ({
 
   const customMenuItems = [
     {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <Analityc />,
+    },
+    {
+      label: "Usuários",
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
+    },
+    {
       label: "Elegibilidade",
-      href: "/dashboard/abattoir-industry/elegibilityAbattoir",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
+    {
+      label: "Propriedades",
+      href: "/dashboard/properties",
+      icon: <PiFarmLight size={44} />,
+    },
+    /*{
+          label: "Multas",
+          href: "/dashboard/multas",
+          icon: <Taxa className="text-current" />,
+        },
+        */
     {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
@@ -241,7 +259,7 @@ export const AbattoirRegisterLayout = ({
         />
 
         <Input
-          name="qtuVoucher"
+          name="quantidadeVoucher"
           label="Quantidade de voucher acordado"
           placeholder="Digite a quantidade de voucher"
           control={control}
@@ -285,7 +303,12 @@ export const AbattoirRegisterLayout = ({
         </Modal.Header>
         <Modal.Body>
           <form onSubmit={handleUserSubmit(handleUserAbattoirSubmit)}>
-            <Input name="cpf" label="CPF" control={userControl} />
+            <Input
+              name="cpf"
+              label="CPF"
+              mask={maskCPF}
+              control={userControl}
+            />
             <Input name="nome" label="Nome do Contato" control={userControl} />
             <Input name="email" label="E-mail" control={userControl} />
             <div className="mt-4 flex justify-center">

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PiSealCheckLight } from "react-icons/pi";
+import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -15,6 +15,7 @@ import {
   useInvalidateAbattoir,
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
+import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 
 import { FilterAbattoir } from "./FilterAbattoir";
@@ -44,13 +45,34 @@ export const AbattoirLayout = () => {
 
   const customMenuItems = [
     {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <Analityc />,
+    },
+    {
+      label: "Usuários",
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
+    },
+    {
       label: "Elegibilidade",
-      href: "/dashboard/abattoir-industry/elegibilityAbattoir",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
     {
+      label: "Propriedades",
+      href: "/dashboard/properties",
+      icon: <PiFarmLight size={44} />,
+    },
+    /*{
+          label: "Multas",
+          href: "/dashboard/multas",
+          icon: <Taxa className="text-current" />,
+        },
+        */
+    {
       label: "Frigorificos",
-      href: "dashboard/abattoir-industry",
+      href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
     },
   ];
@@ -96,16 +118,16 @@ export const AbattoirLayout = () => {
             <Table.Body>
               {abattoir.map((abattoir: any) => (
                 <Table.Row key={abattoir.id}>
-                  <Table.Cell>{abattoir.nomePropriedade}</Table.Cell>
+                  <Table.Cell>{abattoir.nomeFantasia}</Table.Cell>
                   <Table.Cell>{abattoir.telefone || "-"}</Table.Cell>
-                  <Table.Cell>{abattoir.cpfCnpj}</Table.Cell>
+                  <Table.Cell>{abattoir.cnpj}</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-2">
                       <span
                         className="w-2 h-2 rounded-full"
                         style={{
                           backgroundColor:
-                            abattoir.status === "REPROVADO"
+                            abattoir.status === "INATIVO"
                               ? "#F44336"
                               : "#21801A",
                         }}
@@ -113,14 +135,15 @@ export const AbattoirLayout = () => {
                       <span
                         style={{
                           color:
-                            abattoir.status === "REPROVADO"
+                            abattoir.status === "INATIVO"
                               ? "#F44336"
                               : "#21801A",
                         }}
                       >
-                        {abattoir.status === "APROVADO" || abattoir.status === null
-                          ? "Aprovado"
-                          : "Reprovado"}
+                        {abattoir.status === "ATIVO" ||
+                        abattoir.status === null
+                          ? "Ativo"
+                          : "Inativo"}
                       </span>
                     </div>
                   </Table.Cell>

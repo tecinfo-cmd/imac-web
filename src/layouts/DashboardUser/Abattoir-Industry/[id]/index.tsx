@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import React from "react";
-import { PiSealCheckLight } from "react-icons/pi";
+import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 
 import { useAbattoir } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
+import { Analityc } from "@/icons/Analityc";
 
 const AbattoirEditLayout = () => {
   const { id } = useParams();
@@ -19,10 +20,31 @@ const AbattoirEditLayout = () => {
 
   const customMenuItems = [
     {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <Analityc />,
+    },
+    {
+      label: "Usuários",
+      href: "/dashboard/users",
+      icon: <PiUser size={44} />,
+    },
+    {
       label: "Elegibilidade",
-      href: "/dashboard/abattoir-industry/elegibilityAbattoir",
+      href: "/dashboard/elegibility",
       icon: <PiSealCheckLight size={44} />,
     },
+    {
+      label: "Propriedades",
+      href: "/dashboard/properties",
+      icon: <PiFarmLight size={44} />,
+    },
+    /*{
+          label: "Multas",
+          href: "/dashboard/multas",
+          icon: <Taxa className="text-current" />,
+        },
+        */
     {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
@@ -81,7 +103,7 @@ const AbattoirEditLayout = () => {
               rel="noopener noreferrer"
               className="text-[#21801A] underline"
             >
-              Visualizar PDF
+              {abattoir.urlTermoCooperacao.split("/").pop()?.split("-").pop()}
             </a>
           ) : (
             "Não disponível"
@@ -94,6 +116,32 @@ const AbattoirEditLayout = () => {
       </div>
 
       <h1 className="text-2xl font-semibold mt-28">Usuários da Indústria</h1>
+
+          {abattoir.usuarios?.length > 0 ? (
+  <table className="min-w-[300px] mt-10">
+    <thead>
+      <tr className="text-[#21801A] font-bold">
+        <th className="text-left pr-8">Nome:</th>
+        <th className="text-left pr-8">CPF:</th>
+        <th className="text-left pr-8">Email:</th>
+      </tr>
+    </thead>
+    <tbody>
+      {abattoir.usuarios.map((usuario: any) => (
+        <tr key={usuario.id}>
+          <td className="pr-8">{usuario.pessoa?.nome ?? "Não informado"}</td>
+          <td className="pr-8">{usuario.pessoa?.cpfCnpj ?? "Não informado"}</td>
+          <td className="pr-8">{usuario.pessoa?.email ?? "Não informado"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+) : (
+  <div>Nenhum usuário cadastrado.</div>
+)}
+
+
+      
       <Link
         href="/dashboard/abattoir-industry"
         className="text-[#21801A] underline mt-4 block"
