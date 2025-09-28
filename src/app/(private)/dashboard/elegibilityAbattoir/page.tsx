@@ -1,4 +1,4 @@
-import { ElegibilityAbattoirLayout } from "@/layouts/Abattoir-Industry/Elegibility";
+import { ElegibilityAbattoirLayout } from "@/layouts/ElegibilityAbattoir";
 
 export default function ElegibilityAbattoirPage() {
   return <ElegibilityAbattoirLayout />;

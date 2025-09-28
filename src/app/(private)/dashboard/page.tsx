@@ -1,12 +1,15 @@
 "use client";
-import { AbattoirLayout } from "@/layouts/Abattoir-Industry";
+
 import { DashboardLayout } from "@/layouts/Dashboard";
 import { DashboardUserLayout } from "@/layouts/DashboardUser";
+import { ElegibilityAbattoirLayout } from "@/layouts/ElegibilityAbattoir";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 
 export default function Dashboard() {
   const { role } = useUserRoleStore();
-
+  const userData = useAuthStore((s) => s.userData);
+  const cargo = userData?.cargo;
   if (role === "PRODUTOR") {
     return <DashboardLayout />;
   }
@@ -15,7 +18,7 @@ export default function Dashboard() {
     return <DashboardUserLayout />;
   }
 
-  if (role === "FRIGORIFICO") {
-    return <AbattoirLayout />;
+  if (cargo === "FRIGORIFICO" || role === "FRIGORIFICO") {
+    return <ElegibilityAbattoirLayout />;
   }
 }

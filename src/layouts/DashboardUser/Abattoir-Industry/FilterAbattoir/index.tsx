@@ -40,7 +40,7 @@ export const FilterAbattoir = ({ onFilter }: FilterAbattoirProps) => {
       />
 
       <Input
-        name="cnpj"
+        name="cpfCnpj"
         label="CNPJ"
         placeholder="Digite o CNPJ"
         control={control}
@@ -52,8 +52,8 @@ export const FilterAbattoir = ({ onFilter }: FilterAbattoirProps) => {
         placeholder="Selecione"
         control={control}
         options={[
-          { label: "Aprovado", value: "APROVADO", color: "#21801A" },
-          { label: "Reprovado", value: "REPROVADO", color: "#F44336" },
+          { label: "Ativo", value: "ATIVO", color: "#21801A" },
+          { label: "Inativo", value: "INATIVO", color: "#F44336" },
         ]}
         formatOptionLabel={(option: any) => (
           <div className="flex items-center gap-2">

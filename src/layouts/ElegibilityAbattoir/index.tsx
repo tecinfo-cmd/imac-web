@@ -3,14 +3,13 @@
 import { useEffect, useState } from "react";
 import { PiSealCheckLight } from "react-icons/pi";
 
-import { ElegibilityDetail } from "@/components/ElegibilityDetail";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Pagination } from "@/components/Pagination";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
+import { ElegibilityAbattoirDetail } from "@/layouts/ElegibilityAbattoir/components/ElegibilityAbattoirDatails";
 
 import { useAbattoirElegibilities } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
-import { Abattoir } from "@/icons/Abattoir";
 import { Eye } from "@/icons/Eye";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
@@ -20,7 +19,14 @@ export const ElegibilityAbattoirLayout = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
   const [filters, setFilters] = useState({});
-  const { data, isLoading, error } = useAbattoirElegibilities(filters, page);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+
+  const { data, isLoading, error } = useAbattoirElegibilities(
+    filters,
+    page,
+    refreshKey
+  );
 
   const elegibilities = data?.data ?? [];
   const totalItems = data?.total ?? 0;
@@ -29,6 +35,20 @@ export const ElegibilityAbattoirLayout = () => {
   useEffect(() => {
     if (page > totalPages) setPage(1);
   }, [page, totalPages]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRefreshKey((prev) => prev + 1);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [page, filters]);
+
+  useEffect(() => {
+    if (!isLoading && isFirstLoad) {
+      setIsFirstLoad(false);
+    }
+  }, [isLoading, isFirstLoad]);
 
   const [selectedData, setSelectedData] = useState<{
     id: number;
@@ -49,13 +69,13 @@ export const ElegibilityAbattoirLayout = () => {
   const customMenuItems = [
     {
       label: "Elegibilidade",
-      href: "/dashboard/battoir-industry/elegibilityAbattoir",
+      href: "/dashboard",
       icon: <PiSealCheckLight size={44} />,
     },
     {
-      label: "Frigorificos",
-      href: "/dashboard/abattoir-industry",
-      icon: <Abattoir size={44} />,
+      label: "Acompanhamento de Produtores",
+      href: "/dashboard/elegibilityAbattoir/trackProducers",
+      icon: <PiSealCheckLight size={44} />,
     },
   ];
 
@@ -68,6 +88,7 @@ export const ElegibilityAbattoirLayout = () => {
         onFilter={(f) => {
           setFilters(f);
           setPage(1);
+          setIsFirstLoad(true);
         }}
       />
       <span>Total de solicitações: {totalItems || 0}</span>
@@ -165,7 +186,7 @@ export const ElegibilityAbattoirLayout = () => {
         </>
       )}
 
-      <ElegibilityDetail
+      <ElegibilityAbattoirDetail
         isOpen={isModalOpen}
         onOpenChange={setIsModalOpen}
         onClose={() => setIsModalOpen(false)}
