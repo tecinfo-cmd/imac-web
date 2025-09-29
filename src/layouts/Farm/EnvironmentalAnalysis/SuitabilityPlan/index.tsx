@@ -280,16 +280,21 @@ export const SuitabilityPlan = ({
               </div>
 
               {existingSuitabilityPlan.documentos &&
-                existingSuitabilityPlan.documentos.length > 0 && (
+                existingSuitabilityPlan.documentos.filter(
+                  (doc) => doc.tipo === "ADEQUACAO"
+                ).length > 0 && (
                   <div className="mt-4 flex justify-start">
                     <Button
                       variant="outline"
-                      onClick={() =>
-                        window.open(
-                          existingSuitabilityPlan.documentos[0].urlArquivo,
-                          "_blank"
-                        )
-                      }
+                      onClick={() => {
+                        const adequacaoDoc =
+                          existingSuitabilityPlan.documentos.find(
+                            (doc) => doc.tipo === "ADEQUACAO"
+                          );
+                        if (adequacaoDoc) {
+                          window.open(adequacaoDoc.urlArquivo, "_blank");
+                        }
+                      }}
                     >
                       <LuFileSearch size={20} />
                       Acessar parecer

@@ -147,16 +147,20 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
               </div>
 
               {currentAnalysis?.documentos &&
-                currentAnalysis.documentos.length > 0 && (
+                currentAnalysis.documentos.filter(
+                  (doc) => doc.tipo === "CONTESTACAO"
+                ).length > 0 && (
                   <div className="mt-4 flex justify-start">
                     <Button
                       variant="outline"
-                      onClick={() =>
-                        window.open(
-                          currentAnalysis.documentos[0].urlArquivo,
-                          "_blank"
-                        )
-                      }
+                      onClick={() => {
+                        const contestacaoDoc = currentAnalysis.documentos.find(
+                          (doc) => doc.tipo === "CONTESTACAO"
+                        );
+                        if (contestacaoDoc) {
+                          window.open(contestacaoDoc.urlArquivo, "_blank");
+                        }
+                      }}
                     >
                       <LuFileSearch size={20} />
                       Acessar parecer

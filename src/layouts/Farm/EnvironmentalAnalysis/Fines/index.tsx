@@ -184,7 +184,7 @@ export const Fines = ({ farmId }: FinesProps) => {
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Área degradada consolidada (ha):</h2>
-            <p>{areaToRegenerate.toFixed(2)}</p>
+            <p>{areaToRegenerate}</p>
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Valor multa:</h2>
@@ -196,9 +196,7 @@ export const Fines = ({ farmId }: FinesProps) => {
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Desconto:</h2>
-            <p>
-              R${discountPercentage}
-            </p>
+            <p>R${discountPercentage}</p>
           </div>
         </div>
       </div>
@@ -328,7 +326,9 @@ export const Fines = ({ farmId }: FinesProps) => {
                             )
                           : "-"}
                       </div>
-                      <div className="text-[#0A3503]">{payment.valor || "-"}</div>
+                      <div className="text-[#0A3503]">
+                        {payment.valor || "-"}
+                      </div>
                       <div className="text-[#0A3503]">
                         <span
                           className={`px-2 py-1 rounded text-xs ${
