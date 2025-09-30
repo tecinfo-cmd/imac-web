@@ -15,6 +15,7 @@ import { useAbattoirUser } from "@/hooks/useAbattoirElegibilities/useAbattoirEle
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
 
 const customModalSchema = yup.object().shape({
   cpf: yup.string().required("CPF obrigatório").min(11, "CPF inválido"),
@@ -72,8 +73,11 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
       resetModal();
       setShowForm(false);
       onClose();
+      toast.success("Produtor cadastrado com sucesso.");
     },
-    onError: () => {},
+    onError: () => {
+      toast.error("Erro ao cadastrar produtor. Tente novamente.");
+    },
   });
 
   const { data: abattoirUser } = useAbattoirUser();
@@ -214,7 +218,7 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
         }}
       >
         <CustomModal.Header className="text-black">
-          Consulta de Elegibilidade
+          Cadastro de Usuário Produtor 
         </CustomModal.Header>
         <CustomModal.Body>
           <form
@@ -222,7 +226,7 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
               const payload: any = {
                 ...values,
                 idFrigorifico: Number(abattoirUser?.id),
-                idSolicitacao: Number(item.retornoAgrotools?.id),
+                idSolicitacao: Number(item.id),
               };
               mutation.mutate(payload);
             })}
