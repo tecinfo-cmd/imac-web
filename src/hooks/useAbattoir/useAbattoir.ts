@@ -40,7 +40,7 @@ export function useCreateAbattoir() {
 
       formData.append("arquivos", abattoir.termoCooperacao);
       formData.append("parametros", JSON.stringify(rest));
-      
+
       const { data } = await api.post(`${API_URL}/cadastrar`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -66,6 +66,21 @@ export function useCreateUserAbattoir() {
   });
 }
 
+export function useAbattoirById(id: string | null) {
+  return useQuery({
+    queryKey: ["abattoir", id],
+    queryFn: async () => {
+      if (!id) return null;
+      const { data } = await api.get(`${API_URL}`, {
+        params: { page: 1, size: 1000 },
+      });
+      const abattoir = data.data?.find((item: any) => item.id === id);
+      return abattoir || null;
+    },
+    enabled: !!id,
+  });
+}
+
 export function useInvalidateAbattoir() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -84,6 +99,37 @@ export function useUpdateUserAbattoir() {
   return useMutation({
     mutationFn: async ({ id, ...abattoir }: any) => {
       const { data } = await api.patch(`${API_URL}/usuario/${id}`, abattoir);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["abattoirs"] });
+    },
+  });
+}
+
+export function useUpdateAbattoir() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ...abattoir }: any) => {
+      const formData = new FormData();
+
+      if (abattoir.termoCooperacao && abattoir.termoCooperacao[0]) {
+        formData.append("arquivos", abattoir.termoCooperacao[0]);
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { termoCooperacao, ...rest } = abattoir;
+
+      rest.cep = rest.cep?.replace(/\D/g, "");
+      rest.cnpj = rest.cnpj?.replace(/\D/g, "");
+      rest.telefone = rest.telefone?.replace(/\D/g, "");
+
+      formData.append("arquivos", abattoir.termoCooperacao || "");
+      formData.append("parametros", JSON.stringify(rest));
+
+      const { data } = await api.put(`${API_URL}/atualizar/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return data;
     },
     onSuccess: () => {
