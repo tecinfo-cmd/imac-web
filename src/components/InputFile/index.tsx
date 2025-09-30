@@ -9,6 +9,7 @@ interface InputFileUploadProps {
   label: string;
   control: any;
   accept?: string;
+  onRemove?: () => void;
 }
 
 export const InputFileUpload = ({
@@ -16,9 +17,11 @@ export const InputFileUpload = ({
   label,
   control,
   accept,
+  onRemove,
 }: InputFileUploadProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
 
   return (
     <Controller
@@ -55,14 +58,14 @@ export const InputFileUpload = ({
             aria-label="Selecionar arquivo"
           >
             <input
-              key={field.value ? field.value.name : "empty"}
+              key={`${name}-${resetKey}`}
               ref={inputRef}
               type="file"
               accept={accept}
               onChange={(e) => field.onChange(e.target.files?.[0])}
               className="absolute inset-0 opacity-0 cursor-pointer"
               tabIndex={-1}
-              style={{ pointerEvents: "none" }} // impede clique direto no input, só pelo container
+              style={{ pointerEvents: "none" }}
             />
             <span className="flex-1 text-gray-700 truncate z-10">
               {field.value?.name || "Selecione um arquivo ou arraste aqui"}
@@ -75,6 +78,8 @@ export const InputFileUpload = ({
                   e.stopPropagation();
                   field.onChange(undefined);
                   if (inputRef.current) inputRef.current.value = "";
+                  setResetKey((prev) => prev + 1);
+                  onRemove?.();
                 }}
                 tabIndex={0}
                 aria-label="Remover arquivo"
