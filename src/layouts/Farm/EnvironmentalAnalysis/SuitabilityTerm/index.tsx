@@ -16,13 +16,13 @@ export const SuitabilityTerm = ({ farmId }: SuitabilityTermProps) => {
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
         <GoAlertFill size={35} color="#F12929" />
         <p className="text-[#0A3503]">
-          O Termo de adequação deve ser assinado. Os tipos de assinaturas
+          O Plano de adequação deve ser assinado. Os tipos de assinaturas
           aceitas são certificados digitais <br /> (Ex. Gov.br , E-notoriado ou
           Certificado Digital) ou ter firma reconhecida em cartório.
         </p>
       </div>
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
-        TERMO DE ADEQUAÇÃO AO PROGRAMA PREM
+         Plano de Adequação
       </h1>
       <div className="grid grid-cols-3 gap-8 p-6 border border-[#CAC4D0] rounded shadow">
         <div>

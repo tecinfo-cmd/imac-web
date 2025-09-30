@@ -39,11 +39,11 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
         <GoAlertFill size={35} color="#F12929" />
         <p className="text-[#0A3503]">
-          O Termo de adequação após ser solicitado não poderá solicitar contestação ou plano de adequação.
+          O Plano de Adequação após ser solicitado não poderá solicitar contestação ou estratégia de adequação.
         </p>
       </div>
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
-        TERMO DE ADEQUAÇÃO AO PROGRAMA PREM
+          Plano de Adequação
       </h1>
       <div className="grid grid-cols-3 gap-8 p-6 border border-[#CAC4D0] rounded shadow  mb-6">
         <div>
@@ -86,7 +86,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
       </div>
 
       <TableInformation>
-        <TableInformation.Section title="Deseja solicitar o Termo de Adequação?">
+        <TableInformation.Section title="Deseja solicitar o Plano de Adequação?">
           <TableInformation.Row columnsPerRow={2}>
             <TableInformation.Column>
               <TableInformation.Value>
@@ -110,7 +110,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
 
       <TableInformation>
         <TableInformation.Section
-          title="Termo de adequação"
+          title="Plano de Adequação"
           showArrow
           disabled={proposeNewArea !== "yes"}
           defaultOpen={false}
