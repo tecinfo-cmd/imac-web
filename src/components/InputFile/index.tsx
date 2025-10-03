@@ -10,6 +10,7 @@ interface InputFileUploadProps {
   control: any;
   accept?: string;
   onRemove?: () => void;
+  disabled?: boolean;
 }
 
 export const InputFileUpload = ({
@@ -18,6 +19,7 @@ export const InputFileUpload = ({
   control,
   accept,
   onRemove,
+  disabled = false,
 }: InputFileUploadProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragActive, setIsDragActive] = useState(false);
@@ -31,26 +33,37 @@ export const InputFileUpload = ({
         <div>
           <label className="block text-green-700 mb-1">{label}</label>
           <div
-            className={`w-full h-[48px] p-4 rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] placeholder:text-[#D7D6D7] flex items-center bg-white cursor-pointer hover:bg-gray-50 transition relative ${
-              isDragActive ? "border-green-600 bg-green-50" : ""
+            className={`w-full h-[48px] p-4 rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] placeholder:text-[#D7D6D7] flex items-center transition relative ${
+              disabled
+                ? "bg-gray-100 cursor-not-allowed"
+                : "bg-white cursor-pointer hover:bg-gray-50"
+            } ${
+              isDragActive && !disabled ? "border-green-600 bg-green-50" : ""
             }`}
             onClick={() => {
-              if (!field.value && inputRef.current) inputRef.current.click();
+              if (!disabled && !field.value && inputRef.current)
+                inputRef.current.click();
             }}
             onDragOver={(e) => {
-              e.preventDefault();
-              setIsDragActive(true);
+              if (!disabled) {
+                e.preventDefault();
+                setIsDragActive(true);
+              }
             }}
             onDragLeave={(e) => {
-              e.preventDefault();
-              setIsDragActive(false);
+              if (!disabled) {
+                e.preventDefault();
+                setIsDragActive(false);
+              }
             }}
             onDrop={(e) => {
-              e.preventDefault();
-              setIsDragActive(false);
-              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                field.onChange(e.dataTransfer.files[0]);
-                if (inputRef.current) inputRef.current.value = "";
+              if (!disabled) {
+                e.preventDefault();
+                setIsDragActive(false);
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                  field.onChange(e.dataTransfer.files[0]);
+                  if (inputRef.current) inputRef.current.value = "";
+                }
               }
             }}
             tabIndex={0}
@@ -62,30 +75,40 @@ export const InputFileUpload = ({
               ref={inputRef}
               type="file"
               accept={accept}
-              onChange={(e) => field.onChange(e.target.files?.[0])}
+              onChange={(e) => !disabled && field.onChange(e.target.files?.[0])}
               className="absolute inset-0 opacity-0 cursor-pointer"
               tabIndex={-1}
               style={{ pointerEvents: "none" }}
+              disabled={disabled}
             />
-            <span className="flex-1 text-gray-700 truncate z-10">
-              {field.value?.name || "Selecione um arquivo ou arraste aqui"}
+            <span
+              className={`flex-1 truncate z-10 ${
+                disabled ? "text-gray-500" : "text-gray-700"
+              }`}
+            >
+              {field.value?.name ||
+                (disabled
+                  ? "Arquivo não pode ser alterado"
+                  : "Selecione um arquivo ou arraste aqui")}
             </span>
             {field.value ? (
-              <button
-                type="button"
-                className="ml-2 text-red-500 z-10"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  field.onChange(undefined);
-                  if (inputRef.current) inputRef.current.value = "";
-                  setResetKey((prev) => prev + 1);
-                  onRemove?.();
-                }}
-                tabIndex={0}
-                aria-label="Remover arquivo"
-              >
-                <Trash />
-              </button>
+              !disabled && (
+                <button
+                  type="button"
+                  className="ml-2 text-red-500 z-10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    field.onChange(undefined);
+                    if (inputRef.current) inputRef.current.value = "";
+                    setResetKey((prev) => prev + 1);
+                    onRemove?.();
+                  }}
+                  tabIndex={0}
+                  aria-label="Remover arquivo"
+                >
+                  <Trash />
+                </button>
+              )
             ) : (
               <span className="ml-2 text-gray-400 z-10">
                 <FiUpload />

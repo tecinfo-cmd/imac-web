@@ -98,7 +98,7 @@ export function useUpdateUserAbattoir() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...abattoir }: any) => {
-      const { data } = await api.patch(`${API_URL}/usuario/${id}`, abattoir);
+      const { data } = await api.put(`${API_URL}/usuario/${id}`, abattoir);
       return data;
     },
     onSuccess: () => {
@@ -110,30 +110,21 @@ export function useUpdateUserAbattoir() {
 export function useUpdateAbattoir() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, ...abattoir }: any) => {
-      const formData = new FormData();
+    mutationFn: async ({ id, ...rest }: any) => {
+      const payload = {
+        id,
+        ...rest,
+        cep: rest.cep?.replace(/\D/g, ""),
+        cnpj: rest.cnpj?.replace(/\D/g, ""),
+        telefone: rest.telefone?.replace(/\D/g, ""),
+      };
 
-      if (abattoir.termoCooperacao && abattoir.termoCooperacao[0]) {
-        formData.append("arquivos", abattoir.termoCooperacao[0]);
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { termoCooperacao, ...rest } = abattoir;
-
-      rest.cep = rest.cep?.replace(/\D/g, "");
-      rest.cnpj = rest.cnpj?.replace(/\D/g, "");
-      rest.telefone = rest.telefone?.replace(/\D/g, "");
-
-      formData.append("arquivos", abattoir.termoCooperacao || "");
-      formData.append("parametros", JSON.stringify(rest));
-
-      const { data } = await api.put(`${API_URL}/atualizar/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.put(`${API_URL}/atualizar`, payload);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["abattoirs"] });
+      queryClient.invalidateQueries({ queryKey: ["abattoir", variables.id] });
     },
   });
 }
