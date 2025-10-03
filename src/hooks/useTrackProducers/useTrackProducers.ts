@@ -22,11 +22,11 @@ export function useTrackProducers(filters = {}, page = 1) {
     queryKey: ["vouchers", page, filters, idFrigorifico],
     queryFn: async () => {
       if (!idFrigorifico) return { data: [], total: 0, page, size: limit };
-      const { data } = await api.get(`${API_URL}/voucher`, {
+      const { data } = await api.post(`${API_URL}/voucher`, {}, {
         params: { page, size: limit, idFrigorifico, ...filters },
       });
-      return {
-        data: data ?? [],
+      return data ?? {
+        data: [],
         total: data.length ?? 0,
         page,
         size: limit,

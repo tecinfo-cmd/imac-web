@@ -88,7 +88,7 @@ export const FilterTrackProducers = ({ onFilter }: FilterUsersProps) => {
     if (conformidadeData && !isLoading) {
       router.push(
         `/getDcsStatus?carFederal=${encodeURIComponent(conformidadeData.carFederal ?? "")}` +
-        `&idPropriedade=${encodeURIComponent(conformidadeData.idPropriedade ?? "")}`
+        `&idPropriedade=${encodeURIComponent(conformidadeData.id ?? "")}`
       );
     }
   }, [conformidadeData, isLoading, router]);
