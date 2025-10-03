@@ -91,11 +91,14 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
   if (isLoading || !item) return null;
 
   const retorno = item?.retornoAgrotools ?? {};
+  const isEligible = retorno.isEligible === true;
 
   return (
     <>
       <Modal
-        className="bg-[#DFEEE5] border-[1px] border-[#cac8c8]"
+        className={`${
+          isEligible ? "bg-[#DFEEE5]" : "bg-[#fddad8]"
+        } border-[1px] border-[#cac8c8]`}
         isOpen={isOpen && !showForm}
         onOpenChange={onOpenChange}
         onClose={onClose}
@@ -200,11 +203,13 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
               </li>
             </ul>
           </div>
-          <div className="mt-2 flex justify-center">
-            <Button onClick={() => setShowForm(true)}>
-              Cadastrar Propriedade
-            </Button>
-          </div>
+          {isEligible && (
+            <div className="mt-2 flex justify-center">
+              <Button onClick={() => setShowForm(true)}>
+                Cadastrar Propriedade
+              </Button>
+            </div>
+          )}
         </div>
       </Modal>
 
@@ -218,14 +223,16 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
         }}
       >
         <CustomModal.Header className="text-black">
-          Cadastro de Usuário Produtor 
+          Cadastro de Usuário Produtor
         </CustomModal.Header>
         <CustomModal.Body>
           <form
             onSubmit={handleModalSubmit((values) => {
               const payload: any = {
                 ...values,
-                idFrigorifico: Number(abattoirUser?.id),
+                cpf: values.cpf.replace(/\D/g, ""),
+                telefone: values.telefone.replace(/\D/g, ""),
+                idFrogorifico: Number(abattoirUser?.id),
                 idSolicitacao: Number(item.id),
               };
               mutation.mutate(payload);
