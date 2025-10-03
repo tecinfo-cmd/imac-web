@@ -1,27 +1,46 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { GrValidate } from "react-icons/gr";
 import { MdErrorOutline } from "react-icons/md";
 
-import { Input } from "@/components/Input";
 import { InputSelect } from "@/components/InputSelect";
 import { Button } from "@/components/ui/button";
 import EmailModal from "@/components/ui/modals/emailModal";
 
 import { yup } from "@/config/yup";
-import { useValidVoucher } from "@/hooks/useValidVoucher/useValidVoucher";
+import {
+  useGetAbattoirVouchers,
+  useActivateVoucher,
+} from "@/hooks/useValidVoucher/useValidVoucher";
 import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const schema = yup.object({
-  select: yup.string().required("Propriedade obrigatória"),
-  voucher: yup.string().required("O voucher é obrigatório"),
-});
-
 export default function ValidVoucher() {
+  const { data: vouchers = [], isLoading: isLoadingVouchers } =
+    useGetAbattoirVouchers();
+
+  const schema = yup.object({
+    codigoVoucher: yup
+      .object({
+        value: yup.string().required("Voucher obrigatório"),
+        label: yup.string().required("Voucher obrigatório"),
+      })
+      .required("Voucher obrigatório")
+      .test(
+        "ja-validado",
+        "Este voucher já foi validado anteriormente!",
+        (value) => {
+          if (!value?.value) return true;
+          const voucherSelecionado = vouchers.find(
+            (v: any) => v.voucher === value.value
+          );
+          return voucherSelecionado?.status !== "ATIVO";
+        }
+      ),
+  });
   const {
     control,
     handleSubmit,
@@ -29,41 +48,39 @@ export default function ValidVoucher() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      select: "",
-      voucher: "",
+      codigoVoucher: { label: "", value: "" },
     },
   });
 
-  const {
-    propriedades,
-    voucherValido,
-    buscarPropriedadesSalvas,
-    validarVoucher,
-  } = useValidVoucher();
+  const activateVoucherMutation = useActivateVoucher();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalSuccess, setModalSuccess] = useState(false);
 
-  useEffect(() => {
-    void buscarPropriedadesSalvas();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const onSubmit = async (data: any) => {
-    const selectedId = parseInt(data.select, 10);
-    const voucher = data.voucher;
+    const codigoVoucher = data.codigoVoucher.value;
 
-    await validarVoucher(voucher, selectedId);
+    const voucherSelecionado = vouchers.find(
+      (v: any) => v.voucher === codigoVoucher
+    );
 
-    if (voucherValido) {
-      setModalSuccess(true);
-      setModalMessage(
-        "Seu voucher foi validado com sucesso e está vinculado a propriedade selecionada."
-      );
-    } else {
+    if (voucherSelecionado?.status === "ATIVO") {
       setModalSuccess(false);
-      setModalMessage("Verifique-o e tente novamente.");
+      setModalMessage("Este voucher já foi validado anteriormente!");
+      setIsModalOpen(true);
+      return;
+    }
+
+    try {
+      await activateVoucherMutation.mutateAsync(codigoVoucher);
+
+      setModalSuccess(true);
+      setModalMessage("Voucher ativado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao ativar voucher:", error);
+      setModalSuccess(false);
+      setModalMessage("Erro ao ativar voucher. Tente novamente.");
     }
 
     setIsModalOpen(true);
@@ -94,32 +111,39 @@ export default function ValidVoucher() {
             onSubmit={handleSubmit(onSubmit)}
           >
             <InputSelect
-              name="select"
-              label="Selecionar propriedade"
-              placeholder="Selecione propriedade"
+              name="codigoVoucher"
+              label="Selecionar Voucher"
+              placeholder={
+                isLoadingVouchers
+                  ? "Carregando vouchers..."
+                  : "Selecione um voucher"
+              }
               control={control}
-              options={propriedades.map((prop) => ({
-                value: prop.id,
-                label: `${prop.nome} - ${prop.carFederal}`,
+              options={vouchers.map((voucher: any) => ({
+                value: voucher.voucher,
+                label: voucher.voucher,
               }))}
-            />
-            <Input
-              name="voucher"
-              control={control}
-              label="Digite seu código voucher"
-              placeholder="Digite seu código voucher"
-              type="text"
             />
             <Button
               type="submit"
               className="w-full md:w-[130px] self-center mt-3"
-              disabled={isSubmitting}
+              disabled={
+                isSubmitting ||
+                isLoadingVouchers ||
+                activateVoucherMutation.isPending
+              }
             >
-              {isSubmitting ? "Validando..." : "Validar"}
+              {activateVoucherMutation.isPending
+                ? "Validando..."
+                : isSubmitting
+                ? "Validando..."
+                : isLoadingVouchers
+                ? "Carregando..."
+                : "Validar"}
             </Button>
 
             <Link
-              href="/buyVoucher"
+              href="/enrollmentFee"
               className="z-10 underline text-center text-[#21801A]"
             >
               Adquirir um voucher
