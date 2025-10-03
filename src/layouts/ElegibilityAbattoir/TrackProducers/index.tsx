@@ -87,12 +87,12 @@ export const TrackProducersLayout = () => {
             <Table.Body>
               {vouchers?.map((voucher: any) => (
                 <Table.Row key={voucher.id}>
-                  <Table.Cell>{voucher.nomePropriedade}</Table.Cell>
+                  <Table.Cell>{voucher.propriedade.nomePropriedade}</Table.Cell>
                   <Table.Cell>
-                    {voucher.cpfCnpj ? maskCPFOrCNPJ(voucher.cpfCnpj) : "-"}
+                    {voucher.propriedade.proprietarios?.[0]?.pessoa?.cpfCnpj ? maskCPFOrCNPJ(voucher.propriedade.proprietarios[0].pessoa.cpfCnpj) : "-"}
                   </Table.Cell>
-                  <Table.Cell>{voucher.email}</Table.Cell>
-                  <Table.Cell>{voucher.carFederal}</Table.Cell>
+                  <Table.Cell>{voucher.propriedade.proprietarios?.[0]?.pessoa?.email}</Table.Cell>
+                  <Table.Cell>{voucher.propriedade.carFederal}</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-2">
                       <span
@@ -131,9 +131,9 @@ export const TrackProducersLayout = () => {
                           onClick={() => {
                             router.push(
                               `/getDcsStatus?carFederal=${encodeURIComponent(
-                                voucher.carFederal ?? ""
+                                voucher.propriedade.carFederal ?? ""
                               )}&idPropriedade=${encodeURIComponent(
-                                voucher.id ?? ""
+                                voucher.idPropriedade ?? ""
                               )}`
                             );
                           }}

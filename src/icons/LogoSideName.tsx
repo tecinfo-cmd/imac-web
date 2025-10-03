@@ -69,9 +69,9 @@ export const LogoSideName = ({ width = 302, height = 302 }: LogoSideNameProps) =
           width="106.01"
           height="111.242"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"

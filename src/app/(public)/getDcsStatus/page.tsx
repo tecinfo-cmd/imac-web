@@ -22,7 +22,7 @@ function GetDcsStatusContent() {
   if (!data) return <div>Nenhum dado encontrado.</div>;
 
   return (
-    <div className="max-w-[700px] mx-auto border border-gray-300 rounded-lg bg-white p-8">
+    <div className="max-w-[1000px] mx-auto border border-gray-300 rounded-lg bg-white p-8 mt-8">
       <div className="flex justify-between items-center mb-16 mt-6">
         <LogoSideName width={250} height={90} />
         <Imac width={180} height={100} />
@@ -46,6 +46,8 @@ function GetDcsStatusContent() {
             <Table.Cell>{data.nomePropriedade}</Table.Cell>
           </Table.Row>
         </Table.Body>
+      </Table.Container>
+      <Table.Container className="!pt-0">
         <Table.Header>
           <Table.Title>CPF/CNPJ</Table.Title>
           <Table.Title>Data Adesão ao PREM</Table.Title>
@@ -58,6 +60,8 @@ function GetDcsStatusContent() {
             <Table.Cell>{data.id}</Table.Cell>
           </Table.Row>
         </Table.Body>
+      </Table.Container>
+      <Table.Container className="!pt-0">
         <Table.Header>
           <Table.Title colspan={3}>
             as seguintes detecções de desmatamento do território em questão:
@@ -66,12 +70,16 @@ function GetDcsStatusContent() {
         <Table.Body>
           {Array.isArray(data.deteccoes) && data.deteccoes.length > 0 ? (
             data.deteccoes.map((item: any, idx: number) => (
-              <Table.Cell key={idx} colspan={3}>
+              <Table.Row key={idx}>
+              <Table.Cell colspan={3}>
                 {typeof item === "string" ? item : JSON.stringify(item)}
               </Table.Cell>
+              </Table.Row>
             ))
           ) : (
-            <Table.Cell colspan={3}>Nenhuma detecção encontrada</Table.Cell>
+            <Table.Row>
+              <Table.Cell colspan={3}>Nenhuma detecção encontrada</Table.Cell>
+            </Table.Row>
           )}
         </Table.Body>
       </Table.Container>
