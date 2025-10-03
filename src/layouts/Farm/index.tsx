@@ -10,6 +10,7 @@ import { Tooltip } from "@/components/Tooltip";
 import { useGetFarms } from "@/hooks/useFarms/useGetFarms";
 import { Eye } from "@/icons/Eye";
 import { Monitor } from "@/icons/Monitor";
+import { VoucherIcon } from "@/icons/Voucher";
 import { X } from "@/icons/X";
 import { useFarmFilterStore } from "@/store/useFarmFilterStore";
 import { useFarmStore } from "@/store/useFarmStore";
@@ -61,12 +62,20 @@ export const FarmLayout = () => {
 
               <Table.Cell>
                 <div className="flex items-center gap-3">
+                  <Tooltip
+                    message="Validar voucher"
+                    id={`Validar voucher ${farm.id}`}
+                  >
+                    <Link href={"/validVoucher"}>
+                      <VoucherIcon />
+                    </Link>
+                  </Tooltip>
                   {farm.statusVoucher === false ? (
                     <Tooltip
                       message="Comprar voucher"
                       id={`Comprar voucher ${farm.id}`}
                     >
-                      <Link href={`/buyVoucher?propertyId=${farm.id}`}>
+                      <Link href={"/enrollmentFee"}>
                         <FaDollarSign size={20} color="#21801A" />
                       </Link>
                     </Tooltip>
