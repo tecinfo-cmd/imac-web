@@ -1,3 +1,36 @@
+"use client";
+
+import { api } from "@/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+export function useGetAbattoirVouchers() {
+  return useQuery({
+    queryKey: ["abattoir-vouchers"],
+    queryFn: async () => {
+      const { data } = await api.get("frigoficos/voucher");
+      return data ?? [];
+    },
+  });
+}
+
+export function useActivateVoucher() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (codigoVoucher: string) => {
+      const { data } = await api.post(
+        `frigoficos/voucher-ativar/${codigoVoucher}`
+      );
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["abattoir-vouchers"] });
+    },
+  });
+}
+
+/*
+
 import { useState } from "react";
 
 import { api } from "@/api/index";
@@ -79,3 +112,4 @@ export function useValidVoucher() {
     validarVoucher,
   };
 }
+*/
