@@ -13,6 +13,7 @@ import {
 import { Modal } from "../../Properties/[id]/SelfInspection/components/Modal";
 import { Input } from "@/components/Input";
 import { InputFileUpload } from "@/components/InputFile";
+import { InputSelect } from "@/components/InputSelect";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Tooltip } from "@/components/Tooltip";
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,10 @@ import {
   useCreateUserAbattoir,
   useAbattoirById,
   useUpdateUserAbattoir,
+  useUpdateAbattoir,
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { Trash } from "@/icons/Trash";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
@@ -62,7 +63,12 @@ const userSchema = yup.object({
   cpf: yup.string().required(),
   nome: yup.string().required(),
   email: yup.string().email().required(),
-  status: yup.string().optional(),
+  status: yup
+    .object({
+      value: yup.string().optional(),
+      label: yup.string().optional(),
+    })
+    .optional(),
 });
 
 const defaultValues = {
@@ -95,6 +101,7 @@ export const AbattoirRegisterLayout = ({
   const createAbattoir = useCreateAbattoir();
   const createUserAbattoir = useCreateUserAbattoir();
   const updateUserAbattoir = useUpdateUserAbattoir();
+  const updateAbattoir = useUpdateAbattoir();
 
   const { data: abattoirData, refetch: refetchAbattoir } =
     useAbattoirById(createdAbattoirId);
@@ -176,7 +183,12 @@ export const AbattoirRegisterLayout = ({
     formState: { isSubmitting: isSubmittingUser },
   } = useForm({
     resolver: yupResolver(userSchema),
-    defaultValues: { cpf: "", nome: "", email: "", status: "" },
+    defaultValues: {
+      cpf: "",
+      nome: "",
+      email: "",
+      status: { value: "", label: "" },
+    },
   });
 
   const {
@@ -186,7 +198,12 @@ export const AbattoirRegisterLayout = ({
     formState: { isSubmitting: isSubmittingEditUser },
   } = useForm({
     resolver: yupResolver(userSchema),
-    defaultValues: { cpf: "", nome: "", email: "", status: "" },
+    defaultValues: {
+      cpf: "",
+      nome: "",
+      email: "",
+      status: { value: "", label: "" },
+    },
   });
 
   const customMenuItems = [
@@ -249,9 +266,20 @@ export const AbattoirRegisterLayout = ({
 
   const handleEditSubmit = async (data: any) => {
     try {
-      console.log("Dados para atualização (aguardando endpoint):", data);
+      console.log("Dados para atualização:", data);
+
+      await updateAbattoir.mutateAsync({
+        id: registeredData.id,
+        ...data,
+      });
+
+      await refetchAbattoir();
+
+      setIsEditing(false);
+
+      toast.success("Frigorífico atualizado com sucesso!");
     } catch (error) {
-      console.log(error);
+      console.error("Erro ao atualizar frigorífico:", error);
       toast.error("Erro ao atualizar frigorífico.");
     }
   };
@@ -274,7 +302,12 @@ export const AbattoirRegisterLayout = ({
         status: data.status,
       });
 
-      resetUserForm({ cpf: "", nome: "", email: "", status: "" });
+      resetUserForm({
+        cpf: "",
+        nome: "",
+        email: "",
+        status: { value: "", label: "" },
+      });
       setModalOpen(false);
 
       await refetchAbattoir();
@@ -290,20 +323,6 @@ export const AbattoirRegisterLayout = ({
     setIsEditing(true);
     Object.keys(registeredData).forEach((key) => {
       setValue(key, registeredData[key]);
-    });
-  };
-
-  const handleDeleteTerm = () => {
-    setRegisteredData({
-      ...registeredData,
-      termoCooperacao: null,
-    });
-    setValue("termoCooperacao", null);
-    setIsEditing(true);
-    Object.keys(registeredData).forEach((key) => {
-      if (key !== "termoCooperacao") {
-        setValue(key, registeredData[key]);
-      }
     });
   };
 
@@ -344,10 +363,15 @@ export const AbattoirRegisterLayout = ({
         cpf: data.cpf?.replace(/\D/g, ""),
         nome: data.nome,
         email: data.email,
-        status: data.status,
+        status: data.status.value,
       });
 
-      resetEditUserForm({ cpf: "", nome: "", email: "", status: "" });
+      resetEditUserForm({
+        cpf: "",
+        nome: "",
+        email: "",
+        status: { value: "", label: "" },
+      });
       setEditModalOpen(false);
       setEditingUser(null);
 
@@ -363,29 +387,12 @@ export const AbattoirRegisterLayout = ({
   const handleCancelEditUser = () => {
     setEditModalOpen(false);
     setEditingUser(null);
-    resetEditUserForm({ cpf: "", nome: "", email: "", status: "" });
-  };
-
-  const handleInactivateUser = async (user: any) => {
-    const confirmInactivate = window.confirm(
-      `Tem certeza que deseja inativar o usuário ${
-        user.pessoa?.nome || "este usuário"
-      }?`
-    );
-
-    if (!confirmInactivate) return;
-
-    try {
-
-      console.log("Inativando usuário:", user.id);
-
-      await refetchAbattoir();
-
-      toast.success("Usuário inativado com sucesso!");
-    } catch (error) {
-      console.log(error);
-      toast.error("Erro ao inativar usuário.");
-    }
+    resetEditUserForm({
+      cpf: "",
+      nome: "",
+      email: "",
+      status: { value: "", label: "" },
+    });
   };
 
   const renderAbattoirInfo = () => (
@@ -481,31 +488,11 @@ export const AbattoirRegisterLayout = ({
             Termo de Cooperação
           </label>
           {registeredData?.termoCooperacao ? (
-            <div className="flex items-center gap-2">
-              <p className="text-gray-900 underline cursor-pointer">
-                {registeredData?.termoCooperacao?.name || "termocooperacao.pdf"}
-              </p>
-              <button
-                type="button"
-                onClick={handleDeleteTerm}
-                className="text-red-500 hover:text-red-700"
-                title="Excluir termo"
-              >
-                <Trash />
-              </button>
-            </div>
+            <p className="text-gray-900 underline cursor-pointer">
+              {registeredData?.termoCooperacao?.name || "termocooperacao.pdf"}
+            </p>
           ) : (
-            <div className="flex items-center gap-2">
-              <p className="text-gray-500 italic">Termo removido</p>
-              <Button
-                type="button"
-                variant="default"
-                onClick={() => setIsEditing(true)}
-                className="text-sm"
-              >
-                Adicionar novo termo
-              </Button>
-            </div>
+            <p className="text-gray-500 italic">Nenhum termo anexado</p>
           )}
         </div>
       </div>
@@ -602,8 +589,9 @@ export const AbattoirRegisterLayout = ({
             <Input
               name="status"
               label="Status"
-              placeholder="Digite o status"
+              placeholder="Selecione o status"
               control={control}
+              disabled={isEditing}
             />
           )}
 
@@ -612,15 +600,7 @@ export const AbattoirRegisterLayout = ({
             label="Termo de Cooperação"
             control={control}
             accept=".pdf"
-            onRemove={() => {
-              if (isEditing) {
-                setValue("termoCooperacao", null);
-                setRegisteredData({
-                  ...registeredData,
-                  termoCooperacao: null,
-                });
-              }
-            }}
+            disabled={isRegistered && isEditing}
           />
 
           <div className="flex justify-end gap-2 md:col-span-3">
@@ -709,15 +689,6 @@ export const AbattoirRegisterLayout = ({
                         <PiPencil size={16} />
                       </button>
                     </Tooltip>
-                    <Tooltip message="Inativar" id={`inactivate-${user.id}`}>
-                      <button
-                        onClick={() => handleInactivateUser(user)}
-                        className="p-2 hover:bg-gray-100 rounded text-red-500"
-                        disabled={updateUserAbattoir.isPending}
-                      >
-                        <Trash />
-                      </button>
-                    </Tooltip>
                   </div>
                 </div>
               </div>
@@ -784,7 +755,17 @@ export const AbattoirRegisterLayout = ({
                 control={editUserControl}
               />
               <Input name="email" label="E-mail" control={editUserControl} />
-              <Input name="status" label="Status" control={editUserControl} />
+              <InputSelect
+                name="status"
+                label="Status"
+                placeholder="Selecione o status"
+                control={editUserControl}
+                options={[
+                  { value: "ATIVO", label: "Ativo" },
+                  { value: "INATIVO", label: "Inativo" },
+                ]}
+                isSearchable={false}
+              />
             </div>
             <div className="mt-6 flex flex-col sm:flex-row justify-center gap-2">
               <Button

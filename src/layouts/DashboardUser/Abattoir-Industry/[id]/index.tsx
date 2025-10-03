@@ -14,6 +14,7 @@ import {
 import { Modal } from "../AbattoirRegister/../../Properties/[id]/SelfInspection/components/Modal";
 import { Input } from "@/components/Input";
 import { InputFileUpload } from "@/components/InputFile";
+import { InputSelect } from "@/components/InputSelect";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Tooltip } from "@/components/Tooltip";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,6 @@ import {
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { Trash } from "@/icons/Trash";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
@@ -39,7 +39,10 @@ const userSchema = yup.object({
   cpf: yup.string().required(),
   nome: yup.string().required(),
   email: yup.string().email().required(),
-  status: yup.string().optional(),
+  status: yup.object({
+    value: yup.string().optional(),
+    label: yup.string().optional(),
+  }).optional(),
 });
 
 const AbattoirEditLayout = () => {
@@ -89,7 +92,7 @@ const AbattoirEditLayout = () => {
     formState: { isSubmitting: isSubmittingUser },
   } = useForm({
     resolver: yupResolver(userSchema),
-    defaultValues: { cpf: "", nome: "", email: "", status: "" },
+    defaultValues: { cpf: "", nome: "", email: "", status: { value: "", label: "" } },
   });
 
   const {
@@ -99,7 +102,7 @@ const AbattoirEditLayout = () => {
     formState: { isSubmitting: isSubmittingEditUser },
   } = useForm({
     resolver: yupResolver(userSchema),
-    defaultValues: { cpf: "", nome: "", email: "", status: "" },
+    defaultValues: { cpf: "", nome: "", email: "", status: { value: "", label: "" } },
   });
 
   const cep = watch("cep");
@@ -192,17 +195,27 @@ const AbattoirEditLayout = () => {
 
   const handleEditSubmit = async (data: any) => {
     try {
-      await updateAbattoir.mutateAsync({
+      console.log("Dados para atualização:", data);
+      console.log("ID do frigorífico:", abattoir.id);
+
+      const result = await updateAbattoir.mutateAsync({
         id: abattoir.id,
         ...data,
       });
 
+      console.log("Frigorífico atualizado com sucesso na API:", result);
+
+      // Aguarda um pouco e faz refetch para garantir dados atualizados
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const refetchResult = await refetch();
+
+      console.log("Dados refetchados:", refetchResult.data);
+
       setIsEditing(false);
-      await refetch();
       toast.success("Frigorífico atualizado com sucesso!");
     } catch (error) {
-      console.error(error);
-      toast.error("Erro ao atualizar frigorífico.");
+      console.error("Erro detalhado ao atualizar frigorífico:", error);
+      toast.error("Erro ao atualizar frigorífico. Tente novamente.");
     }
   };
 
@@ -224,7 +237,7 @@ const AbattoirEditLayout = () => {
         status: data.status,
       });
 
-      resetUserForm({ cpf: "", nome: "", email: "", status: "" });
+      resetUserForm({ cpf: "", nome: "", email: "", status: { value: "", label: "" } });
       setModalOpen(false);
 
       await refetch();
@@ -260,7 +273,7 @@ const AbattoirEditLayout = () => {
         cpf: data.cpf?.replace(/\D/g, ""),
         nome: data.nome,
         email: data.email,
-        status: data.status,
+        status: data.status.value,
       });
 
       await updateUserAbattoir.mutateAsync({
@@ -268,10 +281,10 @@ const AbattoirEditLayout = () => {
         cpf: data.cpf?.replace(/\D/g, ""),
         nome: data.nome,
         email: data.email,
-        status: data.status,
+        status: data.status.value,
       });
 
-      resetEditUserForm({ cpf: "", nome: "", email: "", status: "" });
+      resetEditUserForm({ cpf: "", nome: "", email: "", status: { value: "", label: "" } });
       setEditModalOpen(false);
       setEditingUser(null);
 
@@ -288,11 +301,7 @@ const AbattoirEditLayout = () => {
   const handleCancelEditUser = () => {
     setEditModalOpen(false);
     setEditingUser(null);
-    resetEditUserForm({ cpf: "", nome: "", email: "", status: "" });
-  };
-
-  const handleInactivateUser = (user: any) => {
-    console.log("Inativar usuário:", user);
+    resetEditUserForm({ cpf: "", nome: "", email: "", status: { value: "", label: "" } });
   };
 
   if (isLoading) return <div className="p-4">Carregando...</div>;
@@ -392,17 +401,20 @@ const AbattoirEditLayout = () => {
               label="Termo de Cooperação"
               control={control}
               accept=".pdf"
-              onRemove={() => {
-                setValue("termoCooperacao", null);
-              }}
+              disabled={isEditing}
             />
 
             <div className="flex justify-end gap-2 md:col-span-3">
               <Button type="button" variant="dark" onClick={handleCancelEdit}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Salvando..." : "Atualizar"}
+              <Button
+                type="submit"
+                disabled={isSubmitting || updateAbattoir.isPending}
+              >
+                {isSubmitting || updateAbattoir.isPending
+                  ? "Salvando..."
+                  : "Atualizar"}
               </Button>
             </div>
           </form>
@@ -601,15 +613,6 @@ const AbattoirEditLayout = () => {
                         <PiPencil size={16} />
                       </button>
                     </Tooltip>
-                    <Tooltip message="Inativar" id={`inactivate-${user.id}`}>
-                      <button
-                        onClick={() => handleInactivateUser(user)}
-                        className="p-2 hover:bg-gray-100 rounded text-red-500"
-                        disabled={updateUserAbattoir.isPending}
-                      >
-                        <Trash />
-                      </button>
-                    </Tooltip>
                   </div>
                 </div>
               </div>
@@ -682,7 +685,15 @@ const AbattoirEditLayout = () => {
                 control={editUserControl}
               />
               <Input name="email" label="E-mail" control={editUserControl} />
-              <Input name="status" label="Status" control={editUserControl} />
+              <InputSelect
+                name="status"
+                label="Status"
+                control={editUserControl}
+                options={[
+                  { value: "ATIVO", label: "Ativo" },
+                  { value: "INATIVO", label: "Inativo" },
+                ]}
+              />
             </div>
             <div className="mt-6 flex flex-col sm:flex-row justify-center gap-2">
               <Button
