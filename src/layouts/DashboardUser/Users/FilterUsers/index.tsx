@@ -54,6 +54,7 @@ export const FilterUsers = ({ onFilter }: FilterUsersProps) => {
         options={[{ label: "Administrativo", value: "ADMINISTRATIVO" },
           { label: "Analista", value: "ANALISTA" },
           { label: "Produtor", value: "PRODUTOR", color: "#F44336" },
+          { label: "Frigorifico", value: "FRIGORIFICO", color: "#F44336" },
         ]}
       />
 

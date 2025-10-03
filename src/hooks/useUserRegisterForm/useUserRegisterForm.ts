@@ -68,6 +68,10 @@ export const useUserRegister = () => {
         ? { nome: "ADMINISTRATIVO", id: 1 }
         : data.perfil?.value === "ANALISTA"
         ? { nome: "ANALISTA", id: 2 }
+        : data.perfil?.value === "PRODUTOR"
+        ? { nome: "PRODUTOR", id: 3 }
+        : data.perfil?.value === "FRIGORIFICO"
+        ? { nome: "FRIGORIFICO", id: 4 }
         : null;
 
     const payload = {
