@@ -11,6 +11,7 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { useTrackProducers } from "@/hooks/useTrackProducers/useTrackProducers";
 import { Eye } from "@/icons/Eye";
+import { RuralProperty } from "@/icons/RuralProperty";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
 import { FilterTrackProducers } from "./FiltersTrackProducers";
@@ -40,7 +41,7 @@ export const TrackProducersLayout = () => {
     {
       label: "Acompanhamento de Produtores",
       href: "/dashboard/elegibilityAbattoir/trackProducers",
-      icon: <PiSealCheckLight size={44} />,
+      icon: <RuralProperty size={44} />,
     },
   ];
 

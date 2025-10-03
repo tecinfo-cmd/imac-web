@@ -97,6 +97,8 @@ export const UsersRegisterLayout = () => {
           options={[
             { label: "Administrativo", value: "ADMINISTRATIVO" },
             { label: "Analista", value: "ANALISTA" },
+            { label: "Produtor", value: "PRODUTOR" },
+            { label: "Frigorifico", value: "FRIGORIFICO" },
           ]}
         />
         <InputSelect

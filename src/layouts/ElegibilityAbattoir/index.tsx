@@ -11,6 +11,7 @@ import { ElegibilityAbattoirDetail } from "@/layouts/ElegibilityAbattoir/compone
 
 import { useAbattoirElegibilities } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
 import { Eye } from "@/icons/Eye";
+import { RuralProperty } from "@/icons/RuralProperty";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
 import { FilterElegibilityAbattoir } from "./FiltersElegility";
@@ -75,7 +76,7 @@ export const ElegibilityAbattoirLayout = () => {
     {
       label: "Acompanhamento de Produtores",
       href: "/dashboard/elegibilityAbattoir/trackProducers",
-      icon: <PiSealCheckLight size={44} />,
+      icon: <RuralProperty size={44} />,
     },
   ];
 
