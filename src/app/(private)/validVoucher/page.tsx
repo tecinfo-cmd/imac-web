@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { GrValidate } from "react-icons/gr";
@@ -21,6 +22,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 export default function ValidVoucher() {
   const { data: vouchers = [], isLoading: isLoadingVouchers } =
     useGetAbattoirVouchers();
+
+  const router = useRouter();
 
   const schema = yup.object({
     codigoVoucher: yup
@@ -74,9 +77,13 @@ export default function ValidVoucher() {
 
     try {
       await activateVoucherMutation.mutateAsync(codigoVoucher);
-
       setModalSuccess(true);
       setModalMessage("Voucher ativado com sucesso!");
+
+      setTimeout(() => {
+      router.push("/propriedade");
+    }, 5000);
+
     } catch (error) {
       console.error("Erro ao ativar voucher:", error);
       setModalSuccess(false);
@@ -106,6 +113,7 @@ export default function ValidVoucher() {
           <h1 className="text-[#0A3503] text-center text-uppercase font-inter font-bold text-2xl leading-[37px] tracking-[0.1em] md:text-[24px] md:leading-[37px] mb-8 mt-5">
             VALIDAR VOUCHER
           </h1>
+
           <form
             className="flex flex-col w-full min-w-[320px] gap-3"
             onSubmit={handleSubmit(onSubmit)}
@@ -147,6 +155,12 @@ export default function ValidVoucher() {
               className="z-10 underline text-center text-[#21801A]"
             >
               Adquirir um voucher
+            </Link>
+            <Link
+              href="/propriedade"
+              className="z-10 underline text-center text-[#21801A]"
+            >
+              Voltar
             </Link>
           </form>
         </div>
