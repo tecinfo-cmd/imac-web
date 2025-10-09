@@ -10,10 +10,18 @@ import {
 } from "react";
 
 import { api } from "@/api";
+import { setUnauthorizedCallback } from "@/api";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
+import { jwtDecode } from "jwt-decode";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
+import { toast } from "sonner";
 
 import { SignInCredentials, useSignIn } from "../hooks/useAuth/useSignIn";
+
+interface DecodedToken {
+  roles: string[];
+}
 
 export interface AuthContextProps {
   handleSignIn: (credentials: SignInCredentials) => void;
@@ -28,13 +36,23 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const { mutateAsync: signIn, isPending } = useSignIn();
   const { setUserData, clearSession } = useAuthStore();
+  const { setRole, clearRole } = useUserRoleStore();
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    const { "@IMAC:T": access_token } = parseCookies();
+    setUnauthorizedCallback(() => {
+      destroyCookie(undefined, "@IMAC:T");
+      clearSession();
+      clearRole();
+      router.push("/auth");
+    });
+  }, [clearRole, clearSession, router]);
 
-    if (access_token) {
-      api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
+  useEffect(() => {
+    const { "@IMAC:T": accessToken } = parseCookies();
+
+    if (accessToken) {
+      api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
       const fetchUserData = async () => {
         try {
@@ -55,28 +73,44 @@ export function AuthProvider({ children }: PropsWithChildren) {
     async ({ email, senha }: SignInCredentials) => {
       try {
         const data = await signIn({ email, senha });
-        console.log(data);
-        const { access_token } = data;
+        const { accessToken } = data;
+        const isProduction = process.env.NODE_ENV === "production";
 
-        setCookie(undefined, "@IMAC:T", access_token, {
+        setCookie(undefined, "email", data.email, {
           maxAge: 60 * 60 * 24 * 7,
           path: "/",
+          secure: isProduction,
+          sameSite: "strict",
+        });
+
+        setCookie(undefined, "@IMAC:T", accessToken, {
+          maxAge: 60 * 60 * 24 * 7,
+          path: "/",
+          secure: isProduction,
+          sameSite: "strict",
         });
         setEmail(email);
+        api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+        const decoded = jwtDecode<DecodedToken>(accessToken);
+
+        const role = decoded.roles?.[0]?.toUpperCase();
+        setRole(role);
         router.push("/dashboard");
-        api.defaults.headers.common.Authorization = `Bearer ${access_token}`;
       } catch (error) {
         console.error(error);
+        toast.error("Email ou senha inválidos");
       }
     },
-    [router, signIn]
+    [router, setRole, signIn]
   );
 
   const signOut = useCallback(() => {
     destroyCookie(undefined, "@IMAC:T");
     clearSession();
+    clearRole();
     router.push("/auth");
-  }, [clearSession, router]);
+  }, [clearRole, clearSession, router]);
 
   const cachedValue = useMemo(() => {
     return {

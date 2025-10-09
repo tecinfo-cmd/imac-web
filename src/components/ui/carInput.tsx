@@ -19,7 +19,7 @@ const CARInput = ({ value, onChange, error }: CARInputProps) => {
   useEffect(() => {
     if (inputRef.current) {
       const maskOptions = {
-        mask: "AA-0000000-****************",
+        mask: `AA-0000000-${"*".repeat(32)}`,
         definitions: {
           A: /[A-Z]/,
           "*": /[A-Z0-9]/,
@@ -50,10 +50,10 @@ const CARInput = ({ value, onChange, error }: CARInputProps) => {
         onChange={(e) => onChange(e.target.value)}
         placeholder="UF-0000000-00000000000000000"
         className={cn(
-          "w-full px-4 py-2 border rounded-lg bg-white text-gray-900",
+          "w-full px-4 py-2 border rounded-lg bg-white text-gray-900 placeholder-[#CAC4D0]",
           error
             ? "border-red-500 focus:border-red-500 focus:ring-0 focus:outline-none"
-            : "border-gray-400 focus:border-gray-400 focus:ring-0 focus:outline-none"
+            : "border-[#CAC4D0]"
         )}
         label={""}
       />

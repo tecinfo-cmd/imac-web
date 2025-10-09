@@ -24,8 +24,8 @@ export default function Auth() {
     resolver: yupResolver(schema),
   });
 
-  const handleSubmitSignIn = (data: SignInCredentials) => {
-    handleSignIn(data);
+  const handleSubmitSignIn = async (data: SignInCredentials) => {
+    await handleSignIn(data);
   };
 
   return (
@@ -51,7 +51,7 @@ export default function Auth() {
               control={control}
             />
             <Link
-              href="/"
+              href="/resetPassword"
               className="text-end text-[#21801A] mr-4 mb-4 text-sm"
             >
               Esqueceu a senha?
@@ -63,7 +63,7 @@ export default function Auth() {
           <span className="text-center text-[#21801A] mt-4 text-sm md:text-base">
             Não possui uma conta?
             <br />
-            <Link href="/" className="underline">
+            <Link href="/register" className="underline">
               Cadastra-se
             </Link>
           </span>

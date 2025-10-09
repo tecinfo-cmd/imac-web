@@ -16,31 +16,32 @@ export function useCAR() {
     setLoading(true);
     setError(null);
 
-    const formattedValue = (() => {
-      if (documentType === "cpf" || documentType === "cnpj") {
-        return documentValue.replace(/[^\w\s]/gi, "");
-      } else {
-        return documentValue;
+    try {
+      const formattedValue =
+        documentType === "cpf" || documentType === "cnpj"
+          ? documentValue.replace(/[^\w\s]/gi, "")
+          : documentValue;
+
+      const result = await fetchCARData(documentType, formattedValue);
+
+      if (!result || !Array.isArray(result) || result.length === 0) {
+        throw new Error("Nenhum dado encontrado para este documento.");
       }
-    })();
 
-    const result = await fetchCARData(documentType, formattedValue);
-
-    if (result && Array.isArray(result) && result.length > 0) {
       const formattedData = {
-        nome: result[0].nome || "Nome não encontrado",
-        carFederal: result[0].carFederal || "CAR Federal não disponível",
+        nome: result[0]?.nomePropriedade || "Nome não encontrado",
+        carFederal: result[0]?.carFederal || "CAR Federal não disponível",
       };
 
       setData(formattedData);
-      setLoading(false);
       return formattedData;
-    } else {
-      setError("Nenhum dado encontrado para este CNPJ.");
+    } catch {
+      setError("Nenhum dado encontrado para este documento.");
       setData(null);
+      return null;
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return { data, loading, error, fetchData };

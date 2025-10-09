@@ -1,10 +1,10 @@
 "use client";
-
 import { useState, useRef } from "react";
 import React from "react";
 import { BsFileText } from "react-icons/bs";
 import { IoMdSearch } from "react-icons/io";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
+import { TbLoaderQuarter } from "react-icons/tb";
 import { TbLeaf } from "react-icons/tb";
 import { TfiBookmarkAlt } from "react-icons/tfi";
 
@@ -17,12 +17,17 @@ import CARInput from "@/components/ui/carInput";
 import { CheckboxComponent } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import MaskedInput from "@/components/ui/maskedInput";
-import { MaskedModalInput } from "@/components/ui/maskedModalInput";
+import {
+  MaskedModalInput,
+  MaskedModalInputHandle,
+} from "@/components/ui/maskedModalInput";
 import EmailModal from "@/components/ui/modals/emailModal";
 import Modal from "@/components/ui/modals/modal";
 import Step from "@/components/ui/step";
 
 import { useCAR } from "@/hooks/useCAR";
+import { setCookie } from "nookies";
+import { toast, Toaster } from "sonner";
 
 export default function Home() {
   const [carValue, setCarValue] = useState<string>("");
@@ -31,7 +36,6 @@ export default function Home() {
     "cpf" | "cnpj" | "carEstadual" | undefined
   >(undefined);
 
-  const [documentValue, setDocumentValue] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -46,8 +50,7 @@ export default function Home() {
   const [isChecked, setIsChecked] = useState(false);
   const [isModalTwoOpen, setIsModalTwoOpen] = useState(false);
 
-  const documentInputRef = useRef<HTMLInputElement>(null);
-
+  const documentInputRef = useRef<MaskedModalInputHandle>(null);
   const documentTypeValue = ["cpf", "cnpj", "carEstadual"].includes(
     documentType ?? ""
   )
@@ -55,17 +58,6 @@ export default function Home() {
     : undefined;
 
   const { data, fetchData } = useCAR();
-
-  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.toUpperCase();
-
-    if (documentType === "carEstadual") {
-      const regex = /^[A-Z]{0,2}\d{0,5}\/?\d{0,4}$/;
-      if (!regex.test(value)) return;
-    }
-
-    setDocumentValue(value);
-  };
 
   const handleCarValueChange = (value: string) => {
     setCarValue(value);
@@ -76,8 +68,12 @@ export default function Home() {
   };
 
   const fetchCARNumbers = async () => {
-    if (!documentValue?.trim()) {
-      setModalErrors({ value: "Por favor, insira um valor para buscar." });
+    const rawValue = documentInputRef.current?.getUnmaskedValue();
+
+    if (!rawValue || !rawValue.trim()) {
+      setModalErrors({
+        value: "Por favor, insira um valor valido para buscar.",
+      });
       return;
     }
 
@@ -86,16 +82,33 @@ export default function Home() {
       return;
     }
 
+    if (documentType === "carEstadual") {
+      console.log("Valor bruto:", rawValue);
+
+      const match = rawValue.match(/^([A-Z]{2})(\d{4,6})\/(\d{4})$/i);
+
+      if (!match) {
+        setModalErrors({
+          value:
+            "Formato inválido. Use duas letras, 4-6 números, uma barra e 4 números finais (ex: AA1234/5678).",
+        });
+        return;
+      }
+    }
+
     setIsLoading(true);
     setModalErrors({});
 
     try {
-      console.log("Buscando CAR com:", { documentType, documentValue });
+      console.log("Função chamada");
+      console.log("Valor desmascarado:", rawValue);
+      console.log("Tipo de documento:", documentType);
 
       const response = await fetchData(
         documentType as "cpf" | "cnpj" | "carEstadual",
-        documentValue
+        rawValue
       );
+      console.log("Resposta da API:", response);
 
       if (response && response.carFederal) {
         setCarNumbers([response.carFederal]);
@@ -114,19 +127,22 @@ export default function Home() {
       setCarNumbers([]);
     } finally {
       setDocumentType(undefined);
-      setDocumentValue("");
       setIsLoading(false);
     }
   };
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newErrors: { [key: string]: string } = {};
+    const rawCpfValue = documentInputRef.current?.getUnmaskedValue();
 
-    if (!carValue)
+    const newErrors: { [key: string]: string } = {};
+    if (!rawCpfValue || rawCpfValue.length !== 11)
+      newErrors.cpf = "Campo obrigatório. | Insira um CPF válido.";
+
+    if (!carValue || carValue.length !== 43)
       newErrors.carValue =
         "Campo obrigatório. | Insira um número de CAR válido.";
-    if (!phone)
+    if (!phone || phone.length !== 15)
       newErrors.phone =
         "Campo obrigatório. | Insira um número de telefone válido.";
     if (!email)
@@ -138,14 +154,61 @@ export default function Home() {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      setIsModalTwoOpen(true);
+      const payload = {
+        carFederal: carValue,
+        telefone: phone,
+        email,
+        cpfCnpj: rawCpfValue,
+      };
+      console.log("Payload enviado:", payload);
+
+      setCookie(null, "carValue", carValue, {
+        maxAge: 60 * 60 * 24 * 7,
+        path: "/",
+      });
+
+      try {
+        const response = await fetch(
+          "https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          throw new Error(
+            `Erro ao enviar solicitação: ${response.status} - ${responseText}`
+          );
+        }
+
+        setCarValue("");
+        setPhone("");
+        setEmail("");
+        setIsChecked(false);
+        documentInputRef.current?.clearValue();
+
+        const result = await response.json();
+        console.log("Resposta da API:", result);
+
+        setIsModalTwoOpen(true);
+      } catch (error) {
+        console.error("Erro ao enviar para API:", error);
+        const match = (error as Error).message.match(/"message":"([^"]+)"/);
+        const errorMessage = match ? match[1] : "Erro ao enviar solicitação";
+        toast.error(`${errorMessage}`);
+      }
     }
   };
 
   const resetModal = () => {
     setCarNumbers([]);
     setSelectedCar(null);
-    setDocumentValue("");
+
     setDocumentType(undefined);
     setModalErrors({});
     setIsModalOpen(false);
@@ -154,6 +217,7 @@ export default function Home() {
   return (
     <>
       <Header />
+      <Toaster />
       <HeroSection topImage={""} title={""} text={""} />
       <div id="form" className="min-h-screen flex flex-col py-4 px-6">
         <main className="flex-grow container mx-auto px-4 py-8">
@@ -193,16 +257,25 @@ export default function Home() {
                     </a>
                   </p>
                 </div>
+                <MaskedModalInput
+                  documentType="cpf"
+                  type="text"
+                  ref={documentInputRef}
+                  placeholder="Digite seu CPF"
+                  className="border focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#CAC4D0]"
+                  label="CPF do próprietario*"
+                  error={errors.cpf}
+                />
                 <MaskedInput
                   mask="(00) 00000-0000"
                   label="telefone de contato (whatsapp)*"
                   type="tel"
                   value={phone}
-                  onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                  }) => setPhone(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setPhone(e.target.value)
+                  }
                   placeholder="(XX) XXXXX - XXXX"
-                  className="w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px]"
+                  className="w-[194px] h-[48px] sm:w-[270px] md:w-[320px] lg:w-[380px] placeholder-[#CAC4D0]"
                   error={errors.phone}
                 />
 
@@ -220,7 +293,7 @@ export default function Home() {
                 <CheckboxComponent
                   checked={isChecked}
                   onCheckedChange={handleCheckboxChange}
-                  className="w-[17px] h-[17px] border-[1px] border-[#666666] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)] "
+                  className="w-[17px] h-[17px] border-[1px] border-[#CAC4D0] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)] "
                   error={errors.isChecked}
                 >
                   aceito os termos e condições de uso.
@@ -319,10 +392,8 @@ export default function Home() {
                 documentType={documentTypeValue}
                 type="text"
                 ref={documentInputRef}
-                value={documentValue}
-                disabled={!documentType}
-                onChange={handleDocumentChange}
                 placeholder="valor"
+                disabled={!documentType}
                 className="border border-[#222222] focus:outline-none rounded-md px-4 py-2 h-12 w-full sm:w-70 md:w-70  placeholder-[#A2A2A2] bg-white"
                 label={""}
                 onKeyDown={(e: { key: string; preventDefault: () => void }) => {
@@ -335,12 +406,14 @@ export default function Home() {
             </div>
             <button
               onClick={fetchCARNumbers}
-              className="absolute right-0 sm:right-0 md:right-0 top-0 translate-y-2 h-12 w-12 bg-white border-t border-b border-[#222222] rounded-r-md hover:bg-gray-100 transition duration-200 flex items-center justify-center"
+              className="absolute right-0 sm:right-0 md:right-0 top-0 translate-y-0 h-12 w-12 bg-white border-t border-b border-r border-[#222222] rounded-r-md hover:bg-gray-100 transition duration-200 flex items-center justify-center"
               disabled={!documentType}
             >
-              <IoMdSearch className="h-5 w-5 text-[#A2A2A2]" />
-
-              {isLoading ? "" : ""}
+              {isLoading ? (
+                <TbLoaderQuarter className="animate-spin h-5 w-5 text-[#A2A2A2]" />
+              ) : (
+                <IoMdSearch className="h-5 w-5 text-[#A2A2A2]" />
+              )}
             </button>
 
             <div className="w-full mt-5 text-center">

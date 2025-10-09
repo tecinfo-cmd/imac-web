@@ -1,8 +1,15 @@
-export const LogoWhite = () => {
+interface LogoProps {
+  width?: number;
+  height?: number;
+  className?: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const LogoWhite = ({ width = 89, height = 89, className = ""}: LogoProps) => {
   return (
     <svg
-      width="77"
-      height="77"
+      width={width}
+      height={height}
       viewBox="0 0 89 89"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

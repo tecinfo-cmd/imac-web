@@ -1,9 +1,14 @@
+"use client";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 
 export default function Header() {
+  const router = useRouter();
+
   return (
     <header className="w-full bg-white shadow-md">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
@@ -17,7 +22,12 @@ export default function Header() {
           />
         </div>
 
-        <Button className="bg-[#52A532] hover:bg-green-700">Entrar</Button>
+        <Button
+          onClick={() => router.push("/auth")}
+          className="bg-[#52A532] hover:bg-green-700"
+        >
+          Entrar
+        </Button>
       </div>
     </header>
   );

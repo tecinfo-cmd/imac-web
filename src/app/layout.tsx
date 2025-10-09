@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
-import "./styles/globals.css";
 import { AuthProvider } from "@/context/provider";
+import { Toaster } from "sonner";
+import "./styles/globals.css";
 
 import QueryProvider from "./QueryProvider";
 
@@ -22,6 +23,7 @@ export default function RootLayout({
       <body>
         <QueryProvider>
           <AuthProvider>{children}</AuthProvider>
+          <Toaster richColors position="top-right" />
         </QueryProvider>
       </body>
     </html>

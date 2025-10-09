@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { InputHTMLAttributes, useState } from "react";
 import { Controller } from "react-hook-form";
+import { BiLogoMastercard } from "react-icons/bi";
+import { HiMiniCreditCard } from "react-icons/hi2";
+import { IoMdCalendar } from "react-icons/io";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
-interface InputProps {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   label?: string;
-  placeholder?: string;
   control: any;
-  type?: string;
-  minWidth?: string | number;
+  className?: string;
+  mask?: (value: string) => string;
 }
 
 export const Input = ({
@@ -17,9 +19,14 @@ export const Input = ({
   placeholder,
   control,
   type = "text",
-  minWidth = 344,
+  mask,
+  className = "",
+  ...rest
 }: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
+  const isDateInput = name === "validade" || name === "data";
+  const isCardInput = name === "numeroCartao";
+  const isCvvInput = name === "CVV";
 
   const isPassword = type === "password";
   const inputType = isPassword && showPassword ? "text" : type;
@@ -33,12 +40,14 @@ export const Input = ({
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => (
-        <>
-          <div className="flex justify-between mx-1">
+        <div className={`flex flex-col ${className}`}>
+          <div className="flex justify-between mx-1 my-1">
             {label && (
               <label
                 htmlFor={name}
-                className="block font-medium text-[#21801A]"
+                className={`block font-medium ${
+                  error ? "text-[#F12929]" : "text-[#21801A]"
+                }`}
               >
                 {label}
               </label>
@@ -54,18 +63,35 @@ export const Input = ({
           <div className="relative w-full">
             <input
               {...field}
-              value={field.value ?? ""}
+              value={mask ? mask(field.value ?? "") : field.value ?? ""}
               type={inputType}
               placeholder={placeholder}
-              className={`w-full min-w-[${minWidth}px] p-4 rounded focus:outline-none border-[#CAC4D0] shadow-sm placeholder:text-[#D7D6D7] ${
-                error ? "border-[#F12929]" : ""
-              }`}
+              {...rest}
+              className="w-full h-[48px] p-4 rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] placeholder:text-[#D7D6D7]"
             />
+
+            {isDateInput && (
+              <span className="absolute inset-y-0 right-2 flex items-center text-gray-300">
+                <IoMdCalendar size={20} />
+              </span>
+            )}
+
+            {isCardInput && (
+              <span className="absolute inset-y-0 right-4 flex items-center text-gray-300">
+                <BiLogoMastercard size={20} />
+              </span>
+            )}
+            {isCvvInput && (
+              <span className="absolute inset-y-0 right-4 flex items-center text-gray-300">
+                <HiMiniCreditCard size={20} />
+              </span>
+            )}
+
             {isPassword && (
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-4 flex items-center text-gray-300 cursor-pointer"
+                className="absolute inset-y-0 right-4 flex items-center text-gray-300 cursor-pointer ml-1"
               >
                 {showPassword ? (
                   <IoEyeOutline size={20} />
@@ -75,7 +101,7 @@ export const Input = ({
               </button>
             )}
           </div>
-        </>
+        </div>
       )}
     />
   );

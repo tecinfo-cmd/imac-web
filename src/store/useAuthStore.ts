@@ -48,3 +48,6 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+export const useAuthEmail = () =>
+  useAuthStore((s) => s.userData?.pessoa?.email ?? s.userData?.email ?? "");
