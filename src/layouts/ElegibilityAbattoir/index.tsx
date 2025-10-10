@@ -12,7 +12,6 @@ import { ElegibilityAbattoirDetail } from "@/layouts/ElegibilityAbattoir/compone
 import { useAbattoirElegibilities } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
 import { Eye } from "@/icons/Eye";
 import { RuralProperty } from "@/icons/RuralProperty";
-import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 
 import { FilterElegibilityAbattoir } from "./FiltersElegility";
 
@@ -113,8 +112,6 @@ export const ElegibilityAbattoirLayout = () => {
           <Table.Container>
             <Table.Header>
               <Table.Title>Nome da Propriedade </Table.Title>
-              <Table.Title>CPF/CNPJ</Table.Title>
-              <Table.Title>Email</Table.Title>
               <Table.Title>CAR Federal</Table.Title>
               <Table.Title>Status</Table.Title>
               <Table.Title>Ações</Table.Title>
@@ -124,12 +121,6 @@ export const ElegibilityAbattoirLayout = () => {
               {elegibilities?.map((elegibilities: any) => (
                 <Table.Row key={elegibilities.id}>
                   <Table.Cell>{elegibilities.nomePropriedade}</Table.Cell>
-                  <Table.Cell>
-                    {elegibilities.cpfCnpj
-                      ? maskCPFOrCNPJ(elegibilities.cpfCnpj)
-                      : "-"}
-                  </Table.Cell>
-                  <Table.Cell>{elegibilities.email}</Table.Cell>
                   <Table.Cell>{elegibilities.carFederal}</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-2">

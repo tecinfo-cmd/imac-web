@@ -1,11 +1,13 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { GoAlertFill } from "react-icons/go";
 
 import { TableInformation } from "@/components/TableInformation";
 import { Button } from "@/components/ui/button";
 
+import { useAdequancyTerm } from "@/hooks/useAdequancyTerm/useAdequancyTerm";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { toast } from "sonner";
 interface AdequancyTermProps {
   farmId: number;
 }
@@ -14,36 +16,44 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
   const { data: farm } = useGetFarmById(farmId);
   const imagemBase64 = farm?.territorios?.[0]?.imagemAdequacao;
 
+  const status = farm?.status === "Enviado" || farm?.status === "Assinado";
+
   const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
     null
   );
 
-  const storageKey = `adequancyTermAgreed_${farmId}`;
-  const [agreed, setAgreed] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(storageKey);
-    setAgreed(stored === "true");
-  }, [storageKey]);
-
-  const handleAgree = () => {
-    setAgreed(true);
-    localStorage.setItem(storageKey, "true");
-  };
+  const adequancyTermMutation = useAdequancyTerm({
+    onSuccess: () => {
+      toast.success("Termo de adequação aceito com sucesso!");
+    },
+    onError: (error: any) => {
+      toast.error("Erro ao aceitar o termo de adequação");
+      console.error("Erro:", error);
+    },
+  });
 
   const handleProposeNewAreaChange = (value: "yes" | "no") => {
     setProposeNewArea(proposeNewArea === value ? null : value);
   };
+
+  const handleAcceptTerm = () => {
+    if (farmId) {
+      console.log("Chamando mutation com farmId:", farmId);
+      adequancyTermMutation.mutate({ id: farmId });
+    }
+  };
+
   return (
     <>
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
         <GoAlertFill size={35} color="#F12929" />
         <p className="text-[#0A3503]">
-          O Plano de Adequação após ser solicitado não poderá solicitar contestação ou estratégia de adequação.
+          O Plano de Adequação após ser solicitado não poderá solicitar
+          contestação ou estratégia de adequação.
         </p>
       </div>
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
-          Plano de Adequação
+        Plano de Adequação
       </h1>
       <div className="grid grid-cols-3 gap-8 p-6 border border-[#CAC4D0] rounded shadow  mb-6">
         <div>
@@ -297,8 +307,14 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                 </TableInformation.Row>
               </TableInformation>
               <div className="flex justify-end mt-4">
-                <Button variant="green" onClick={handleAgree} disabled={agreed}>
-                  Declaro que estou de acordo
+                <Button
+                  variant="green"
+                  onClick={handleAcceptTerm}
+                  disabled={adequancyTermMutation.isPending || status}
+                >
+                  {adequancyTermMutation.isPending
+                    ? "Processando..."
+                    : "Declaro que estou de acordo"}
                 </Button>
               </div>
             </>
