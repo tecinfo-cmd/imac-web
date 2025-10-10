@@ -55,3 +55,26 @@ export function useCreateProdutor(options: any = {}) {
     ...options,
   });
 }
+
+export function useCheckExistsProdutor(email: string) {
+  return useQuery({
+    queryKey: ["exists-produtor", email],
+    queryFn: async () => {
+      const { data } = await api.get(`${API_URL}/usuario/${email}`);
+      return data;
+    },
+    enabled: !!email,
+  });
+}
+
+export function useAssociateUser(options: any = {}) {
+  return useMutation<any, any, { idUsuario: number; idSolicitacao: number; idFrogorifico: number }>({
+    mutationFn: async (params) => {
+      const { data } = await api.get(`${API_URL}/associa-usuario`, {
+        params: { idUsuario: params.idUsuario, idSolicitacao: params.idSolicitacao, idFrogorifico: params.idFrogorifico },
+      });
+      return data;
+    },
+    ...options,
+  });
+}
