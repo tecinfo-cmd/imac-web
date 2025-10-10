@@ -10,6 +10,8 @@ import { yup } from "@/config/yup";
 import {
   useAbattoirElegibilities,
   useCreateProdutor,
+  useCheckExistsProdutor,
+  useAssociateUser,
 } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
 import { useAbattoirUser } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
 import { maskCPF } from "@/utils/maskCPF";
@@ -57,6 +59,7 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
     control: modalControl,
     handleSubmit: handleModalSubmit,
     reset: resetModal,
+    watch,
   } = useForm({
     resolver: yupResolver(customModalSchema),
     mode: "onChange",
@@ -68,7 +71,11 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
     },
   });
 
-  const mutation = useCreateProdutor({
+  const emailValue = watch("email");
+
+  const { data: existingUser } = useCheckExistsProdutor(emailValue);
+
+  const createMutation = useCreateProdutor({
     onSuccess: () => {
       resetModal();
       setShowForm(false);
@@ -80,18 +87,52 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
     },
   });
 
+  const associateMutation = useAssociateUser({
+    onSuccess: () => {
+      resetModal();
+      setShowForm(false);
+      onClose();
+      toast.success("Usuário associado com sucesso.");
+    },
+    onError: () => {
+      toast.error("Erro ao associar usuário. Tente novamente.");
+    },
+  });
+
   const { data: abattoirUser } = useAbattoirUser();
 
-  // Busca os dados de elegibilidade pelo id
   const { data, isLoading } = useAbattoirElegibilities({ id }, 1, 0);
 
-  // Extrai o item correto do array retornado
   const item = data?.data?.find((el: any) => el.id === id);
 
   if (isLoading || !item) return null;
 
   const retorno = item?.retornoAgrotools ?? {};
   const isEligible = retorno.isEligible === true;
+  const hasProperties = item?.propriedades && Array.isArray(item.propriedades) && item.propriedades.length > 0;
+  const shouldEnableButton = isEligible && !hasProperties;
+
+
+  const handleFormSubmit = (values: any) => {
+    if (existingUser && existingUser.id) {
+      const idUsuario = existingUser.id;
+      
+      associateMutation.mutate({
+        idUsuario,
+        idSolicitacao: Number(item.id),
+        idFrogorifico: Number(abattoirUser?.id),
+      });
+    } else {
+      const payload: any = {
+        ...values,
+        cpf: values.cpf.replace(/\D/g, ""),
+        telefone: values.telefone.replace(/\D/g, ""),
+        idFrogorifico: Number(abattoirUser?.id),
+        idSolicitacao: Number(item.id),
+      };
+      createMutation.mutate(payload);
+    }
+  };
 
   return (
     <>
@@ -205,7 +246,9 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
           </div>
           {isEligible && (
             <div className="mt-2 flex justify-center">
-              <Button onClick={() => setShowForm(true)}>
+              <Button onClick={() => setShowForm(true)}
+                disabled={!shouldEnableButton}
+                className={!shouldEnableButton ? "cursor-not-allowed" : ""}>
                 Cadastrar Propriedade
               </Button>
             </div>
@@ -227,16 +270,7 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
         </CustomModal.Header>
         <CustomModal.Body>
           <form
-            onSubmit={handleModalSubmit((values) => {
-              const payload: any = {
-                ...values,
-                cpf: values.cpf.replace(/\D/g, ""),
-                telefone: values.telefone.replace(/\D/g, ""),
-                idFrogorifico: Number(abattoirUser?.id),
-                idSolicitacao: Number(item.id),
-              };
-              mutation.mutate(payload);
-            })}
+            onSubmit={handleModalSubmit(handleFormSubmit)}
           >
             <Input
               name="cpf"
@@ -266,8 +300,12 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
             />
 
             <div className="flex justify-center mt-4">
-              <Button type="submit" variant="green">
-                Salvar
+              <Button type="submit" variant="green" disabled={createMutation.isPending || associateMutation.isPending}
+              >
+                {createMutation.isPending || associateMutation.isPending 
+                  ? "Salvando..." 
+                  : "Salvar"
+                }
               </Button>
             </div>
           </form>
