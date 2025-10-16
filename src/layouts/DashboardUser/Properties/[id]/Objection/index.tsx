@@ -360,18 +360,26 @@ export const ObjectionLayout = () => {
 
       const statusWktObrigatorio = ["DEFERIDO", "DEFERIDO_PARCIAL"];
       const wktObrigatorio = statusWktObrigatorio.includes(formData.status);
+
       (formData.deteccoes || []).forEach((d, i) => {
         const w = (d?.wkt ?? "").trim();
+        const originalList = data?.deteccoes ?? [];
+        const original = originalList[i];
+
+        const areaOriginal = toNum(original?.area_ha ?? 0);
+        const areaRegenerar = toNum(d?.areaARegenerar);
+
         if (w) {
           if (!isValidPolygonWKT(sanitizeWKT(w))) {
             erros.push(`Polígono ${i + 1}: WKT inválido.`);
           }
         } else if (wktObrigatorio) {
-          erros.push(
-            `Polígono ${
-              i + 1
-            }: WKT é obrigatório para status Deferido ou Deferido Parcialmente.`
-          );
+          const deveObrigarWkt =
+            areaOriginal !== areaRegenerar && areaOriginal !== 0;
+
+          if (deveObrigarWkt) {
+            erros.push(`Polígono ${i + 1}: WKT é obrigatório.`);
+          }
         }
       });
 
@@ -457,17 +465,14 @@ export const ObjectionLayout = () => {
 
       const valorBruto = toNum(areaHaValue) * 250;
       const desconto: any = formData.descontoPercentual;
-      const valorFinalMulta =
-        desconto.value === "100"
-          ? 0
-          : desconto.value === "50"
-          ? valorBruto / 2
-          : valorBruto;
+  
 
       const payload: any = {
         status: formData.status,
         parametros,
-        descontoPercentual: valorFinalMulta,
+        descontoPercentual: desconto.value,
+        valorMulta: valorBruto
+
       };
       if (arquivosOut.length) payload.deteccoes = arquivosOut;
       if (poligonosOut.length) payload.poligonos = poligonosOut;
