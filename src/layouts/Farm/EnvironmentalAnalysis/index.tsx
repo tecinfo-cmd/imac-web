@@ -1,5 +1,5 @@
 "use client";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { JSX, useState } from "react";
 import {
   FaFileAlt,
@@ -15,6 +15,7 @@ import { GoAlertFill, GoArrowLeft } from "react-icons/go";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 
+import GetDcsStatus from "@/app/(public)/getDcsStatus/page";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 
 import { AdequancyTerm } from "./AdequancyTerm";
@@ -29,6 +30,7 @@ import { SuitabilityPlan } from "./SuitabilityPlan";
 
 export const EnvironmentalAnalysisLayout = () => {
   const params = useParams();
+  const router = useRouter();
   const farmId = Number(params.id);
 
   const { data: farm } = useGetFarmById(farmId);
@@ -78,8 +80,7 @@ export const EnvironmentalAnalysisLayout = () => {
     {
       label: "Autorização de Comercialização",
       icon: FaStore,
-      key: "commercializationAuthorization",
-      disabled: true,
+      key: "getDcsStatus",
     },
   ];
 
@@ -115,8 +116,19 @@ export const EnvironmentalAnalysisLayout = () => {
     setActiveScreen("suitabilityPlan");
   };
 
+  const handleCommercializationAuthorization = () => {
+    if (farm?.carFederal && farm?.id) {
+      const queryParams = new URLSearchParams({
+        carFederal: farm.carFederal,
+        idPropriedade: farm.id.toString(),
+      });
+      router.push(`/getDcsStatus?${queryParams.toString()}`);
+    }
+  };
+
   const componentMap: Record<string, JSX.Element> = {
     overview: <FarmOverview farmId={farmId} />,
+    getDcsStatus: <GetDcsStatus />,
     //suitabilityTerm: <SuitabilityTerm farmId={farmId} />,
     AdequancyTerm: <AdequancyTerm farmId={farmId} />,
     environmentalAnalysisPDF: (
@@ -222,7 +234,13 @@ export const EnvironmentalAnalysisLayout = () => {
           <button
             key={label}
             disabled={disabled}
-            onClick={() => setActiveScreen(key)}
+            onClick={() => {
+              if (key === "getDcsStatus") {
+                handleCommercializationAuthorization();
+              } else {
+                setActiveScreen(key);
+              }
+            }}
             className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 transition-colors ${
               disabled
                 ? "bg-[#CAC4D0] text-[#7A7A7A] cursor-not-allowed"

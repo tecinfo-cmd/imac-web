@@ -80,6 +80,7 @@ interface ObjectionData {
     etapa: string;
     status: string;
     descontoPercentual?: number;
+    vouches?: string;
   };
 
   justificativaSupressao: string | null;
@@ -175,7 +176,7 @@ export const useObjectionData = () => {
 
       const farmData = {
         car: data.carFederal || "-",
-        voucher: data.voucher || "-",
+        vouches: data.vouches?.[0]?.voucher || "-",
         nome: data.nomePropriedade || "-",
         municipio: data.cidade?.nome || "-",
         estado: data.cidade?.uf || "-",
