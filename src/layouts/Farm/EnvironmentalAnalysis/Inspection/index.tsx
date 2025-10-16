@@ -1,5 +1,8 @@
 import Image from "next/image";
 import { GoAlertFill } from "react-icons/go";
+import { LuFileSearch } from "react-icons/lu";
+
+import { Button } from "@/components/ui/button";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { useGetAutoInspection } from "@/hooks/useGetElegibilities/useGetAutoVistoria";
@@ -11,7 +14,11 @@ interface InspectionProps {
 
 export const Inspection = ({ farmId }: InspectionProps) => {
   const { data: farm } = useGetFarmById(farmId);
-  const { data: autoInspection, isLoading } = useGetAutoInspection();
+  const idPropriedade = farmId;
+  const { data: autoInspection, isLoading } =
+    useGetAutoInspection(idPropriedade);
+
+    console.log("autoInspection", autoInspection);
 
   if (isLoading) return <p>Carregando dados da vistoria...</p>;
 
@@ -78,18 +85,53 @@ export const Inspection = ({ farmId }: InspectionProps) => {
             <h2 className="text-[#21801A]">Data final limite da vistoria:</h2>
             <p>
               {currentInspection
-                ? formatDate(currentInspection.endDate)
+                ? formatDate(currentInspection.dataTermino)
                 : "Não informado"}
             </p>
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Status da vistoria:</h2>
-            <p>{currentInspection?.inspectionStatus || "Não realizada"}</p>
+            <p>
+              {currentInspection?.statusVistoria.toLowerCase() ||
+                "Não realizada"}
+            </p>
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Resultado da vistoria:</h2>
-            <p>{currentInspection?.inspection || "Aguardando vistoria"}</p>
+            <p>
+              {currentInspection?.vistoria.toLowerCase() ||
+                "Aguardando vistoria"}
+            </p>
           </div>
+        </div>
+        <div className="col-span-2 flex flex-col gap-4 justify-center items-end">
+          {currentInspection?.formularios?.reportUrl ? (
+            <div className="mt-4 flex justify-start">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const reportUrl = currentInspection.formularios.reportUrl;
+                  if (reportUrl) {
+                    window.open(reportUrl, "_blank");
+                  }
+                }}
+              >
+                <LuFileSearch size={20} />
+                Acessar Relatório
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-4 flex justify-start">
+              <Button
+                variant="outline"
+                disabled
+                className="opacity-50 cursor-not-allowed"
+              >
+                <LuFileSearch size={20} />
+                Relatório não disponível
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
