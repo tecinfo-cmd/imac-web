@@ -8,30 +8,46 @@ export interface Form {
   name: string;
   type: string;
   url: string;
+  
+}
+
+export interface Formularios {
+  reportUrl: string | null;
+  title: string;
+  comments: string | null;
+  mobileImei: string | null;
+  quizzes: any[];
 }
 
 export interface AutoInspection {
   id: number;
   startDate: string;
-  endDate: string;
-  inspectionStatus: string;
-  inspection: string;
+  dataTermino: string;
+  statusVistoria: string;
+  vistoria: string;
   surveyId: string;
   forms: Form[];
+  formularios: Formularios;
 }
 
-export const getAutoInspection = async () => {
+export const getAutoInspection = async (idPropriedade: number) => {
   try {
-    const { data } = await api.get("/auto-vistoria");
+    const { data } = await api.get("/auto-vistoria",
+      {
+          params: {
+            idPropriedade,
+          },
+        }
+    );
     return data as AutoInspection[];
   } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export function useGetAutoInspection() {
+export function useGetAutoInspection(idPropriedade: number) {
   return useQuery({
-    queryKey: [QUERY_KEY_GET_AUTO_INSPECTION],
-    queryFn: getAutoInspection,
+    queryKey: [QUERY_KEY_GET_AUTO_INSPECTION, idPropriedade],
+    queryFn: () => getAutoInspection(idPropriedade),
   });
 } 

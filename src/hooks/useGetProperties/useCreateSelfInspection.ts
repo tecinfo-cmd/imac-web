@@ -6,7 +6,6 @@ interface CreateSelfInspectionPayload {
   idPropriedade: number;
 }
 
-
 interface SelfInspection {
   dataInicio: string;
   statusVistoria: string;
@@ -16,25 +15,26 @@ interface SelfInspection {
 export function useCreateSelfInspection() {
   return useMutation({
     mutationFn: async (payload: CreateSelfInspectionPayload) => {
-      const { data } = await api.post(
-        "auto-vistoria/cadastro",
-        payload
-      );
+      const { data } = await api.post("auto-vistoria/cadastro", payload);
       return data;
     },
   });
-
-
 }
 
-export function useGetSelfInspections() {
-  return useQuery<{data: SelfInspection[]}>({
-    queryKey: ["self-inspections"],
+export function useGetSelfInspections(idPropriedade: number) {
+  return useQuery<{ data: SelfInspection[] }>({
+    queryKey: ["self-inspections", idPropriedade],
     queryFn: async () => {
-      const { data } = await api.get<{data: SelfInspection[]}>(
-        "auto-vistoria"
+      const { data } = await api.get<{ data: SelfInspection[] }>(
+        "auto-vistoria",
+        {
+          params: {
+            idPropriedade,
+          },
+        }
       );
       return data;
     },
+    enabled: !!idPropriedade,
   });
 }
