@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
 import {
@@ -9,12 +9,14 @@ import {
   PiSealCheckLight,
   PiUserCircleThin,
 } from "react-icons/pi";
+import { TbLoaderQuarter } from "react-icons/tb";
 
 import { Modal } from "./components/Modal";
 import { InfoGrid } from "@/components/InfoGrid";
 import { Input } from "@/components/Input";
 import { InputSelect } from "@/components/InputSelect";
 import { LayoutContainer } from "@/components/LayoutContainer";
+import { Radio } from "@/components/RadioBox";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 import { Button } from "@/components/ui/button";
@@ -25,10 +27,14 @@ import { useGetSelfInspections } from "@/hooks/useGetProperties/useCreateSelfIns
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
+import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
+import { X } from "@/icons/X";
 import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
+
+const PARECER_LABEL = "Parecer Técnico da Contestação";
 
 const customMenuItems = [
   { label: "Dashboard", href: "/dashboard", icon: <Analityc /> },
@@ -66,11 +72,25 @@ const selfInspectionSchema = yup.object().shape({
   dataInicio: yup.string().required(),
 });
 
+const parecerSchema = yup.object().shape({
+  parecer: yup.string().required("Selecione um parecer"),
+});
+
 export const SelfInspectionLayout = () => {
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(selfInspectionSchema),
   });
+
+  const { control: parecerControl, handleSubmit: handleParecerSubmit } =
+    useForm({
+      resolver: yupResolver(parecerSchema),
+    });
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reportUrl, setReportUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
   const params = useParams();
@@ -78,9 +98,11 @@ export const SelfInspectionLayout = () => {
   const { data } = useObjectionData();
   const createSelfInspection = useCreateSelfInspection();
 
-  const { data: selfInspectionsData } = useGetSelfInspections();
+  const { data: selfInspectionsData } = useGetSelfInspections(
+    Number(propriedadeId)
+  );
 
-  const selfInspections = selfInspectionsData?.data ?? [];
+  const selfInspections = selfInspectionsData ?? [];
 
   if (!data) {
     return <div>Carregando...</div>;
@@ -91,12 +113,12 @@ export const SelfInspectionLayout = () => {
   const farmInfoRows = [
     [
       { label: "Cadastro Ambiental Rural (CAR)", value: farmData.car },
-      { label: "Código Voucher PREM", value: farmData.voucher },
+      { label: "Código Voucher PREM", value: farmData.vouches },
     ],
     [
-      { label: "Nome da propriedade*", value: farmData.nome },
-      { label: "Município*", value: farmData.municipio },
-      { label: "Estado*", value: farmData.estado },
+      { label: "Nome da propriedade", value: farmData.nome },
+      { label: "Município", value: farmData.municipio },
+      { label: "Estado", value: farmData.estado },
     ],
     [
       { label: "Etapa Atual:", value: farmData.etapa },
@@ -105,10 +127,93 @@ export const SelfInspectionLayout = () => {
   ];
 
   const formatDateToISO = (dateStr: string) => {
-    // Espera "dd/mm/yyyy" e retorna "yyyy-mm-dd"
     const [day, month, year] = dateStr.split("/");
     if (!day || !month || !year) return dateStr;
     return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  };
+
+  const formatDateFromISO = (isoDateStr: string) => {
+    const date = new Date(isoDateStr);
+    return date.toLocaleDateString("pt-BR");
+  };
+
+  const handleViewDCS = () => {
+    const primeiraUrl =
+      selfInspections?.[0]?.formularios?.reportUrl || "https://chatgpt.com/";
+
+    if (primeiraUrl) {
+      setReportUrl(primeiraUrl);
+    } else {
+      alert("Nenhum documento encontrado");
+    }
+  };
+
+  const openFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        toast.error("Por favor, selecione apenas arquivos PDF");
+        return;
+      }
+
+      setSelectedFile(file);
+    }
+  };
+
+  const clearFile = () => {
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+
+      if (file.type !== "application/pdf") {
+        toast.error("Por favor, selecione apenas arquivos PDF");
+        return;
+      }
+
+      setSelectedFile(file);
+
+    }
+  };
+
+  const canSendParecer = selectedFile !== null;
+
+  const onParecerSubmit = async (formData: any) => {
+    if (!selectedFile) {
+      toast.error("Por favor, selecione um arquivo");
+      return;
+    }
+
+    console.log("Parecer:", formData.parecer);
+    console.log("Arquivo:", selectedFile);
+
+  
+    toast.success("Parecer salvo com sucesso!");
+    setReportUrl(null);
+    setSelectedFile(null);
   };
 
   const onSubmit = (formData: any) => {
@@ -119,15 +224,15 @@ export const SelfInspectionLayout = () => {
       },
       {
         onSuccess: (data) => {
-          toast.success(data.mensagem || "Agendamento realizado com sucesso!");
+          console.log(data);
+          setTimeout(() => {
+            setIsModalOpen(false);
+          }, 5000);
+          toast.success("Agendamento realizado com sucesso!");
         },
         onError: (error: any) => {
-          // Se a API retorna a mensagem de erro em error.response.data.mensagem
-          const apiMessage =
-            error?.response?.data?.mensagem ||
-            error?.message ||
-            "Erro ao agendar vistoria.";
-          toast.error(apiMessage);
+          console.log(error);
+          toast.error("Erro ao agendar vistoria.");
         },
       }
     );
@@ -187,17 +292,27 @@ export const SelfInspectionLayout = () => {
               mask={maskDate}
             />
             <div className="flex justify-center">
-              <Button type="submit" variant="dark">
-                Agendar
+              <Button
+                type="submit"
+                variant="dark"
+                disabled={createSelfInspection.isPending}
+              >
+                {createSelfInspection.isPending ? (
+                  <TbLoaderQuarter className="animate-spin" />
+                ) : (
+                  "Agendar"
+                )}
               </Button>
             </div>
           </form>
         </Modal.Body>
         <Modal.CloseButton onClose={() => setIsModalOpen(false)} />
       </Modal.Container>
+
       <h1 className="bg-[#1A6415] text-xl text-white font-semibold text-center py-2">
         Vistorias
       </h1>
+
       <Table.Container className="!pt-0">
         <Table.Header>
           <Table.Title>Data da vistoria</Table.Title>
@@ -208,13 +323,20 @@ export const SelfInspectionLayout = () => {
         <Table.Body>
           {selfInspections.map((inspection: any) => (
             <Table.Row key={inspection.id}>
-              <Table.Cell>{inspection.dataInicio}</Table.Cell>
+              <Table.Cell>
+                {formatDateFromISO(inspection.dataInicio)}
+              </Table.Cell>
               <Table.Cell>{inspection.statusVistoria}</Table.Cell>
               <Table.Cell>{inspection.vistoria}</Table.Cell>
               <Table.Cell>
                 <div className="flex items-center gap-2">
                   <Tooltip message="Visualizar" id={`view-${inspection.id}`}>
-                    <Eye />
+                    <button
+                      onClick={() => handleViewDCS()}
+                      className="cursor-pointer hover:opacity-70 transition-opacity"
+                    >
+                      <Eye />
+                    </button>
                   </Tooltip>
                 </div>
               </Table.Cell>
@@ -222,6 +344,142 @@ export const SelfInspectionLayout = () => {
           ))}
         </Table.Body>
       </Table.Container>
+
+      {reportUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white w-[90%] h-[90%] rounded-lg overflow-hidden flex flex-col">
+            <div className="p-2 bg-gray-100 flex justify-between items-center">
+              <span className="font-bold text-lg">Relatório da Vistoria</span>
+              <button
+                onClick={() => setReportUrl(null)}
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              >
+                Fechar
+              </button>
+            </div>
+            <iframe
+              src={reportUrl}
+              className="flex-1"
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+              title="Relatório da Vistoria"
+            />
+            <form
+              onSubmit={handleParecerSubmit(onParecerSubmit)}
+              className="p-4"
+            >
+              <section className="border rounded-md shadow bg-white">
+                <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
+                  Parecer da Autovistoria
+                </div>
+                <Table.Container className="!pt-0">
+                  <Table.Header>
+                    <Table.Title colspan={4}>
+                      Qual é o parecer da analise do Plano de Adequação?
+                    </Table.Title>
+                  </Table.Header>
+                  <Table.Body>
+                    <Table.Row>
+                      <Table.Cell>
+                        <Radio
+                          name="parecer"
+                          value="deferido"
+                          label="Deferido"
+                          control={parecerControl}
+                        />
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Radio
+                          name="parecer"
+                          value="indeferido"
+                          label="Indeferido"
+                          control={parecerControl}
+                        />
+                      </Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table.Container>
+              </section>
+
+              <section
+                className={`border rounded-md shadow bg-white mt-4 transition-colors ${
+                  isDragOver ? "border-blue-400 bg-blue-50" : ""
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
+                  Faça o upload do parecer da analise do Plano de Adequação
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  className="hidden"
+                  onChange={onFileChange}
+                />
+
+                <Table.Container className="!pt-0">
+                  <Table.Header>
+                    <Table.Title colspan={3}>
+                      Descrição do documento
+                    </Table.Title>
+                  </Table.Header>
+                  <Table.Body>
+                    <Table.Row>
+                      <Table.Cell>
+                        <div className="flex items-center gap-2">
+                          <span>{PARECER_LABEL}</span>
+                          {selectedFile && (
+                            <span className="text-xs text-gray-600 italic">
+                              ({selectedFile.name})
+                            </span>
+                          )}
+                        </div>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={openFilePicker}
+                            className="inline-flex items-center gap-2 hover:underline"
+                            title="Selecionar arquivo (PDF)"
+                          >
+                            <DownloadIcon />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={clearFile}
+                            className="inline-flex items-center gap-2 hover:underline disabled:opacity-50"
+                            title="Remover arquivo"
+                            disabled={!selectedFile}
+                          >
+                            <X />
+                          </button>
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table.Container>
+              </section>
+
+              <div className="flex justify-center mt-4">
+                <Button
+                  variant="dark"
+                  type="submit"
+                  className="w-36"
+                  disabled={!canSendParecer}
+                >
+                  Salvar
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </LayoutContainer>
   );
 };
