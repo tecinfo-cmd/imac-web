@@ -48,6 +48,18 @@ interface PlanoAdequacao {
   documentos: PlanoDocumento[];
 }
 
+interface RetornoAnalise {
+   id: number;
+  urlRelatorio: string;
+  idPropriedade: number;
+  areaDesmatadaTotal: number;
+  areaARegenerar: string;
+  moduloFiscal: number;
+  valorMulta: number;
+  descontoPercentual: number;
+}
+
+
 interface ObjectionData {
   tecnico: {
     nome: string;
@@ -91,6 +103,7 @@ interface ObjectionData {
   idAnalise?: number;
   planoAdequacao?: PlanoAdequacao | null;
   documentosPlano: DocumentoTecnicoData[];
+  retornoAnalises: RetornoAnalise[];
 }
 
 interface SubmitObjectionProps {
@@ -236,6 +249,8 @@ export const useObjectionData = () => {
 
         planoAdequacao,
         documentosPlano,
+
+        retornoAnalises: data.retornoAnalises || [],
 
         // Expor status das contestações
         contestacaoAutorizacaoSupressao: contestacaoSupressao
