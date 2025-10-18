@@ -307,111 +307,129 @@ export const SuitabilityPlan = ({
         </div>
       )}
 
-      <TableInformation>
-        <TableInformation.Section title="Deseja propor uma nova área para regeneração?">
-          <TableInformation.Row columnsPerRow={2}>
-            <TableInformation.Column>
-              <TableInformation.Value>
-                <input
-                  type="checkbox"
-                  id="propose-yes"
-                  name="proposeNewArea"
-                  value="yes"
-                  checked={proposeNewArea === "yes"}
-                  onChange={() => handleProposeNewAreaChange("yes")}
-                  className="accent-[#21801A]"
-                />
-                <label htmlFor="propose-yes" className="ml-2 cursor-pointer">
-                  Sim
-                </label>
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Value>
-                <input
-                  type="checkbox"
-                  id="propose-no"
-                  name="proposeNewArea"
-                  value="no"
-                  checked={proposeNewArea === "no"}
-                  onChange={() => {
-                    handleProposeNewAreaChange("no");
-                    if (onNavigateToAdequancyTerm) {
-                      onNavigateToAdequancyTerm();
-                    }
-                  }}
-                  className="accent-[#21801A]"
-                />
-                <label htmlFor="propose-no" className="ml-2 cursor-pointer">
-                  Não
-                </label>
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
+      {existingSuitabilityPlan ? (
+        <div className="bg-white border border-[#CAC4D0] shadow">
+          <div className="bg-[#1A6415] text-white p-4">
+            <h2 className="font-semibold text-lg">Estratégia de Adequação</h2>
+          </div>
+          <div className="bg-[#E8F5E8] p-4 border-b border-[#CAC4D0]">
+            <p className="text-[#0A3503] text-sm">
+              Situação da Estratégia de Adequação
+            </p>
+          </div>
+          <div className="p-6">
+            <div className="text-center py-8">
+              <p className="text-gray-600">Estratégia de Adequação enviada com sucesso.</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <TableInformation>
+          <TableInformation.Section title="Deseja propor uma nova área para regeneração?">
+            <TableInformation.Row columnsPerRow={2}>
+              <TableInformation.Column>
+                <TableInformation.Value>
+                  <input
+                    type="checkbox"
+                    id="propose-yes"
+                    name="proposeNewArea"
+                    value="yes"
+                    checked={proposeNewArea === "yes"}
+                    onChange={() => handleProposeNewAreaChange("yes")}
+                    className="accent-[#21801A]"
+                  />
+                  <label htmlFor="propose-yes" className="ml-2 cursor-pointer">
+                    Sim
+                  </label>
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Value>
+                  <input
+                    type="checkbox"
+                    id="propose-no"
+                    name="proposeNewArea"
+                    value="no"
+                    checked={proposeNewArea === "no"}
+                    onChange={() => {
+                      handleProposeNewAreaChange("no");
+                      if (onNavigateToAdequancyTerm) {
+                        onNavigateToAdequancyTerm();
+                      }
+                    }}
+                    className="accent-[#21801A]"
+                  />
+                  <label htmlFor="propose-no" className="ml-2 cursor-pointer">
+                    Não
+                  </label>
+                </TableInformation.Value>
+              </TableInformation.Column>
+            </TableInformation.Row>
+          </TableInformation.Section>
 
-        <TableInformation.Section
-          title="Estratégia de Adequação"
-          showArrow
-          disabled={proposeNewArea !== "yes"}
-          defaultOpen={!!existingSuitabilityPlan}
-        >
-          <TableInformation.Row columnsPerRow={1}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Disponibilize o projeto da proposta de Estratégia de Adequação
-                na nova área para regeneração
-              </TableInformation.Title>
-              <br />
-              <TechnicalResponsibleSection />
+          <TableInformation.Section
+            title="Estratégia de Adequação"
+            showArrow
+            disabled={proposeNewArea !== "yes"}
+            defaultOpen={!!existingSuitabilityPlan}
+          >
+            <TableInformation.Row columnsPerRow={1}>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Disponibilize o projeto da proposta de Estratégia de Adequação
+                  na nova área para regeneração
+                </TableInformation.Title>
+                <br />
+                <TechnicalResponsibleSection />
 
-              <form onSubmit={handleSubmit(handleSaveDocuments)}>
-                <div className="mt-6">
-                  <p className="text-[#0A3503] mb-4">
-                    Justificativa: Explique de forma breve o objetivo do laudo,
-                    indicando o que se pretende comprovar.
-                  </p>
-                  <TextArea
-                    name="motivo"
-                    label="Justificativa"
-                    placeholder="Digite a justificativa..."
-                    control={control}
+                <form onSubmit={handleSubmit(handleSaveDocuments)}>
+                  <div className="mt-6">
+                    <p className="text-[#0A3503] mb-4">
+                      Justificativa: Explique de forma breve o objetivo do
+                      laudo, indicando o que se pretende comprovar.
+                    </p>
+                    <TextArea
+                      name="motivo"
+                      label="Justificativa"
+                      placeholder="Digite a justificativa..."
+                      control={control}
+                      disabled={!!existingSuitabilityPlan}
+                    />
+                  </div>
+
+                  <DocumentTable
+                    documents={documents}
+                    onCheckboxChange={handleCheckboxChange}
+                    onFileChange={handleFileChange}
+                    onRemoveFile={handleRemoveFile}
+                    labelMap={DOCUMENT_LABEL_MAP}
                     disabled={!!existingSuitabilityPlan}
                   />
-                </div>
 
-                <DocumentTable
-                  documents={documents}
-                  onCheckboxChange={handleCheckboxChange}
-                  onFileChange={handleFileChange}
-                  onRemoveFile={handleRemoveFile}
-                  labelMap={DOCUMENT_LABEL_MAP}
-                  disabled={!!existingSuitabilityPlan}
-                />
-
-                <div className="my-6 flex justify-end">
-                  <Button
-                    type="submit"
-                    disabled={
-                      createSuitabilityPlan.isPending ||
-                      !technicalResponsible ||
-                      !!existingSuitabilityPlan
-                    }
-                    variant="green"
-                    className="w-[320px]"
-                  >
-                    {existingSuitabilityPlan
-                      ? "Plano de Adequação já solicitado"
-                      : createSuitabilityPlan.isPending
-                      ? "Salvando..."
-                      : "Solicitar Plano de Adequação"}
-                  </Button>
-                </div>
-              </form>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-      </TableInformation>
+                  <div className="my-6 flex justify-end">
+                    <Button
+                      type="submit"
+                      disabled={
+                        createSuitabilityPlan.isPending ||
+                        !technicalResponsible ||
+                        !!existingSuitabilityPlan
+                      }
+                      variant="green"
+                      className="w-[320px]"
+                    >
+                      {existingSuitabilityPlan
+                        ? "Plano de Adequação já solicitado"
+                        : createSuitabilityPlan.isPending
+                        ? "Salvando..."
+                        : "Solicitar Plano de Adequação"}
+                    </Button>
+                  </div>
+                </form>
+              </TableInformation.Column>
+            </TableInformation.Row>
+          </TableInformation.Section>
+        </TableInformation>
+      )}
     </>
   );
 };
