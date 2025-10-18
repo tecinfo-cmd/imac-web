@@ -33,6 +33,8 @@ export const ReportContestationSection = ({
   disabled = false,
 }: ReportContestationSectionProps) => {
   const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
+    const [sent, setSent] = useState(false);
+
   const { mutateAsync: createReportContestation, isPending } =
     useCreateReportContestation(farmId, analysisId);
   const { technicalResponsible } = useTechnicalResponsibleContestationStore();
@@ -46,7 +48,7 @@ export const ReportContestationSection = ({
 
   const motivo = watch("motivo");
 
-  if (disabled) {
+  if (sent || disabled) {
     return (
       <div className="bg-white border border-[#CAC4D0] shadow">
         <div className="bg-[#1A6415] text-white p-4">
@@ -136,6 +138,7 @@ export const ReportContestationSection = ({
           onSuccess: () => {
             toast.success("Contestação por laudo enviada com sucesso!");
             setDocuments(INITIAL_DOCUMENTS);
+            setSent(true);
           },
           onError: (error) => {
             console.error("Erro ao enviar contestação por laudo:", error);

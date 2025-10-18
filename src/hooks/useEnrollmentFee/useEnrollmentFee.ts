@@ -32,25 +32,28 @@ export const useEnrollmentFee = () => {
       idSolicitacao,
       cep,
       endereco,
+      cidade,
+      uf,
     }: {
       idSolicitacao: number;
       cep: string;
       endereco: string;
+      bairro?: string;
+      cidade?: string;
+      uf?: string;
     }) => {
       const prop = propriedades?.find((p: any) => p.id === idSolicitacao);
       if (!prop) throw new Error("Propriedade não encontrada");
 
-      const viaCep = await getAddressByCep(cep);
-
       const payload = {
         pagador: {
           cep,
-          cidade: viaCep.localidade,
+          cidade: cidade || "",
           documento: prop.pessoa.cpfCnpj,
           nome: prop.pessoa.nome,
           tipoPessoa: "PESSOA_FISICA",
           endereco,
-          uf: viaCep.uf,
+          uf: uf || "",
         },
         informativos: [prop.carFederal, prop.nomePropriedade],
       };

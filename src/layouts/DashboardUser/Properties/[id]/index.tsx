@@ -67,7 +67,6 @@ const cards = [
     icon: <FineTracking size={36} />,
     active: false,
     path: (id: string) => `/dashboard/properties/${id}/fines`,
-    disabled: true,
   },
   {
     label: "Autovistoria",
@@ -79,7 +78,7 @@ const cards = [
     label: "Autorização de Comercialização",
     icon: <SalesPermit size={36} />,
     active: false,
-    disabled: true,
+    path: (id: string) => `/getDcsStatus?carFederal=&idPropriedade=${id}`,
   },
   {
     label: "Revisão de Car",
@@ -179,6 +178,11 @@ export const MonitoringLayout = () => {
           "Relatório socioambiental ainda não está disponível para esta propriedade."
         );
       }
+      return;
+    }
+    if (card.label === "Autorização de Comercialização") {
+      const url = `/getDcsStatus?carFederal=${propriedade?.carFederal}&idPropriedade=${propriedadeId}`;
+      window.open(url, "_blank");
       return;
     }
     if (card.path) {

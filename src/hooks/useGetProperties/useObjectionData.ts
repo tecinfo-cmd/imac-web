@@ -48,6 +48,17 @@ interface PlanoAdequacao {
   documentos: PlanoDocumento[];
 }
 
+interface RetornoAnalise {
+  id: number;
+  urlRelatorio: string;
+  idPropriedade: number;
+  areaDesmatadaTotal: number;
+  areaARegenerar: string;
+  moduloFiscal: number;
+  valorMulta: number;
+  descontoPercentual: number;
+}
+
 interface ObjectionData {
   tecnico: {
     nome: string;
@@ -91,6 +102,7 @@ interface ObjectionData {
   idAnalise?: number;
   planoAdequacao?: PlanoAdequacao | null;
   documentosPlano: DocumentoTecnicoData[];
+  retornoAnalises: RetornoAnalise[];
 }
 
 interface SubmitObjectionProps {
@@ -104,6 +116,7 @@ interface SubmitObjectionProps {
   }[];
   parametros: { nome: string; tipo: string }[];
   descontoPercentual?: number;
+  valorMulta?: number | string;
   idAnalise?: number;
 }
 
@@ -237,6 +250,8 @@ export const useObjectionData = () => {
         planoAdequacao,
         documentosPlano,
 
+        retornoAnalises: data.retornoAnalises || [],
+
         // Expor status das contestações
         contestacaoAutorizacaoSupressao: contestacaoSupressao
           ? { situacao: contestacaoSupressao.situacao ?? null }
@@ -270,6 +285,17 @@ export const useObjectionData = () => {
           "descontoPercentual",
           String(payload.descontoPercentual)
         );
+      }
+
+      if (payload.valorMulta !== undefined) {
+        const valorMultaNumber =
+          typeof payload.valorMulta === "string"
+            ? parseFloat(payload.valorMulta)
+            : payload.valorMulta;
+
+        if (!isNaN(valorMultaNumber)) {
+          formData.append("valorMulta", String(valorMultaNumber));
+        }
       }
 
       const parametrosArray: { nome: string; tipo: string }[] = [];

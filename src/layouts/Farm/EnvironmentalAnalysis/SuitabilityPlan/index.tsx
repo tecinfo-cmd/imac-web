@@ -35,7 +35,7 @@ export const SuitabilityPlan = ({
   analysisId,
   onNavigateToAdequancyTerm,
 }: SuitabilityPlanProps) => {
-  const { data: farm } = useGetFarmById(farmId);
+  const { data: farm, refetch } = useGetFarmById(farmId);
   const createSuitabilityPlan = useCreateSuitabilityPlan();
   const { technicalResponsible } =
     useTechnicalResponsibleSuitabilityPlanStore();
@@ -186,6 +186,7 @@ export const SuitabilityPlan = ({
       });
 
       toast.success("Plano de adequação salvo com sucesso!");
+      refetch();
     } catch {
       toast.error("Erro ao salvar plano de adequação. Tente novamente.");
     }

@@ -10,6 +10,9 @@ interface SelfInspection {
   dataInicio: string;
   statusVistoria: string;
   vistoria: string;
+  formularios: {
+    reportUrl: string | null;
+  };
 }
 
 export function useCreateSelfInspection() {
@@ -22,17 +25,14 @@ export function useCreateSelfInspection() {
 }
 
 export function useGetSelfInspections(idPropriedade: number) {
-  return useQuery<{ data: SelfInspection[] }>({
+  return useQuery<SelfInspection[]>({
     queryKey: ["self-inspections", idPropriedade],
     queryFn: async () => {
-      const { data } = await api.get<{ data: SelfInspection[] }>(
-        "auto-vistoria",
-        {
-          params: {
-            idPropriedade,
-          },
-        }
-      );
+      const { data } = await api.get<SelfInspection[]>("auto-vistoria", {
+        params: {
+          idPropriedade,
+        },
+      });
       return data;
     },
     enabled: !!idPropriedade,
