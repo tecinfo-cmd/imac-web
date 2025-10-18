@@ -82,7 +82,7 @@ export const SuppressionAuthorizationSection = ({
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
-
+  const [sent, setSent] = useState(false);
   const { data: suppressionTypes } = useGetSuppressionTypes();
   const { data: issuingBodies } = useGetIssuingBodies();
   const { mutateAsync: createSuppressionAuthorization, isPending } =
@@ -98,7 +98,7 @@ export const SuppressionAuthorizationSection = ({
 
   const [justification, setJustification] = useState<string>("");
 
-  if (disabled) {
+  if (sent ||disabled) {
     return (
       <div className="bg-white border border-[#CAC4D0] shadow">
         <div className="bg-[#1A6415] text-white p-4">
@@ -247,6 +247,7 @@ export const SuppressionAuthorizationSection = ({
             setUploadedFiles([]);
             setDocuments(INITIAL_DOCUMENTS);
             setJustification("");
+            setSent(true);
           },
           onError: (error) => {
             console.error("Erro ao enviar contestação:", error);
