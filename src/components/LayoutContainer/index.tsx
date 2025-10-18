@@ -6,7 +6,7 @@ import { FiLogOut } from "react-icons/fi";
 import {
   PiFarmLight,
   PiSealCheckLight,
-  PiCowboyHatLight,
+  //PiCowboyHatLight,
 } from "react-icons/pi";
 import { RiMenuUnfoldLine } from "react-icons/ri";
 
@@ -51,11 +51,12 @@ export const LayoutContainer = ({
       href: "/propriedade",
       icon: <PiFarmLight size={44} />,
     },
-    {
+    /*{
       label: "Proprietários",
       href: "/owners",
       icon: <PiCowboyHatLight size={44} />,
     },
+    */
     {
       label: "Elegibilidade",
       href: "/",
@@ -101,6 +102,7 @@ export const LayoutContainer = ({
                 key={item.href}
                 href={item.href}
                 className={activePathClass(item.href)}
+                target={item.label === "Elegibilidade" ? "_blank" : undefined}
               >
                 {item.icon}
                 {isOpen && <span>{item.label}</span>}
