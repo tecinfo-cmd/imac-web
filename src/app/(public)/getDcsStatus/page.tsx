@@ -27,8 +27,8 @@ function GetDcsStatusContent() {
   });
 
   const handleViewDCS = () => {
-       const primeiraUrl = farmData?.documentos?.[0]?.urlArquivo;
-
+    const primeiraUrl =
+      farmData?.documentos?.find((doc) => doc.tipo === "DCS")?.urlArquivo || "";
 
     if (primeiraUrl) {
       setPdfUrl(primeiraUrl);
@@ -42,6 +42,12 @@ function GetDcsStatusContent() {
     setShowPdfViewer(false);
     setPdfUrl("");
   };
+
+  function maskCpf(cpf: string) {
+    const digits = cpf.replace(/\D/g, "");
+    if (digits.length !== 11) return cpf;
+    return `${digits.slice(0, 3)}.***.***-${digits.slice(9, 11)}`;
+  }
 
   useEffect(() => {
     const agora = new Date();
@@ -98,7 +104,7 @@ function GetDcsStatusContent() {
           </Table.Header>
           <Table.Body>
             <Table.Row>
-              <Table.Cell>{data.cpfCnpj}</Table.Cell>
+              <Table.Cell>{maskCpf(data.cpfCnpj)}</Table.Cell>
               <Table.Cell>{data.dataAdesaoPrem}</Table.Cell>
               <Table.Cell>{data.id}</Table.Cell>
             </Table.Row>
