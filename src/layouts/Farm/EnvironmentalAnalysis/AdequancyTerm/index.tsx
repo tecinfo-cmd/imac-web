@@ -13,7 +13,7 @@ interface AdequancyTermProps {
 }
 
 export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
-  const { data: farm } = useGetFarmById(farmId);
+  const { data: farm, refetch } = useGetFarmById(farmId);
   const imagemBase64 = farm?.territorios?.[0]?.imagemAdequacao;
 
   const status = farm?.status === "Enviado" || farm?.status === "Assinado";
@@ -22,9 +22,12 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
     null
   );
 
+  const termoCompromissoAssinado = farm?.urlTermoCompromisso;
+
   const adequancyTermMutation = useAdequancyTerm({
     onSuccess: () => {
       toast.success("Termo de adequação aceito com sucesso!");
+      refetch();
     },
     onError: (error: any) => {
       toast.error("Erro ao aceitar o termo de adequação");
@@ -42,7 +45,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
       adequancyTermMutation.mutate({ id: farmId });
     }
   };
-
+ console.log("Farm data:", farm);
   return (
     <>
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
@@ -306,7 +309,16 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                   </TableInformation.Column>
                 </TableInformation.Row>
               </TableInformation>
-              <div className="flex justify-end mt-4">
+              <div className="flex justify-end mt-4 gap-4">
+                {termoCompromissoAssinado !== null && (
+                  <Button
+                    onClick={() => {
+                      window.open(termoCompromissoAssinado, "_blank");
+                    }}
+                  >
+                    Baixar Termo de Compromisso
+                  </Button>
+                )}
                 <Button
                   variant="green"
                   onClick={handleAcceptTerm}
@@ -316,6 +328,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                     ? "Processando..."
                     : "Declaro que estou de acordo"}
                 </Button>
+                
               </div>
             </>
           )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
@@ -8,7 +9,7 @@ import { InfoGrid } from "@/components/InfoGrid";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
 
-import { useGetFine } from "@/hooks/useFine/useFine";
+import { useGetFine, useImprimirBoleto } from "@/hooks/useFine/useFine";
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
@@ -49,12 +50,15 @@ const customMenuItems = [
 ];
 
 export const FinesLayout = () => {
+  const [pdfData, setPdfData] = useState<string | null>(null);
+
   const router = useRouter();
   const params = useParams();
   const propriedadeId = params?.id as string;
   const { data } = useObjectionData();
   const { data: fineResponse, isLoading: isLoadingFines } =
     useGetFine(propriedadeId);
+  const imprimirBoletoMutation = useImprimirBoleto();
 
   if (!data) return <p> Dados não encontrados</p>;
 
@@ -79,6 +83,22 @@ export const FinesLayout = () => {
   };
   const formatCurrency = (value: number) => {
     return `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+  };
+
+  const handleImprimirBoleto = async (linhaDigitavel: string) => {
+    try {
+      const result = await imprimirBoletoMutation.mutateAsync(linhaDigitavel);
+      if (result?.pdf) {
+        setPdfData(result.pdf);
+      } else {
+        alert("Não foi possível obter o PDF do boleto.");
+      }
+
+      console.log("Boleto carregado com sucesso");
+    } catch (error) {
+      console.error("Erro ao imprimir boleto:", error);
+      alert("Erro ao carregar o boleto. Tente novamente.");
+    }
   };
 
   if (isLoadingFines) {
@@ -186,7 +206,7 @@ export const FinesLayout = () => {
                 <Table.Cell>
                   <button
                     onClick={() => {
-                      console.log("Imprimir boleto:", boleto.linhaDigitavel);
+                      handleImprimirBoleto(boleto.linhaDigitavel);
                     }}
                     className="hover:opacity-70 transition-opacity"
                   >
@@ -207,6 +227,29 @@ export const FinesLayout = () => {
           )}
         </Table.Body>
       </Table.Container>
+      {pdfData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full h-full max-w-6xl max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="text-lg font-semibold">Visualizar/Imprimir Boleto</h3>
+              <button
+                onClick={() => setPdfData(null)}
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              >
+               Fechar
+              </button>
+            </div>
+            <div className="flex-1 p-4">
+              <iframe
+                width="100%"
+                height="100%"
+                src={`data:application/pdf;base64,${pdfData}`}
+                className="border-0 rounded"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </LayoutContainer>
   );
 };
