@@ -194,6 +194,7 @@ export interface Farm {
   moduloFiscal: number;
   etapa: string;
   status: string;
+  urlTermoCompromisso: string | null;
   documentos: Documento[];
   territorios: Territorio[];
   retornoAnalises: Analise[];

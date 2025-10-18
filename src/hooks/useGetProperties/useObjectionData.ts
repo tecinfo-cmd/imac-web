@@ -49,7 +49,7 @@ interface PlanoAdequacao {
 }
 
 interface RetornoAnalise {
-   id: number;
+  id: number;
   urlRelatorio: string;
   idPropriedade: number;
   areaDesmatadaTotal: number;
@@ -58,7 +58,6 @@ interface RetornoAnalise {
   valorMulta: number;
   descontoPercentual: number;
 }
-
 
 interface ObjectionData {
   tecnico: {
@@ -117,6 +116,7 @@ interface SubmitObjectionProps {
   }[];
   parametros: { nome: string; tipo: string }[];
   descontoPercentual?: number;
+  valorMulta?: number | string;
   idAnalise?: number;
 }
 
@@ -285,6 +285,17 @@ export const useObjectionData = () => {
           "descontoPercentual",
           String(payload.descontoPercentual)
         );
+      }
+
+      if (payload.valorMulta !== undefined) {
+        const valorMultaNumber =
+          typeof payload.valorMulta === "string"
+            ? parseFloat(payload.valorMulta)
+            : payload.valorMulta;
+
+        if (!isNaN(valorMultaNumber)) {
+          formData.append("valorMulta", String(valorMultaNumber));
+        }
       }
 
       const parametrosArray: { nome: string; tipo: string }[] = [];
