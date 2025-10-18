@@ -22,17 +22,15 @@ import { Eye } from "@/icons/Eye";
 //import { Taxa } from "@/icons/Taxa";
 
 export const PropertySummaryLayout = () => {
-  const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
+  const [selectedDocs, setSelectedDocs] = useState<number[]>([]);
   const { data, isLoading, error } = usePropertySummary();
   const params = useParams();
   const router = useRouter();
   const propriedadeId = params?.id as string;
 
-  const handleCheckboxChange = (docName: string) => {
+  const handleCheckboxChange = (index: number) => {
     setSelectedDocs((prev) =>
-      prev.includes(docName)
-        ? prev.filter((name) => name !== docName)
-        : [...prev, docName]
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
 
@@ -42,8 +40,8 @@ export const PropertySummaryLayout = () => {
       return;
     }
 
-    const docsToOpen = data?.documentos.filter((d) =>
-      selectedDocs.includes(d.descricao)
+    const docsToOpen = data?.documentos.filter((_, idx) =>
+      selectedDocs.includes(idx)
     );
 
     docsToOpen?.forEach((doc) => {
@@ -268,10 +266,8 @@ export const PropertySummaryLayout = () => {
                       <Table.Cell>
                         <label className="flex items-center gap-2">
                           <CheckboxComponent
-                            checked={selectedDocs.includes(doc.descricao)}
-                            onCheckedChange={() =>
-                              handleCheckboxChange(doc.descricao)
-                            }
+                            checked={selectedDocs.includes(index)}
+                            onCheckedChange={() => handleCheckboxChange(index)}
                           />
                           {doc.descricao}
                         </label>
