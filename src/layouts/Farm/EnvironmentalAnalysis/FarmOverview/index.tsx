@@ -106,6 +106,14 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
     }
   };
 
+  const formatDateFromISO = (isoDateStr: string) => {
+    if (!isoDateStr) return "";
+    const datePart = isoDateStr.split("T")[0]; // Pega só a data
+
+    const [year, month, day] = datePart.split("-");
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div className="max-w-6xl mx-auto my-8">
       <TableInformation>
@@ -265,7 +273,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
                 Data de Nascimento
               </TableInformation.Title>
               <TableInformation.Value>
-                {owner?.pessoa.dataNascimento}
+                {formatDateFromISO(owner?.pessoa.dataNascimento || "")}
               </TableInformation.Value>
             </TableInformation.Column>
             <TableInformation.Column>
