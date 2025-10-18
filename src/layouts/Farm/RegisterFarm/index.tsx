@@ -60,6 +60,7 @@ export const RegisterFarmLayout = () => {
 
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploadingDocuments, setIsUploadingDocuments] = useState(false);
 
   const isCadastro = !farm?.endereco?.cep;
   const shouldShowForm = isCadastro || isEditing;
@@ -176,6 +177,8 @@ export const RegisterFarmLayout = () => {
   };
 
   const handleUploadDocuments = async () => {
+    setIsUploadingDocuments(true);
+
     const files = documents
       .filter((doc) => doc.checked && doc.file)
       .map((doc) => doc.file) as File[];
@@ -212,6 +215,8 @@ export const RegisterFarmLayout = () => {
     } catch (error) {
       toast.error("Erro ao enviar documentos!");
       console.error("Erro ao enviar documentos:", error);
+    } finally {
+      setIsUploadingDocuments(false);
     }
   };
 
@@ -533,11 +538,15 @@ export const RegisterFarmLayout = () => {
             ))}
           </Table.Body>
         </Table.Container>
-          <div className="mt-4 flex justify-end">
-            <Button variant="dark" disabled={farm?.documentos.length === 3} onClick={handleUploadDocuments}>
-              Enviar documentação
-            </Button>
-          </div>
+        <div className="mt-4 flex justify-end">
+          <Button
+            variant="dark"
+            disabled={isUploadingDocuments}
+            onClick={handleUploadDocuments}
+          >
+            {isUploadingDocuments ? "Enviando..." : "Enviar documentação"}
+          </Button>
+        </div>
       </div>
     </LayoutContainer>
   );
