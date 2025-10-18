@@ -411,7 +411,7 @@ export const SelfInspectionLayout = () => {
                 onDrop={handleDrop}
               >
                 <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
-                  Faça o upload do parecer da analise do Plano de Adequação
+                  Faça o upload  do parecer da analise da autovistoria
                 </div>
 
                 <input
