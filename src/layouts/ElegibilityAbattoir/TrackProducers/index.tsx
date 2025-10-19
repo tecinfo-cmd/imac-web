@@ -99,9 +99,9 @@ export const TrackProducersLayout = () => {
                         className="w-2 h-2 rounded-full"
                         style={{
                           backgroundColor:
-                            voucher.status === "ATIVADO"
+                            voucher.status === "ATIVO"
                               ? "#21801A"
-                              : voucher.status === "EXPIRADO"
+                              : voucher.status === "INATIVO"
                               ? "#F44336"
                               : "#F3BF45",
                         }}
@@ -109,17 +109,17 @@ export const TrackProducersLayout = () => {
                       <span
                         style={{
                           color:
-                            voucher.status === "ATIVADO"
+                            voucher.status === "ATIVO"
                               ? "#21801A"
-                              : voucher.status === "EXPIRADO"
+                              : voucher.status === "INATIVO"
                               ? "#F44336"
                               : "#F3BF45",
                         }}
                       >
-                        {voucher.status === "ATIVADO"
+                        {voucher.status === "ATIVO"
                           ? "Ativado"
-                          : voucher.status === "EXPIRADO"
-                          ? "Expirado"
+                          : voucher.status === "INATIVO"
+                          ? "Inativo"
                           : "Pendente"}
                       </span>
                     </div>
