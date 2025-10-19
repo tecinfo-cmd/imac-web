@@ -48,6 +48,14 @@ export const UpdateOwnerForm = ({
     (owner) => owner.id === idProprietario
   );
 
+  const formatDateToISO = (dateStr: string) => {
+    const [day, month, year] = dateStr.split("/");
+    if (!day || !month || !year) return dateStr;
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  }; 
+ 
+  
+
   useEffect(() => {
     if (owner) {
       reset({
@@ -67,6 +75,7 @@ export const UpdateOwnerForm = ({
     const payload = [
       {
         ...ownerData,
+        dataNascimento: formatDateToISO(ownerData.dataNascimento),
         idProprietario: owner?.id,
         tipoProprietario: "PROPRIETARIO",
       },
