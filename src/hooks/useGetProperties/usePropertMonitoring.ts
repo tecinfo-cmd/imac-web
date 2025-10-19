@@ -28,6 +28,11 @@ interface PropriedadeResponse {
   voucher: string;
   etapa: string;
   status: string;
+  retornoAnalises?: {
+    contestacaoLaudo?: any; // Tipar corretamente se souber a estrutura
+    contestacaoAutorizacaoSupressao?: any;
+    planoAdequacao?: any;
+  }[];
 }
 
 export const usePropertyMonitoring = (id?: string | number) => {
