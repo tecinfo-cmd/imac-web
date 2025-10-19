@@ -13,6 +13,7 @@ import { RiMenuUnfoldLine } from "react-icons/ri";
 import { useAuthContext } from "@/context";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
 
 interface MenuItem {
   label: string;
@@ -35,6 +36,7 @@ export const LayoutContainer = ({
 }: HeaderProps) => {
   const { signOut } = useAuthContext();
   const { userData } = useAuthStore();
+  const { role } = useUserRoleStore();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -97,17 +99,22 @@ export const LayoutContainer = ({
               <RiMenuUnfoldLine size={44} /> {isOpen && <span>Menu</span>}
             </button>
 
-            {itemsToRender.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={activePathClass(item.href)}
-                target={item.label === "Elegibilidade" ? "_blank" : undefined}
-              >
-                {item.icon}
-                {isOpen && <span>{item.label}</span>}
-              </Link>
-            ))}
+            {itemsToRender.map((item) => {
+              const isElegibilidade = item.label === "Elegibilidade";
+              const isProdutor = role === "PRODUTOR";
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={activePathClass(item.href)}
+                  target={isElegibilidade && isProdutor ? "_blank" : undefined}
+                >
+                  {item.icon}
+                  {isOpen && <span>{item.label}</span>}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </aside>
