@@ -133,8 +133,11 @@ export const SelfInspectionLayout = () => {
   };
 
   const formatDateFromISO = (isoDateStr: string) => {
-    const date = new Date(isoDateStr);
-    return date.toLocaleDateString("pt-BR");
+    if (!isoDateStr) return "";
+  const datePart = isoDateStr.split("T")[0]; // Pega só a data
+
+    const [year, month, day] = datePart.split("-");
+  return `${day}/${month}/${year}`;
   };
 
   const handleViewDCS = () => {

@@ -185,13 +185,6 @@ export const ReportContestationSection = ({
             </div>
 
             <div className="mt-8">
-              <h3 className="text-[#21801A] font-medium mb-4">
-                Anotação de responsabilidade técnica
-              </h3>
-              <p className="text-[#0A3503] mb-4">
-                Anexe Recibo do CAR da propriedade e Comprovante de pagamento de
-                taxa.
-              </p>
               <DocumentTable
                 documents={documents}
                 onCheckboxChange={handleToggleDocument}

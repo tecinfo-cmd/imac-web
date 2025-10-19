@@ -1,8 +1,8 @@
 "use client";
 
-import { DashboardLayout } from "@/layouts/Dashboard";
 import { DashboardUserLayout } from "@/layouts/DashboardUser";
 import { ElegibilityAbattoirLayout } from "@/layouts/ElegibilityAbattoir";
+import { FarmLayout } from "@/layouts/Farm";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 
@@ -11,7 +11,7 @@ export default function Dashboard() {
   const userData = useAuthStore((s) => s.userData);
   const cargo = userData?.cargo;
   if (role === "PRODUTOR") {
-    return <DashboardLayout />;
+    return <FarmLayout />;
   }
 
   if (role === "ADMINISTRATIVO" || role === "ANALISTA") {

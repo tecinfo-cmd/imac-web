@@ -1,9 +1,11 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GoAlertFill } from "react-icons/go";
+import { MdOutlineMarkEmailRead } from "react-icons/md";
 
 import { TableInformation } from "@/components/TableInformation";
 import { Button } from "@/components/ui/button";
+import EmailModal from "@/components/ui/modals/emailModal";
 
 import { useAdequancyTerm } from "@/hooks/useAdequancyTerm/useAdequancyTerm";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
@@ -21,12 +23,19 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
   const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
     null
   );
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (farm?.status === "Enviado" || farm?.status === "Assinado") {
+      setProposeNewArea("yes");
+    }
+  }, [farm?.status]);
 
   const termoCompromissoAssinado = farm?.urlTermoCompromisso;
 
   const adequancyTermMutation = useAdequancyTerm({
     onSuccess: () => {
-      toast.success("Termo de adequação aceito com sucesso!");
+      setIsSuccessModalOpen(true);
       refetch();
     },
     onError: (error: any) => {
@@ -45,9 +54,26 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
       adequancyTermMutation.mutate({ id: farmId });
     }
   };
- console.log("Farm data:", farm);
+  console.log("Farm data:", farm);
+
   return (
     <>
+      <EmailModal
+        isOpen={isSuccessModalOpen}
+        onOpenChange={setIsSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+      >
+        <div className="flex justify-center items-center w-full h-full">
+          <div className="w-[90%] max-w-[300px] h-auto max-h-[90%] flex flex-col justify-center items-center">
+            <MdOutlineMarkEmailRead className="text-red-400 w-8 h-8 sm:w-9 sm:h-9 mb-2" />
+            <h2 className="sm:text-lg text-red-400 font-bold mb-2">Atenção</h2>
+            <p className="sm:text-sm text-center">
+              O termo de compromisso será enviado ao seu email para assinatura.
+            </p>
+          </div>
+        </div>
+      </EmailModal>
+
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
         <GoAlertFill size={35} color="#F12929" />
         <p className="text-[#0A3503]">
@@ -97,36 +123,36 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
           </div>
         </div>
       </div>
-
-      <TableInformation>
-        <TableInformation.Section title="Deseja solicitar o Plano de Adequação?">
-          <TableInformation.Row columnsPerRow={2}>
-            <TableInformation.Column>
-              <TableInformation.Value>
-                <input
-                  type="checkbox"
-                  id="propose-yes"
-                  name="proposeNewArea"
-                  value="yes"
-                  checked={proposeNewArea === "yes"}
-                  onChange={() => handleProposeNewAreaChange("yes")}
-                  className="accent-[#21801A]"
-                />
-                <label htmlFor="propose-yes" className="ml-2 cursor-pointer">
-                  Sim
-                </label>
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-      </TableInformation>
-
+      {!status && (
+        <TableInformation>
+          <TableInformation.Section title="Deseja solicitar o Plano de Adequação?">
+            <TableInformation.Row columnsPerRow={2}>
+              <TableInformation.Column>
+                <TableInformation.Value>
+                  <input
+                    type="checkbox"
+                    id="propose-yes"
+                    name="proposeNewArea"
+                    value="yes"
+                    checked={proposeNewArea === "yes"}
+                    onChange={() => handleProposeNewAreaChange("yes")}
+                    className="accent-[#21801A]"
+                  />
+                  <label htmlFor="propose-yes" className="ml-2 cursor-pointer">
+                    Sim
+                  </label>
+                </TableInformation.Value>
+              </TableInformation.Column>
+            </TableInformation.Row>
+          </TableInformation.Section>
+        </TableInformation>
+      )}
       <TableInformation>
         <TableInformation.Section
           title="Plano de Adequação"
           showArrow
           disabled={proposeNewArea !== "yes"}
-          defaultOpen={false}
+          defaultOpen={status}
         >
           {proposeNewArea === "yes" && (
             <>
@@ -328,7 +354,6 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                     ? "Processando..."
                     : "Declaro que estou de acordo"}
                 </Button>
-                
               </div>
             </>
           )}

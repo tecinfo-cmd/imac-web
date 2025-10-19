@@ -1,5 +1,5 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { JSX, useState } from "react";
 import {
   FaFileAlt,
@@ -30,7 +30,6 @@ import { SuitabilityPlan } from "./SuitabilityPlan";
 
 export const EnvironmentalAnalysisLayout = () => {
   const params = useParams();
-  const router = useRouter();
   const farmId = Number(params.id);
 
   const { data: farm } = useGetFarmById(farmId);
@@ -122,7 +121,7 @@ export const EnvironmentalAnalysisLayout = () => {
         carFederal: farm.carFederal,
         idPropriedade: farm.id.toString(),
       });
-      router.push(`/getDcsStatus?${queryParams.toString()}`);
+      window.open(`/getDcsStatus?${queryParams.toString()}`, "_blank");
     }
   };
 

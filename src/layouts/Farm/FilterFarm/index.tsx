@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { FiPlus } from "react-icons/fi";
 import { IoSearchSharp } from "react-icons/io5";
 
 import { Input } from "@/components/Input";
@@ -81,9 +80,6 @@ export const FilterFarm = () => {
           onClick={clearFilter}
         >
           Limpar
-        </Button>
-        <Button type="button" variant="dark" className="mt-4">
-          <FiPlus size={20} /> Novo
         </Button>
       </div>
     </form>
