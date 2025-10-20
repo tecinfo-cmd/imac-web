@@ -35,7 +35,7 @@ export const EnvironmentalAnalysisLayout = () => {
   const { data: farm } = useGetFarmById(farmId);
 
   const menuItems: MenuItem[] = [
-    { label: "Resumo da Propriedade", icon: FaFileAlt, key: "overview" },
+    { label: "Resumo da Propriedade", icon: FaFileAlt, key: "overview", disabled: !farm?.endereco },
     // {
     //   label: "Documentos da Propriedade",
     //   icon: FaFileContract,
