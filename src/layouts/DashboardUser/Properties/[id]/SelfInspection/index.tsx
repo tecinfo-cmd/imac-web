@@ -98,7 +98,7 @@ export const SelfInspectionLayout = () => {
   const { data } = useObjectionData();
   const createSelfInspection = useCreateSelfInspection();
 
-  const { data: selfInspectionsData } = useGetSelfInspections(
+  const { data: selfInspectionsData, refetch: refetch } = useGetSelfInspections(
     Number(propriedadeId)
   );
 
@@ -232,6 +232,7 @@ export const SelfInspectionLayout = () => {
             setIsModalOpen(false);
           }, 5000);
           toast.success("Agendamento realizado com sucesso!");
+          refetch();
         },
         onError: (error: any) => {
           console.log(error);

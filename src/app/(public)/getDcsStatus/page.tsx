@@ -9,6 +9,7 @@ import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { usePremCompliance } from "@/hooks/useTrackProducers/useTrackProducers";
 import { Imac } from "@/icons/Imac";
 import { LogoSideName } from "@/icons/LogoSideName";
+import { toast } from "sonner";
 
 function GetDcsStatusContent() {
   const searchParams = useSearchParams();
@@ -34,7 +35,7 @@ function GetDcsStatusContent() {
       setPdfUrl(primeiraUrl);
       setShowPdfViewer(true);
     } else {
-      alert("Nenhum documento encontrado");
+      toast.error("Nenhum documento encontrado, por favor assine o termo de adequação e compromisso.");
     }
   };
 

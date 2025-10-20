@@ -14,6 +14,7 @@ import { InfoGrid } from "@/components/InfoGrid";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Card } from "@/components/ui/card";
 
+import { useGetFine } from "@/hooks/useFine/useFine";
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
 import { usePropertySummary } from "@/hooks/useGetProperties/usePropertySummary";
 import { Abattoir } from "@/icons/Abattoir";
@@ -26,68 +27,6 @@ import { SelfInspection } from "@/icons/SelfInspection";
 import { toast } from "sonner";
 //import { Taxa } from "@/icons/Taxa";
 
-const cards = [
-  {
-    label: "Resumo da Propriedade",
-    icon: <PiFarmLight size={36} />,
-    active: false,
-    path: (id: string) => `/dashboard/properties/${id}/summary`,
-  },
-  {
-    label: "Documentos da Propriedade",
-    icon: <DocPropertie size={36} />,
-    active: false,
-    disabled: true,
-  },
-  {
-    label: "Contestação",
-    icon: <DocPropertie size={36} />,
-    active: false,
-    path: (id: string) => `/dashboard/properties/${id}/objection`,
-  },
-  {
-    label: "Plano de Adequação",
-    icon: <DocPropertie size={36} />,
-    active: false,
-    path: (id: string) => `/dashboard/properties/${id}/adaptationPlan`,
-  },
-  {
-    label: "Análise Socioambiental",
-    icon: <Analityc size={36} />,
-    active: false,
-  },
-  {
-    label: "Termo de Adequação",
-    icon: <AdjustmentTerm size={36} />,
-    active: false,
-    path: (id: string) => `/dashboard/properties/${id}/adjustmentTerm`,
-  },
-  {
-    label: "Multas",
-    icon: <FineTracking size={36} />,
-    active: false,
-    path: (id: string) => `/dashboard/properties/${id}/fines`,
-  },
-  {
-    label: "Autovistoria",
-    icon: <SelfInspection size={36} />,
-    active: false,
-    path: (id: string) => `/dashboard/properties/${id}/selfInspection`,
-  },
-  {
-    label: "Autorização de Comercialização",
-    icon: <SalesPermit size={36} />,
-    active: false,
-    path: (id: string) => `/getDcsStatus?carFederal=&idPropriedade=${id}`,
-  },
-  {
-    label: "Revisão de Car",
-    icon: <SalesPermit size={36} />,
-    active: false,
-    disabled: true,
-  },
-];
-
 export const MonitoringLayout = () => {
   const router = useRouter();
   const params = useParams();
@@ -96,7 +35,90 @@ export const MonitoringLayout = () => {
 
   const { data: propriedade, isLoading } = usePropertyMonitoring(propriedadeId);
   const { data: summary } = usePropertySummary();
+  const { data: fines } = useGetFine(propriedadeId);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  const contestacao = propriedade?.retornoAnalises?.[0]?.contestacaoLaudo;
+  const contestacaoAutorizacaoSupressao =
+    propriedade?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao;
+  const retorno = propriedade?.retornoAnalises;
+  const Adequacao = propriedade?.retornoAnalises?.[0]?.planoAdequacao;
+  const status =
+    propriedade?.status === "Enviado" || propriedade?.status === "Assinado";
+  const multas = fines;
+
+  const isEmpty = (obj: any) =>
+    !obj ||
+    (Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0);
+
+  const cards = [
+    {
+      label: "Resumo da Propriedade",
+      icon: <PiFarmLight size={36} />,
+      active: false,
+      path: (id: string) => `/dashboard/properties/${id}/summary`,
+    },
+    {
+      label: "Análise Socioambiental",
+      icon: <Analityc size={36} />,
+      active: false,
+      disabled: isEmpty(retorno),
+    },
+    {
+      label: "Contestação",
+      icon: <DocPropertie size={36} />,
+      active: false,
+      path: (id: string) => `/dashboard/properties/${id}/objection`,
+      disabled:
+        isEmpty(contestacao) && isEmpty(contestacaoAutorizacaoSupressao),
+    },
+    {
+      label: "Plano de Adequação",
+      icon: <DocPropertie size={36} />,
+      active: false,
+      path: (id: string) => `/dashboard/properties/${id}/adaptationPlan`,
+      disabled: isEmpty(Adequacao),
+    },
+    {
+      label: "Termo de Adequação",
+      icon: <AdjustmentTerm size={36} />,
+      active: false,
+      path: (id: string) => `/dashboard/properties/${id}/adjustmentTerm`,
+      disabled: !status,
+    },
+    {
+      label: "Multas",
+      icon: <FineTracking size={36} />,
+      active: false,
+      path: (id: string) => `/dashboard/properties/${id}/fines`,
+      disabled: isEmpty(multas),
+    },
+    {
+      label: "Autovistoria",
+      icon: <SelfInspection size={36} />,
+      active: false,
+      path: (id: string) => `/dashboard/properties/${id}/selfInspection`,
+      disabled: !status,
+    },
+    {
+      label: "Autorização de Comercialização",
+      icon: <SalesPermit size={36} />,
+      active: false,
+      path: (id: string) => `/getDcsStatus?carFederal=&idPropriedade=${id}`,
+    },
+    {
+      label: "Revisão de Car",
+      icon: <SalesPermit size={36} />,
+      active: false,
+      disabled: true,
+    },
+    {
+      label: "Documentos da Propriedade",
+      icon: <DocPropertie size={36} />,
+      active: false,
+      disabled: true,
+    },
+  ];
 
   const customMenuItems = [
     {
