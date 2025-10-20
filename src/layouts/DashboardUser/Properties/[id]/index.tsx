@@ -14,6 +14,7 @@ import { InfoGrid } from "@/components/InfoGrid";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Card } from "@/components/ui/card";
 
+import { useGetFine } from "@/hooks/useFine/useFine";
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
 import { usePropertySummary } from "@/hooks/useGetProperties/usePropertySummary";
 import { Abattoir } from "@/icons/Abattoir";
@@ -34,6 +35,7 @@ export const MonitoringLayout = () => {
 
   const { data: propriedade, isLoading } = usePropertyMonitoring(propriedadeId);
   const { data: summary } = usePropertySummary();
+  const { data: fines } = useGetFine(propriedadeId);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const contestacao = propriedade?.retornoAnalises?.[0]?.contestacaoLaudo;
@@ -41,9 +43,13 @@ export const MonitoringLayout = () => {
     propriedade?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao;
   const retorno = propriedade?.retornoAnalises;
   const Adequacao = propriedade?.retornoAnalises?.[0]?.planoAdequacao;
-  const status = propriedade?.status === "Enviado" || propriedade?.status === "Assinado";
+  const status =
+    propriedade?.status === "Enviado" || propriedade?.status === "Assinado";
+  const multas = fines;
 
-  const isEmpty = (obj: any) => !obj || Object.keys(obj).length === 0;
+  const isEmpty = (obj: any) =>
+    !obj ||
+    (Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0);
 
   const cards = [
     {
@@ -85,12 +91,14 @@ export const MonitoringLayout = () => {
       icon: <FineTracking size={36} />,
       active: false,
       path: (id: string) => `/dashboard/properties/${id}/fines`,
+      disabled: isEmpty(multas),
     },
     {
       label: "Autovistoria",
       icon: <SelfInspection size={36} />,
       active: false,
       path: (id: string) => `/dashboard/properties/${id}/selfInspection`,
+      disabled: !status,
     },
     {
       label: "Autorização de Comercialização",
