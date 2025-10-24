@@ -3,8 +3,10 @@
 import { useParams, useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FiUpload } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
+import { IoTrashSharp } from "react-icons/io5";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -23,10 +25,8 @@ import { CheckboxComponent } from "@/components/ui/checkbox";
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
 //import { Taxa } from "@/icons/Taxa";
-import { X } from "@/icons/X";
 import { toast } from "sonner";
 
 type Parecer =
@@ -50,6 +50,7 @@ export const PlanoAdequacaoLayout = () => {
 
   const [selectedDocsIds, setSelectedDocsIds] = useState<number[]>([]);
   const [openSection, setOpenSection] = useState({ tecnico: true });
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const {
     data,
@@ -68,6 +69,23 @@ export const PlanoAdequacaoLayout = () => {
       wkt: "",
     },
   });
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type === "application/pdf") {
+      setValue("parecerTecnicoFile", file, { shouldValidate: true });
+    }
+  };
 
   const PARECER_LABEL = "Parecer Técnico da Contestação";
 
@@ -518,52 +536,62 @@ export const PlanoAdequacaoLayout = () => {
           <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
             Faça o upload do parecer da analise do Plano de Adequação?
           </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={onFileChange}
-          />
+          <section
+            className={`${isDragOver ? "border-blue-400 bg-blue-50" : ""}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={onFileChange}
+            />
+            <Table.Container className="!pt-0">
+              <Table.Header>
+                <Table.Title colspan={3}>Descrição do documento</Table.Title>
+              </Table.Header>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      <span>{PARECER_LABEL}</span>
+                      {selectedFile && (
+                        <span className="text-xs text-gray-600 italic">
+                          ({selectedFile.name})
+                        </span>
+                      )}
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={openFilePicker}
+                        className="inline-flex items-center gap-2 hover:underline"
+                        title="Selecionar arquivo (PDF)"
+                      >
+                        <FiUpload />
+                      </button>
+                      {/* Limpar */}
+                      <button
+                        type="button"
+                        onClick={clearFile}
+                        className="inline-flex items-center gap-2 hover:underline disabled:opacity-50"
+                        title="Remover arquivo"
+                        disabled={!selectedFile}
+                      >
+                        <IoTrashSharp className="text-red-500" />
+                      </button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table.Container>
+          </section>
           <Table.Container className="!pt-0">
-            <Table.Header>
-              <Table.Title colspan={3}>Descrição do documento</Table.Title>
-            </Table.Header>
             <Table.Body>
-              <Table.Row>
-                <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    <span>{PARECER_LABEL}</span>
-                    {selectedFile && (
-                      <span className="text-xs text-gray-600 italic">
-                        ({selectedFile.name})
-                      </span>
-                    )}
-                  </div>
-                </Table.Cell>
-                <Table.Cell>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={openFilePicker}
-                      className="inline-flex items-center gap-2 hover:underline"
-                      title="Selecionar arquivo (PDF)"
-                    >
-                      <DownloadIcon />
-                    </button>
-                    {/* Limpar */}
-                    <button
-                      type="button"
-                      onClick={clearFile}
-                      className="inline-flex items-center gap-2 hover:underline disabled:opacity-50"
-                      title="Remover arquivo"
-                      disabled={!selectedFile}
-                    >
-                      <X />
-                    </button>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
               <Table.Row>
                 <Table.Cell>
                   <Input

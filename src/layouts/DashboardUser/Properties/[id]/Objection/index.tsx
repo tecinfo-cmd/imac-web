@@ -3,8 +3,10 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { useForm, useWatch, Controller } from "react-hook-form";
+import { FiUpload } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
+import { IoTrashSharp } from "react-icons/io5";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -24,9 +26,7 @@ import { CheckboxComponent } from "@/components/ui/checkbox";
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
-import { X } from "@/icons/X";
 import { toast } from "sonner";
 
 type SelectOption = { label: string; value: string } | string | undefined;
@@ -59,6 +59,8 @@ export const ObjectionLayout = () => {
   const params = useParams();
   const router = useRouter();
   const propriedadeId = params?.id as string;
+
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const { control, handleSubmit, reset, register, setValue, watch } =
     useForm<FormValues>({
@@ -232,6 +234,27 @@ export const ObjectionLayout = () => {
       { label: "Status", value: farmData.status },
     ],
   ];
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type === "application/pdf") {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      setValue("parecerTecnico.pdf", dataTransfer.files, {
+        shouldValidate: true,
+      });
+    }
+  };
 
   const toggleAllSupressaoDocs = () => {
     if (selectedSupressaoDocsIds.length === documentosSupressao.length) {
@@ -465,14 +488,12 @@ export const ObjectionLayout = () => {
 
       const valorBruto = toNum(areaHaValue) * 250;
       const desconto: any = formData.descontoPercentual;
-  
 
       const payload: any = {
         status: formData.status,
         parametros,
         descontoPercentual: desconto.value,
-        valorMulta: valorBruto
-
+        valorMulta: valorBruto,
       };
       if (arquivosOut.length) payload.deteccoes = arquivosOut;
       if (poligonosOut.length) payload.poligonos = poligonosOut;
@@ -838,75 +859,81 @@ export const ObjectionLayout = () => {
           <div className="bg-[#21801A] text-white px-4 py-2 font-semibold">
             Faça o upload do parecer da análise da contestação
           </div>
-          <Table.Container className="!pt-0 w-full">
-            <Table.Header>
-              <Table.Title>Descrição do documento</Table.Title>
-              <Table.Title>Arquivo selecionado</Table.Title>
-              <Table.Title>Ações</Table.Title>
-            </Table.Header>
-            <Table.Body>
-              <Table.Row>
-                <Table.Cell>
-                  <div className="flex items-center gap-2">
-                    <CheckboxComponent checked={hasParecer} disabled />
-                    <span>Parecer Técnico da Contestação</span>
-                  </div>
-                </Table.Cell>
-                <Table.Cell>
-                  <span className="truncate block max-w-xs">
-                    {parecerNome || "-"}
-                  </span>
-                </Table.Cell>
-                <Table.Cell>
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    id="parecer-tecnico-input"
-                    className="hidden"
-                    {...register("parecerTecnico.pdf" as const)}
-                  />
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        document
-                          .getElementById("parecer-tecnico-input")
-                          ?.click()
-                      }
-                      className="p-1 hover:scale-110 transition-transform"
-                      title="Selecionar PDF"
-                    >
-                      <DownloadIcon />
-                    </button>
+          <section
+            className={`${isDragOver ? "border-blue-400 bg-blue-50" : ""}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <Table.Container className="!pt-0 w-full">
+              <Table.Header>
+                <Table.Title>Descrição do documento</Table.Title>
+                <Table.Title>Arquivo selecionado</Table.Title>
+                <Table.Title>Ações</Table.Title>
+              </Table.Header>
+              <Table.Body>
+                <Table.Row>
+                  <Table.Cell>
+                    <div className="flex items-center gap-2">
+                      <CheckboxComponent checked={hasParecer} disabled />
+                      <span>Parecer Técnico da Contestação</span>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <span className="truncate block max-w-xs">
+                      {parecerNome || "-"}
+                    </span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      id="parecer-tecnico-input"
+                      className="hidden"
+                      {...register("parecerTecnico.pdf" as const)}
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document
+                            .getElementById("parecer-tecnico-input")
+                            ?.click()
+                        }
+                        className="p-1 hover:scale-110 transition-transform"
+                        title="Selecionar PDF"
+                      >
+                        <FiUpload />
+                      </button>
 
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setValue(
-                          "parecerTecnico.pdf" as const,
-                          undefined as any,
-                          {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          }
-                        );
-                        const input = document.getElementById(
-                          "parecer-tecnico-input"
-                        ) as HTMLInputElement | null;
-                        if (input) input.value = "";
-                      }}
-                      className="p-1 hover:scale-110 transition-transform"
-                      title="Limpar arquivo"
-                      //disabled={!hasParecer}
-                    >
-                      <X />
-                    </button>
-                  </div>
-                </Table.Cell>
-              </Table.Row>
-            </Table.Body>
-          </Table.Container>
-
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setValue(
+                            "parecerTecnico.pdf" as const,
+                            undefined as any,
+                            {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            }
+                          );
+                          const input = document.getElementById(
+                            "parecer-tecnico-input"
+                          ) as HTMLInputElement | null;
+                          if (input) input.value = "";
+                        }}
+                        className="p-1 hover:scale-110 transition-transform"
+                        title="Limpar arquivo"
+                        //disabled={!hasParecer}
+                      >
+                        <IoTrashSharp className="text-red-500" />
+                      </button>
+                    </div>
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table.Container>
+          </section>
           <div className="bg-[#21801A] text-white px-4 py-2 font-semibold">
             Indique os poligonos a serem considerados no cálculo da área
             degradada.
