@@ -50,6 +50,7 @@ export const MonitoringLayout = () => {
   const isEmpty = (obj: any) =>
     !obj ||
     (Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0);
+    
 
   const cards = [
     {
@@ -71,6 +72,7 @@ export const MonitoringLayout = () => {
       path: (id: string) => `/dashboard/properties/${id}/objection`,
       disabled:
         isEmpty(contestacao) && isEmpty(contestacaoAutorizacaoSupressao),
+        
     },
     {
       label: "Plano de Adequação",

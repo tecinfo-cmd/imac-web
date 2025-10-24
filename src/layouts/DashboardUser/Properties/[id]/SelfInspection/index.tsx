@@ -3,7 +3,9 @@
 import { useParams, useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { FiUpload } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
+import { IoTrashSharp } from "react-icons/io5";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -22,14 +24,15 @@ import { Tooltip } from "@/components/Tooltip";
 import { Button } from "@/components/ui/button";
 
 import { yup } from "@/config/yup";
-import { useCreateSelfInspection } from "@/hooks/useGetProperties/useCreateSelfInspection";
+import {
+  useCreateSelfInspection,
+  useSendParecerAutoVistoria,
+} from "@/hooks/useGetProperties/useCreateSelfInspection";
 import { useGetSelfInspections } from "@/hooks/useGetProperties/useCreateSelfInspection";
 import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { DownloadIcon } from "@/icons/Download";
 import { Eye } from "@/icons/Eye";
-import { X } from "@/icons/X";
 import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
@@ -97,7 +100,7 @@ export const SelfInspectionLayout = () => {
   const propriedadeId = params?.id as string;
   const { data } = useObjectionData();
   const createSelfInspection = useCreateSelfInspection();
-
+  const sendParecer = useSendParecerAutoVistoria();
   const { data: selfInspectionsData, refetch: refetch } = useGetSelfInspections(
     Number(propriedadeId)
   );
@@ -134,10 +137,10 @@ export const SelfInspectionLayout = () => {
 
   const formatDateFromISO = (isoDateStr: string) => {
     if (!isoDateStr) return "";
-  const datePart = isoDateStr.split("T")[0]; // Pega só a data
+    const datePart = isoDateStr.split("T")[0]; // Pega só a data
 
     const [year, month, day] = datePart.split("-");
-  return `${day}/${month}/${year}`;
+    return `${day}/${month}/${year}`;
   };
 
   const handleViewDCS = () => {
@@ -198,26 +201,31 @@ export const SelfInspectionLayout = () => {
       }
 
       setSelectedFile(file);
-
     }
   };
 
   const canSendParecer = selectedFile !== null;
 
   const onParecerSubmit = async (formData: any) => {
-    if (!selectedFile) {
-      toast.error("Por favor, selecione um arquivo");
-      return;
-    }
+  if (!selectedFile) {
+    toast.error("Por favor, selecione um arquivo");
+    return;
+  }
 
-    console.log("Parecer:", formData.parecer);
-    console.log("Arquivo:", selectedFile);
-
-  
+  try {
+    await sendParecer.mutateAsync({
+      id: selfInspections[0]?.id,
+      status: formData.parecer.toUpperCase(),
+      file: selectedFile,
+    });
     toast.success("Parecer salvo com sucesso!");
     setReportUrl(null);
     setSelectedFile(null);
-  };
+  } catch (error) {
+    console.error(error);
+    toast.error("Erro ao salvar parecer!");
+  }
+};
 
   const onSubmit = (formData: any) => {
     createSelfInspection.mutate(
@@ -415,7 +423,7 @@ export const SelfInspectionLayout = () => {
                 onDrop={handleDrop}
               >
                 <div className="bg-[#21801A] text-white px-4 py-2 font-semibold flex justify-between items-center">
-                  Faça o upload  do parecer da analise da autovistoria
+                  Faça o upload do parecer da analise da autovistoria
                 </div>
 
                 <input
@@ -452,7 +460,7 @@ export const SelfInspectionLayout = () => {
                             className="inline-flex items-center gap-2 hover:underline"
                             title="Selecionar arquivo (PDF)"
                           >
-                            <DownloadIcon />
+                            <FiUpload />
                           </button>
                           <button
                             type="button"
@@ -461,7 +469,7 @@ export const SelfInspectionLayout = () => {
                             title="Remover arquivo"
                             disabled={!selectedFile}
                           >
-                            <X />
+                            <IoTrashSharp className="text-red-500" />
                           </button>
                         </div>
                       </Table.Cell>
