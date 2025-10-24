@@ -107,6 +107,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const signOut = useCallback(() => {
     destroyCookie(undefined, "@IMAC:T");
+    destroyCookie(undefined, "email");
+    localStorage.clear();
+    sessionStorage.clear();
     clearSession();
     clearRole();
     router.push("/auth");

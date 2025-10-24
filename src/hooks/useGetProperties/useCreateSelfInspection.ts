@@ -7,6 +7,7 @@ interface CreateSelfInspectionPayload {
 }
 
 interface SelfInspection {
+  id: number;
   dataInicio: string;
   statusVistoria: string;
   vistoria: string;
@@ -36,5 +37,38 @@ export function useGetSelfInspections(idPropriedade: number) {
       return data;
     },
     enabled: !!idPropriedade,
+  });
+}
+
+export function useSendParecerAutoVistoria() {
+  return useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      file,
+    }: {
+      id: number;
+      status: string;
+      file: File;
+    }) => {
+      const formData = new FormData();
+      formData.append(
+        "parametros",
+        JSON.stringify([
+          { nome: file.name, tipo: "PARECER_AUTO_VISTORIA" },
+        ])
+      );
+      formData.append("arquivos", file);
+      formData.append("status", status);
+
+      const { data } = await api.post(
+        `/auto-vistoria/${id}/parecer-auto-vistoria`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      return data;
+    },
   });
 }
