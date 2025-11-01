@@ -3,9 +3,9 @@ import { useState, useRef } from "react";
 import React from "react";
 import { BsFileText } from "react-icons/bs";
 import { IoMdSearch } from "react-icons/io";
+import { IoCheckmarkOutline } from "react-icons/io5";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 import { TbLoaderQuarter } from "react-icons/tb";
-import { TbLeaf } from "react-icons/tb";
 import { TfiBookmarkAlt } from "react-icons/tfi";
 
 import Footer from "../components/ui/footer";
@@ -303,7 +303,7 @@ export default function Home() {
                   type="submit"
                   className="w-[285px] h-[48px] sm:w-[320px] md:w-[350px] lg:w-[380px]"
                 >
-                  Consultar
+                  Consultar Elegibilidade
                 </Button>
               </form>
               <EmailModal
@@ -325,22 +325,22 @@ export default function Home() {
             </div>
             <Card>
               <h2 className="text-xl font-bold text-center text-gray-800 border-b pb-2 mb-4">
-                Etapas do credenciamento
+                Etapas da Consulta de Elegibilidade
               </h2>
               <Step
                 icon={<BsFileText className="w-6 h-6 text-white" />}
-                title="Preenchimento de formulário"
-                description="Preencha o formulário de consulta informando o número CAR da propriedade ou, alternativamente, seu CPF/CNPJ e a localização da fazenda. Informe também o seu contato para receber o retorno."
+                title="1- Preenchimento de formulário"
+                description="Preencha o formulário de consulta de Elegibilidade com os dados solicitados. "
               />
               <Step
-                icon={<TbLeaf className="w-6 h-6 text-white" />}
-                title="Análise socioambiental"
-                description="O IMAC realizará uma análise socioambiental da propriedade e informará se ela está elegível para participar da reinserção no mercado."
+                icon={<IoCheckmarkOutline className="w-6 h-6 text-white" />}
+                title="2- Confirmação de dados"
+                description="O IMAC enviara um e-mail de confirmação de solicitação. Verifique sua caixa de SPAM ou Lixo Eletrônico caso não esteja na caixa de entrada."
               />
               <Step
                 icon={<TfiBookmarkAlt className="w-6 h-6 text-white" />}
-                title="Credenciamento"
-                description="Se a sua propriedade for elegível, você receberá as instruções para seguir com o credenciamento no PREM."
+                title="3- Resultado"
+                description="Você receberá no e-mail verificado o resultado da consulta de Elegibilidade e instruções para as próximas etapas."
               />
             </Card>
           </div>
