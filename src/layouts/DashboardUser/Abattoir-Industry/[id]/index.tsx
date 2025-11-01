@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { MdEngineering } from "react-icons/md";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -39,10 +40,12 @@ const userSchema = yup.object({
   cpf: yup.string().required(),
   nome: yup.string().required(),
   email: yup.string().email().required(),
-  status: yup.object({
-    value: yup.string().optional(),
-    label: yup.string().optional(),
-  }).optional(),
+  status: yup
+    .object({
+      value: yup.string().optional(),
+      label: yup.string().optional(),
+    })
+    .optional(),
 });
 
 const AbattoirEditLayout = () => {
@@ -92,7 +95,12 @@ const AbattoirEditLayout = () => {
     formState: { isSubmitting: isSubmittingUser },
   } = useForm({
     resolver: yupResolver(userSchema),
-    defaultValues: { cpf: "", nome: "", email: "", status: { value: "", label: "" } },
+    defaultValues: {
+      cpf: "",
+      nome: "",
+      email: "",
+      status: { value: "", label: "" },
+    },
   });
 
   const {
@@ -102,7 +110,12 @@ const AbattoirEditLayout = () => {
     formState: { isSubmitting: isSubmittingEditUser },
   } = useForm({
     resolver: yupResolver(userSchema),
-    defaultValues: { cpf: "", nome: "", email: "", status: { value: "", label: "" } },
+    defaultValues: {
+      cpf: "",
+      nome: "",
+      email: "",
+      status: { value: "", label: "" },
+    },
   });
 
   const cep = watch("cep");
@@ -165,6 +178,11 @@ const AbattoirEditLayout = () => {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 
@@ -237,7 +255,12 @@ const AbattoirEditLayout = () => {
         status: data.status,
       });
 
-      resetUserForm({ cpf: "", nome: "", email: "", status: { value: "", label: "" } });
+      resetUserForm({
+        cpf: "",
+        nome: "",
+        email: "",
+        status: { value: "", label: "" },
+      });
       setModalOpen(false);
 
       await refetch();
@@ -284,7 +307,12 @@ const AbattoirEditLayout = () => {
         status: data.status.value,
       });
 
-      resetEditUserForm({ cpf: "", nome: "", email: "", status: { value: "", label: "" } });
+      resetEditUserForm({
+        cpf: "",
+        nome: "",
+        email: "",
+        status: { value: "", label: "" },
+      });
       setEditModalOpen(false);
       setEditingUser(null);
 
@@ -301,7 +329,12 @@ const AbattoirEditLayout = () => {
   const handleCancelEditUser = () => {
     setEditModalOpen(false);
     setEditingUser(null);
-    resetEditUserForm({ cpf: "", nome: "", email: "", status: { value: "", label: "" } });
+    resetEditUserForm({
+      cpf: "",
+      nome: "",
+      email: "",
+      status: { value: "", label: "" },
+    });
   };
 
   if (isLoading) return <div className="p-4">Carregando...</div>;
