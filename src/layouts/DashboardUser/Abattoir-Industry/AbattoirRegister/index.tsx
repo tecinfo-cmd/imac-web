@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { MdEngineering } from "react-icons/md";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -237,6 +238,11 @@ export const AbattoirRegisterLayout = ({
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 

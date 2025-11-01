@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MdEngineering } from "react-icons/md";
 import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
 import { ElegibilityDetail } from "@/components/ElegibilityDetail";
@@ -82,6 +83,11 @@ export const ElegibilityLayout = () => {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 

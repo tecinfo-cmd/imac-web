@@ -11,6 +11,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   control: any;
   className?: string;
   mask?: (value: string) => string;
+  error?: string | null;
+  
 }
 
 export const Input = ({

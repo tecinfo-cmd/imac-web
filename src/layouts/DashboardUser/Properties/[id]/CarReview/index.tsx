@@ -1,4 +1,5 @@
 "use client";
+import { MdEngineering } from "react-icons/md";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -59,6 +60,11 @@ const menuItems = [
     label: "Frigorificos",
     href: "/dashboard/abattoir-industry",
     icon: <Abattoir size={44} />,
+  },
+  {
+    label: "Responsável Técnico",
+    href: "/dashboard/technical-manager",
+    icon: <MdEngineering size={44} />,
   },
 ];
 

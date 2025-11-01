@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { MdEngineering } from "react-icons/md";
 import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
 import { Input } from "@/components/Input";
@@ -55,6 +56,11 @@ export const UserDetailLayout = () => {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 

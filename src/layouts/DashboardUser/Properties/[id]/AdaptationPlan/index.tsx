@@ -7,6 +7,7 @@ import { FiUpload } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
 import { IoTrashSharp } from "react-icons/io5";
+import { MdEngineering } from "react-icons/md";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -144,6 +145,11 @@ export const PlanoAdequacaoLayout = () => {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 
