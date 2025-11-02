@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -11,7 +12,6 @@ import { CheckboxComponent } from "@/components/ui/checkbox";
 import { api } from "@/api";
 import { yup } from "@/config/yup";
 import { useCadastroUsuario } from "@/hooks/useCadastroUsuario/useCadastroUsuario";
-import { LogoGreen } from "@/icons/LogoGreen";
 import { LogoWhite } from "@/icons/LogoWhite";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
@@ -210,156 +210,191 @@ export default function Register() {
           Programa de Reinserção <br /> e Monitoramento
         </p>
       </header>
-      <div className="bg-[#165312] min-h-screen w-full flex items-center justify-center relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center opacity-20">
-          <LogoGreen width={1300} height={1300} />
-        </div>
-        <div className="relative z-10 bg-[#DFEEE5] w-full max-w-[400px] rounded-xl shadow-lg p-5 flex flex-col justify-center items-center">
-          <h1 className="text-[#0A3503] text-center text-uppercase font-inter font-bold text-2xl leading-[37px] tracking-[0.1em] md:text-[24px] md:leading-[37px] mb-8 mt-5">
-            CADASTRO
-          </h1>
+      <div className="relative z-10 bg-[#DFEEE5] w-full rounded-xl shadow-lg p-5 flex flex-col justify-center items-center">
+        <h1 className="text-[#0A3503] text-center text-uppercase font-inter font-bold text-2xl leading-[37px] tracking-[0.1em] md:text-[24px] md:leading-[37px] mb-8 mt-5">
+          ADESÃO AO PREM
+        </h1>
+        <p className="font-bold mb-4">
+          PRODUTOR, FAÇA SEU CADASTRO PARA ACESSAR A PLATAFORMA PREM E CONCLUIR
+          A SUA ADESÃO AO PROGRAMA!
+        </p>
+        <p className="font-bold mb-4">
+          ATENÇÃO! ULTILIZE OS MESMOS DADOS INFORMADOS NA CONSULTA DE
+          ELEGIBILIDADE!
+        </p>
+        <h2 className="font-bold mb-4 text-sm sm:text-base md:text-lg lg:text-xl">
+          CADASTRO DE USUÁRIO
+        </h2>
+        <form
+          className="flex flex-col gap-3 w-full max-w-[900px] mt-6"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <p className="font-bold">DADOS PESSOAIS</p>
+          <div className="flex flex-row gap-6 w-full">
+            <div className="flex flex-col gap-3 flex-1">
+              <Input
+                name="nome"
+                label="Nome Completo"
+                placeholder="Insira seu nome completo"
+                control={control}
+              />
 
-          <form
-            className="flex flex-col gap-3 w-full"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <Input
-              name="nome"
-              label="Nome Completo"
-              placeholder="Insira seu nome completo"
-              control={control}
-            />
+              <Input
+                name="data"
+                type="text"
+                label="Data de Nascimento"
+                placeholder="dd/mm/aaaa"
+                mask={maskDate}
+                control={control}
+              />
 
-            <Input
-              name="data"
-              type="text"
-              label="Data de Nascimento"
-              placeholder="dd/mm/aaaa"
-              mask={maskDate}
-              control={control}
-            />
-
-            <Input
-              name="cpf"
-              type="text"
-              label="CPF"
-              placeholder="000.000.000-00"
-              mask={maskCPF}
-              control={control}
-            />
-
-            <Input
-              name="email"
-              label="E-mail"
-              placeholder="Insira seu email"
-              control={control}
-            />
-
-            <Input
-              name="telefone"
-              label="Celular"
-              placeholder="Digite seu numero de telefone"
-              control={control}
-              mask={maskPhone}
-            />
-
-            <div className="flex flex-row gap-4 items-start">
-              <div className="flex flex-col w-[250px] gap-3">
-                <Input
-                  name="cep"
-                  label="CEP"
-                  placeholder="_ _ _ _ _ - _ _ _"
-                  control={control}
-                  mask={maskCep}
-                />
-              </div>
-              <div className="flex flex-col w-[130px] gap-3">
-                <Input
-                  name="uf"
-                  label="UF"
-                  placeholder="MT"
-                  control={control}
-                />
-              </div>
+              <Input
+                name="cpf"
+                type="text"
+                label="CPF"
+                placeholder="000.000.000-00"
+                mask={maskCPF}
+                control={control}
+              />
             </div>
+            <div className="flex flex-col gap-3 flex-1">
+              <Input
+                name="email"
+                label="E-mail"
+                placeholder="Insira seu email"
+                control={control}
+              />
 
-            <Input
-              name="logradouro"
-              label="Logradouro"
-              placeholder="Digite o seu Logradouro"
-              control={control}
-            />
-
-            <div className="flex flex-row gap-4 items-start">
-              <div className="flex flex-col w-[80px] gap-3">
-                <Input
-                  name="numero"
-                  label="N°"
-                  placeholder=""
-                  control={control}
-                />
-              </div>
-              <div className="flex flex-col w-[260px] gap-3">
-                <Input
-                  name="bairro"
-                  label="Bairro"
-                  placeholder="(Opcional)"
-                  control={control}
-                />
-              </div>
+              <Input
+                name="telefone"
+                label="Celular"
+                placeholder="Digite seu numero de telefone"
+                control={control}
+                mask={maskPhone}
+              />
             </div>
+          </div>
 
-            <Input
-              name="cidade"
-              label="Cidade"
-              placeholder="(Opcional)"
-              control={control}
-            />
+          <p className="font-bold mt-2">ENDEREÇO</p>
+          <div className="flex flex-row gap-4 w-full">
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="cep"
+                label="CEP"
+                placeholder="_ _ _ _ _ - _ _ _"
+                control={control}
+                mask={maskCep}
+              />
+            </div>
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="cidade"
+                label="Cidade"
+                placeholder="nome do município"
+                control={control}
+              />
+            </div>
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="uf"
+                label="Estado"
+                placeholder="UF"
+                control={control}
+              />
+            </div>
+          </div>
 
-            <Input
-              name="senha"
-              type="password"
-              label="Senha"
-              placeholder="Digite sua nova senha"
-              control={control}
-            />
+          <div className="flex flex-row gap-4 w-full mt-3">
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="logradouro"
+                label="Logradouro"
+                placeholder="logradouro"
+                control={control}
+              />
+            </div>
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="numero"
+                label="Número"
+                placeholder="xxxx"
+                control={control}
+              />
+            </div>
+          </div>
 
-            <Input
-              name="confirmacaoSenha"
-              type="password"
-              label="Confirmar senha"
-              placeholder="Digite sua nova senha"
-              control={control}
-            />
+          <div className="flex flex-row gap-4 w-full mt-3">
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="bairro"
+                label="Bairro"
+                placeholder="nome do bairro"
+                control={control}
+              />
+            </div>
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="complemento"
+                label="Complemento"
+                placeholder="informe um complemento"
+                control={control}
+              />
+            </div>
+          </div>
 
-            <Controller
-              name="aceitouTermos"
-              control={control}
-              render={({ field }) => (
-                <CheckboxComponent
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="w-[17px] h-[17px] border-[1px] border-[#666666] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)]"
-                >
-                  Li e concordo com os termos de uso e política de privacidade.
-                </CheckboxComponent>
-              )}
-            />
-            {errors.aceitouTermos && (
-              <p className="text-[#F12929] font-light text-xs mt-1">
-                {errors.aceitouTermos.message}
-              </p>
+          <p className="font-bold mt-4">SENHA</p>
+          <div className="flex flex-row gap-4 w-full">
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="senha"
+                type="password"
+                label="Informe uma senha"
+                placeholder="Digite sua nova senha"
+                control={control}
+              />
+            </div>
+            <div className="flex flex-col flex-1 gap-3">
+              <Input
+                name="confirmacaoSenha"
+                type="password"
+                label="Informe novamente a senha"
+                placeholder="Digite sua nova senha"
+                control={control}
+              />
+            </div>
+          </div>
+
+          <Controller
+            name="aceitouTermos"
+            control={control}
+            render={({ field }) => (
+              <CheckboxComponent
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                className="w-[17px] h-[17px] border-[1px] border-[#666666] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)]"
+              >
+                Li e concordo com os termos de uso e política de privacidade.
+              </CheckboxComponent>
             )}
+          />
+          {errors.aceitouTermos && (
+            <p className="text-[#F12929] font-light text-xs mt-1">
+              {errors.aceitouTermos.message}
+            </p>
+          )}
 
-            <Button
-              type="submit"
-              className="w-full md:w-[130px] self-center"
-              disabled={isLoading}
-            >
-              {isLoading ? "Enviando..." : "Enviar"}
-            </Button>
-          </form>
-        </div>
+          <Button
+            type="submit"
+            className="w-full md:w-[130px] self-center"
+            disabled={isLoading}
+          >
+            {isLoading ? "Enviando..." : "Enviar"}
+          </Button>
+
+          <Link href="/auth" className="font-bold text-center">
+            JÁ TEM CADASTRO? FAÇA O LOGIN!
+          </Link>
+        </form>
       </div>
     </>
   );

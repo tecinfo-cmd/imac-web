@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MdEngineering } from "react-icons/md";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { ConfirmBox } from "@/components/ConfirmBox";
@@ -75,6 +76,11 @@ export const AbattoirLayout = () => {
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
     },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
+    },
   ];
 
   return (
@@ -140,8 +146,7 @@ export const AbattoirLayout = () => {
                               : "#21801A",
                         }}
                       >
-                        {abattoir.status === "ATIVO" ||
-                        abattoir.status === null
+                        {abattoir.status === "ATIVO" || abattoir.status === null
                           ? "Ativo"
                           : "Inativo"}
                       </span>

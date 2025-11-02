@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { FiUpload } from "react-icons/fi";
 import { GoArrowLeft } from "react-icons/go";
 import { IoTrashSharp } from "react-icons/io5";
+import { MdEngineering } from "react-icons/md";
 import {
   PiFarmLight,
   PiSealCheckLight,
@@ -60,6 +61,11 @@ const customMenuItems = [
     label: "Frigorificos",
     href: "/dashboard/abattoir-industry",
     icon: <Abattoir size={44} />,
+  },
+  {
+    label: "Responsável Técnico",
+    href: "/dashboard/technical-manager",
+    icon: <MdEngineering size={44} />,
   },
 ];
 
@@ -207,25 +213,25 @@ export const SelfInspectionLayout = () => {
   const canSendParecer = selectedFile !== null;
 
   const onParecerSubmit = async (formData: any) => {
-  if (!selectedFile) {
-    toast.error("Por favor, selecione um arquivo");
-    return;
-  }
+    if (!selectedFile) {
+      toast.error("Por favor, selecione um arquivo");
+      return;
+    }
 
-  try {
-    await sendParecer.mutateAsync({
-      id: selfInspections[0]?.id,
-      status: formData.parecer.toUpperCase(),
-      file: selectedFile,
-    });
-    toast.success("Parecer salvo com sucesso!");
-    setReportUrl(null);
-    setSelectedFile(null);
-  } catch (error) {
-    console.error(error);
-    toast.error("Erro ao salvar parecer!");
-  }
-};
+    try {
+      await sendParecer.mutateAsync({
+        id: selfInspections[0]?.id,
+        status: formData.parecer.toUpperCase(),
+        file: selectedFile,
+      });
+      toast.success("Parecer salvo com sucesso!");
+      setReportUrl(null);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao salvar parecer!");
+    }
+  };
 
   const onSubmit = (formData: any) => {
     createSelfInspection.mutate(

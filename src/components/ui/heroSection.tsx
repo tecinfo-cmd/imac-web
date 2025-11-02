@@ -1,7 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
 
 interface HeroProps {
   topImage: string;
@@ -36,12 +33,6 @@ const HeroSection: React.FC<HeroProps> = () => {
           O processo é simples e permite identificar oportunidades para
           regularização e reintegração com frigoríficos.
         </p>
-
-        <Link href="#form" scroll={true}>
-          <Button className="mt-3 w-64 sm:w-80 md:w-96 h-10 text-lg px-6 py-3 hover:bg-green-700 rounded-lg flex items-center justify-center gap-1">
-            Consultar agora
-          </Button>
-        </Link>
       </div>
     </section>
   );

@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
+import { MdEngineering } from "react-icons/md";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { InfoGrid } from "@/components/InfoGrid";
@@ -46,6 +47,11 @@ const customMenuItems = [
     label: "Frigorificos",
     href: "/dashboard/abattoir-industry",
     icon: <Abattoir size={44} />,
+  },
+  {
+    label: "Responsável Técnico",
+    href: "/dashboard/technical-manager",
+    icon: <MdEngineering size={44} />,
   },
 ];
 
@@ -231,12 +237,14 @@ export const FinesLayout = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg w-full h-full max-w-6xl max-h-[90vh] flex flex-col">
             <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold">Visualizar/Imprimir Boleto</h3>
+              <h3 className="text-lg font-semibold">
+                Visualizar/Imprimir Boleto
+              </h3>
               <button
                 onClick={() => setPdfData(null)}
                 className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
               >
-               Fechar
+                Fechar
               </button>
             </div>
             <div className="flex-1 p-4">

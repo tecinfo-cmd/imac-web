@@ -10,6 +10,7 @@ interface RadioProps {
   value: string;
   control: any;
   className?: string;
+  disabled?: boolean;
 }
 
 export const Radio = ({

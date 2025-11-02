@@ -3,6 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { GoArrowLeft } from "react-icons/go";
+import { MdEngineering } from "react-icons/md";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
@@ -75,6 +76,11 @@ export const PropertySummaryLayout = () => {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 

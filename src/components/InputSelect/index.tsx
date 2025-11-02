@@ -15,6 +15,7 @@ interface InputSelectProps {
     | undefined;
   isSearchable?: boolean;
   formatOptionLabel?: (option: any) => JSX.Element;
+  disabled?: boolean;
 }
 
 export const InputSelect = ({
@@ -36,7 +37,9 @@ export const InputSelect = ({
             {label && (
               <label
                 htmlFor={name}
-                className="block font-medium text-[#21801A]"
+                className={`block font-medium ${
+                  error ? "text-[#F12929]" : "text-[#21801A]"
+                }`}
               >
                 {label}
               </label>
@@ -57,6 +60,7 @@ export const InputSelect = ({
               options={options}
               isSearchable={isSearchable}
               placeholder={placeholder}
+              isDisabled={rest.disabled}
               {...rest}
               classNamePrefix="custom-select"
               menuPortalTarget={
@@ -67,13 +71,14 @@ export const InputSelect = ({
                   ...base,
                   height: "48px",
                   borderColor: "#CAC4D0",
-                  boxShadow: state.isFocused
-                    ? "0px 1px 3px rgba(0, 0, 0, 0.3)"
-                    : "0px 1px 3px rgba(0, 0, 0, 0.3)",
+                  boxShadow: "0px 1px 3px rgba(0,0,0,0.3)",
                   borderRadius: "0.25rem",
                   fontSize: "1rem",
                   outline: "none",
                   borderWidth: "1px",
+                  backgroundColor: state.isDisabled ? "#F5F5F5" : "#FFFFFF",
+                  color: state.isDisabled ? "#A1A1A1" : "#000000",
+                  cursor: state.isDisabled ? "not-allowed" : "pointer",
                   "&:hover": {
                     borderColor: "#CAC4D0",
                     boxShadow: "0px 1px 3px rgba(0, 0, 0, 0.3)",
@@ -95,7 +100,7 @@ export const InputSelect = ({
                 }),
                 menuPortal: (base) => ({
                   ...base,
-                  zIndex: 9999, 
+                  zIndex: 9999,
                 }),
                 menuList: (base) => ({
                   ...base,
@@ -115,6 +120,9 @@ export const InputSelect = ({
                   },
                 }),
               }}
+              formatOptionLabel={(option: any, ) => (
+                <span style={{ color: "#0A3503" }}>{option.label}</span>
+              )}
               components={{
                 DropdownIndicator: () => (
                   <RiArrowDownSFill

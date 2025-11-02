@@ -9,7 +9,6 @@ import { Tooltip } from "@/components/Tooltip";
 
 import { useGetFarms } from "@/hooks/useFarms/useGetFarms";
 import { Eye } from "@/icons/Eye";
-import { Monitor } from "@/icons/Monitor";
 import { VoucherIcon } from "@/icons/Voucher";
 import { X } from "@/icons/X";
 import { useFarmFilterStore } from "@/store/useFarmFilterStore";
@@ -62,6 +61,7 @@ export const FarmLayout = () => {
 
               <Table.Cell>
                 <div className="flex items-center gap-3">
+                  {farm.statusVoucher === false ? (
                   <Tooltip
                     message="Validar voucher"
                     id={`Validar voucher ${farm.id}`}
@@ -70,6 +70,16 @@ export const FarmLayout = () => {
                       <VoucherIcon />
                     </Link>
                   </Tooltip>
+                  ) : (
+                     <Tooltip
+                    message=""
+                    id={`Voucher ativo ${farm.id}`}
+                  >
+                    <div className="opacity-40 cursor-not-allowed">
+                      <VoucherIcon />
+                    </div>
+                  </Tooltip>
+                  )}
                   {farm.statusVoucher === false ? (
                     <Tooltip
                       message="Comprar voucher"
@@ -107,14 +117,6 @@ export const FarmLayout = () => {
                       }}
                     >
                       <Eye />
-                    </Link>
-                  </Tooltip>
-                  <Tooltip
-                    message="Análise ambiental"
-                    id={`Análise ambiental ${farm.id}`}
-                  >
-                    <Link href={`/analise-ambiental/${farm.id}`}>
-                      <Monitor />
                     </Link>
                   </Tooltip>
                   <Tooltip

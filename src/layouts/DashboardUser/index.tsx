@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { MdEngineering } from "react-icons/md";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -161,6 +162,11 @@ export const DashboardUserLayout = () => {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
       icon: <Abattoir size={44} />,
+    },
+    {
+      label: "Responsável Técnico",
+      href: "/dashboard/technical-manager",
+      icon: <MdEngineering size={44} />,
     },
   ];
 
