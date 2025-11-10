@@ -45,7 +45,7 @@ const schema = yup.object({
   cep: yup.string().required(),
   uf: yup.string().required("!"),
   logradouro: yup.string().required(),
-  numero: yup.string().required("!"),
+  numero: yup.string().notRequired(),
   bairro: yup.string().required(),
   cidade: yup.string().required(),
   senha: yup

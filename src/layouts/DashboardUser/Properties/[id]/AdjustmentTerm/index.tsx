@@ -81,8 +81,8 @@ export const AdjustmentTermLayout = () => {
     car: propriedade.carFederal,
     voucher: propriedade.voucher,
     nome: propriedade.nomePropriedade,
-    municipio: propriedade.cidade?.nome,
-    estado: propriedade.cidade?.uf,
+    municipio: propriedade.endereco?.municipio,
+    estado: propriedade.endereco?.estado,
     etapa: propriedade.etapa,
     status: propriedade.status,
   };

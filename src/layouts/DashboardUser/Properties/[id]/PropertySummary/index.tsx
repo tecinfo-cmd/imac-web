@@ -20,7 +20,6 @@ import { usePropertySummary } from "@/hooks/useGetProperties/usePropertySummary"
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
-//import { Taxa } from "@/icons/Taxa";
 
 export const PropertySummaryLayout = () => {
   const [selectedDocs, setSelectedDocs] = useState<number[]>([]);
@@ -69,9 +68,6 @@ export const PropertySummaryLayout = () => {
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    /*
-    { label: "Multas", href: "/dashboard/multas", icon: <Taxa /> },
-     */
     {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
@@ -88,7 +84,7 @@ export const PropertySummaryLayout = () => {
     return <p className="p-4">Carregando dados da propriedade...</p>;
   if (error)
     return <p className="p-4 text-red-500">Erro ao carregar os dados.</p>;
-
+  console.log("Property Summary Data:", data);
   return (
     <LayoutContainer title="Análise Socioambiental" menuItems={customMenuItems}>
       <div className="max-w-6xl mx-auto my-8">
@@ -119,44 +115,20 @@ export const PropertySummaryLayout = () => {
             <Table.Body>
               <Table.Row>
                 <Table.Cell>{data?.nomePropriedade}</Table.Cell>
-                <Table.Cell>{data?.municipio}</Table.Cell>
-                <Table.Cell>{data?.uf}</Table.Cell>
+                <Table.Cell>{data?.endereco?.municipio}</Table.Cell>
+                <Table.Cell>{data?.endereco?.estado}</Table.Cell>
                 <Table.Cell>{data?.cep}</Table.Cell>
               </Table.Row>
             </Table.Body>
 
             <Table.Header className="bg-[#D7EADD]">
               <Table.Title>Logradouro</Table.Title>
-              <Table.Title colspan={3}>Complemento</Table.Title>
+              <Table.Title colspan={3}>Módulo Fiscal</Table.Title>
             </Table.Header>
             <Table.Body>
               <Table.Row>
                 <Table.Cell>{data?.logradouro}</Table.Cell>
-                <Table.Cell colspan={3}>{data?.complemento}</Table.Cell>
-              </Table.Row>
-            </Table.Body>
-
-            <Table.Header className="bg-[#D7EADD]">
-              <Table.Title>Longitude</Table.Title>
-              <Table.Title>Latitude</Table.Title>
-              <Table.Title colspan={2}>Caixa Postal</Table.Title>
-            </Table.Header>
-            <Table.Body>
-              <Table.Row>
-                <Table.Cell>{data?.longitude}</Table.Cell>
-                <Table.Cell>{data?.latitude}</Table.Cell>
-                <Table.Cell colspan={2}>{data?.caixaPostal}</Table.Cell>
-              </Table.Row>
-            </Table.Body>
-
-            <Table.Header className="bg-[#D7EADD]">
-              <Table.Title>Módulo Fiscal</Table.Title>
-              <Table.Title colspan={3}>Tamanho da Propriedade</Table.Title>
-            </Table.Header>
-            <Table.Body>
-              <Table.Row>
-                <Table.Cell>{data?.moduloFiscal}</Table.Cell>
-                <Table.Cell colspan={3}>{data?.tamanhoPropriedade}</Table.Cell>
+                <Table.Cell colspan={3}>{data?.moduloFiscal}</Table.Cell>
               </Table.Row>
             </Table.Body>
 
