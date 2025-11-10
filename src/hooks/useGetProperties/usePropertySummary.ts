@@ -17,6 +17,10 @@ interface Documento {
   dataUpload: string;
   url: string;
 }
+interface Endereco {
+  municipio: string;
+  estado: string;
+}
 
 interface PropertySummary {
   nomePropriedade: string;
@@ -39,6 +43,7 @@ interface PropertySummary {
   coproprietarios: Pessoa[];
   documentos: Documento[];
   relatorioUrl?: string | null;
+  endereco?: Endereco;
 }
 
 const formatPessoa = (p: any): Pessoa => ({
@@ -48,7 +53,7 @@ const formatPessoa = (p: any): Pessoa => ({
   dataNascimento: p.pessoa?.dataNascimento
     ? new Date(p.pessoa.dataNascimento).toLocaleDateString("pt-BR")
     : "-",
-  telefone: p.pessoa?.telefone ?? "-",
+  telefone: p.telefone ?? "-",
   email: p.pessoa?.email ?? "-",
 });
 
@@ -86,8 +91,8 @@ const mapResponseToPropertySummary = (prop: any): PropertySummary => {
     caixaPostal: endereco.caixaPostal ?? "-",
     moduloFiscal: prop.moduloFiscal ?? "-",
     tamanhoPropriedade: `${prop.tamanhoPropriedade} ha`,
-    atividadePrincipal: String(prop.idAtividadePrincipal ?? "-"),
-    cicloProducao: String(prop.idClicloProducao ?? "-"),
+    atividadePrincipal: String(prop.atividadePrincipal.descricao ?? "-"),
+    cicloProducao: String(prop.cicloProducao.descricao ?? "-"),
     numeroProprietarios: String(proprietarios.length),
     cadastroAmbientalRural: prop.carFederal ?? "-",
     codigoVoucherPrem: prop.voucher ?? "-",
@@ -95,6 +100,7 @@ const mapResponseToPropertySummary = (prop: any): PropertySummary => {
     coproprietarios: coproprietarios.map(formatPessoa),
     documentos,
     relatorioUrl,
+    endereco: endereco,
   };
 };
 

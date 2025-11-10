@@ -15,16 +15,16 @@ export type PropriedadeDetailForm = {
   status: string;
 };
 
-interface Cidade {
-  nome: string;
-  uf: string;
+interface Endereco {
+  municipio: string;
+  estado: string;
 }
 
 interface PropriedadeResponse {
   id: number;
   nomePropriedade: string;
   carFederal: string;
-  cidade: Cidade;
+  endereco: Endereco;
   voucher: string;
   etapa: string;
   status: string;
@@ -70,8 +70,8 @@ export const usePropertyMonitoring = (id?: string | number) => {
       reset({
         nomePropriedade: data.nomePropriedade,
         carFederal: data.carFederal,
-        municipio: data.cidade?.nome,
-        estado: data.cidade?.uf,
+        municipio: data.endereco?.municipio,
+        estado: data.endereco?.estado,
         voucher: data.voucher,
         etapa: data.etapa,
         status: data.status,

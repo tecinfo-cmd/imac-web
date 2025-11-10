@@ -234,7 +234,7 @@ export const RegisterFarmLayout = () => {
       title="Dados da Propriedade"
       actions={
         <>
-          {farm?.endereco?.cep && (
+          {farm?.endereco && Object.keys(farm.endereco).length > 0 && (
             <Tooltip message="Editar dados" id="Editar dados" position="bottom">
               <button
                 className="border-2 border-[#CAC4D0] p-1 rounded"

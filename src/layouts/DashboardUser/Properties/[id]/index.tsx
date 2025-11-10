@@ -26,7 +26,6 @@ import { FineTracking } from "@/icons/FineTracking";
 import { SalesPermit } from "@/icons/SalesPermit";
 import { SelfInspection } from "@/icons/SelfInspection";
 import { toast } from "sonner";
-//import { Taxa } from "@/icons/Taxa";
 
 export const MonitoringLayout = () => {
   const router = useRouter();
@@ -111,13 +110,13 @@ export const MonitoringLayout = () => {
       label: "Revisão de Car",
       icon: <SalesPermit size={36} />,
       active: false,
-      disabled: true,
+      path: (id: string) => `/dashboard/properties/${id}/carReview`,
     },
     {
       label: "Documentos da Propriedade",
       icon: <DocPropertie size={36} />,
       active: false,
-      disabled: true,
+      path: (id: string) => `/dashboard/properties/${id}/propertyDocuments`,
     },
   ];
 
@@ -142,13 +141,6 @@ export const MonitoringLayout = () => {
       href: "/dashboard/properties",
       icon: <PiFarmLight size={44} />,
     },
-    /*
-    {
-      label: "Multas",
-      href: "/multas",
-      icon: <Taxa />,
-    },
-    */
     {
       label: "Frigorificos",
       href: "/dashboard/abattoir-industry",
@@ -173,8 +165,8 @@ export const MonitoringLayout = () => {
     car: propriedade.carFederal,
     voucher: propriedade.voucher,
     nome: propriedade.nomePropriedade,
-    municipio: propriedade.cidade?.nome,
-    estado: propriedade.cidade?.uf,
+    municipio: propriedade.endereco?.municipio,
+    estado: propriedade.endereco?.estado,
     etapa: propriedade.etapa,
     status: propriedade.status,
   };
@@ -226,7 +218,7 @@ export const MonitoringLayout = () => {
 
       <InfoGrid rows={farmInfoRows} data={[]} />
       <div className="grid p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-6 mt-8">
-        {cards.map((card, idx) => (
+        {cards.slice(0, 8).map((card, idx) => (
           <Card
             key={card.label}
             className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 cursor-pointer transition
@@ -252,6 +244,37 @@ export const MonitoringLayout = () => {
           </Card>
         ))}
       </div>
+      
+      <div className="w-full h-px bg-gray-300 my-8"></div>
+
+      <div className="grid p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-6">
+        {cards.slice(8).map((card, idx) => (
+          <Card
+            key={card.label}
+            className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 cursor-pointer transition
+            bg-[#21801A] text-white
+            hover:bg-[#F3F3F3] hover:text-[#21801A] hover:opacity-60
+            ${
+              card.path && pathname === card.path(propriedadeId)
+                ? "bg-[#F3F3F3] !text-[#21801A] opacity-60"
+                : ""
+            }
+             ${
+               card.disabled
+                 ? "bg-[#F3F3F3] !text-[#21801A] cursor-not-allowed pointer-events-none opacity-60"
+                 : ""
+             }
+          `}
+            onClick={() => !card.disabled && handleCardClick(idx + 8)}
+          >
+            <div className="mb-2">{card.icon}</div>
+            <span className="text-center text-sm font-semibold">
+              {card.label}
+            </span>
+          </Card>
+        ))}
+      </div>
+
       {pdfUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white w-[90%] h-[90%] rounded-lg overflow-hidden flex flex-col">

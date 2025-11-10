@@ -1,10 +1,22 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
+import { GoArrowLeft } from "react-icons/go";
+import { MdEngineering } from "react-icons/md";
+import {
+  PiUserCircleThin,
+  PiSealCheckLight,
+  PiFarmLight,
+} from "react-icons/pi";
+
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
+import { Abattoir } from "@/icons/Abattoir";
+import { Analityc } from "@/icons/Analityc";
 import { DownloadIcon } from "@/icons/Download";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
 
 const mockDocuments = [
   {
@@ -48,14 +60,82 @@ const mockDocuments = [
   },
 ];
 
-export default function PropertyDocumentsLayout() {
+const customMenuItems = [
+  {
+    label: "Home",
+    href: "/dashboard",
+    icon: <Analityc />,
+  },
+  {
+    label: "Usuários",
+    href: "/dashboard/users",
+    icon: <PiUserCircleThin size={44} />,
+  },
+  {
+    label: "Elegibilidade",
+    href: "/dashboard/elegibility",
+    icon: <PiSealCheckLight size={44} />,
+  },
+  {
+    label: "Propriedades",
+    href: "/dashboard/properties",
+    icon: <PiFarmLight size={44} />,
+  },
+  {
+    label: "Frigorificos",
+    href: "/dashboard/abattoir-industry",
+    icon: <Abattoir size={44} />,
+  },
+  {
+    label: "Responsável Técnico",
+    href: "/dashboard/technical-manager",
+    icon: <MdEngineering size={44} />,
+  },
+];
+
+interface PropertyDocumentsLayoutProps {
+  farmId?: number;
+  onGoBack?: () => void;
+}
+
+export default function PropertyDocumentsLayout({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  farmId,
+  onGoBack,
+}: PropertyDocumentsLayoutProps) {
+  const params = useParams();
+  const router = useRouter();
+  const propriedadeId = params?.id as string;
+
+  const { role } = useUserRoleStore();
+
+  const menuItems = role === "ANALISTA" ? customMenuItems : undefined;
+  const handleGoBack = () => {
+    if (role === "PRODUTOR" && onGoBack) {
+      onGoBack();
+    } else if (role === "ANALISTA") {
+      router.push(`/dashboard/properties/${propriedadeId}`);
+    }
+  };
+
   return (
-    <LayoutContainer title="Acompanhamento da Propriedade">
+    <LayoutContainer
+      title="Acompanhamento da Propriedade"
+      menuItems={menuItems}
+    >
+      <div className="max-w-6xl mx-auto my-8">
+        <button
+          onClick={handleGoBack}
+          className="text-[#21801A] flex items-center gap-3"
+        >
+          <GoArrowLeft size={28} />
+        </button>
+      </div>
       <h2 className="text-center text-2xl font-semibold mb-8 text-[#21801A]">
         Documentos da Propriedade
       </h2>
       {mockDocuments.map((section) => (
-        <>
+        <div key={section.section} className="mb-8">
           <Table.Container>
             <Table.Header>
               <Table.Title
@@ -92,10 +172,17 @@ export default function PropertyDocumentsLayout() {
               ))}
             </Table.Body>
           </Table.Container>
-        </>
+        </div>
       ))}
       <div className="mt-10">
-        <a href="#" className="text-[#21801A] underline text-sm">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            handleGoBack();
+          }}
+          className="text-[#21801A] underline text-sm"
+        >
           Voltar
         </a>
       </div>

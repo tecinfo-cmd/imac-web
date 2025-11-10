@@ -108,207 +108,128 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
 
   const formatDateFromISO = (isoDateStr: string) => {
     if (!isoDateStr) return "";
-    const datePart = isoDateStr.split("T")[0]; // Pega só a data
+    const datePart = isoDateStr.split("T")[0];
 
     const [year, month, day] = datePart.split("-");
     return `${day}/${month}/${year}`;
   };
 
   return (
-    <div className="max-w-6xl mx-auto my-8">
-      <TableInformation>
-        <TableInformation.Section title="Informações Propriedades">
-          <TableInformation.Row columnsPerRow={4}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Nome da Propriedade
-              </TableInformation.Title>
-              <TableInformation.Value>
-                {farm.nomePropriedade}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Município</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.cidade?.nome}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>UF</TableInformation.Title>
-              <TableInformation.Value>{farm.cidade?.uf}</TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>CEP</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.endereco?.cep}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
+    <>
+      <div className="max-w-6xl mx-auto my-8">
+        <TableInformation>
+          <TableInformation.Section title="Informações Propriedades">
+            <TableInformation.Row columnsPerRow={4}>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Nome da Propriedade
+                </TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.nomePropriedade}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>Município</TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.endereco?.municipio}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>UF</TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.endereco?.estado}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>CEP</TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.endereco?.cep}
+                </TableInformation.Value>
+              </TableInformation.Column>
+            </TableInformation.Row>
 
-          <TableInformation.Row columnsPerRow={2}>
-            <TableInformation.Column>
-              <TableInformation.Title>Logradouro</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.endereco?.logradouro}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Complemento</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.endereco?.complemento}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
+            <TableInformation.Row columnsPerRow={3}>
+              <TableInformation.Column>
+                <TableInformation.Title>Logradouro</TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.endereco?.logradouro}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>Módulo Fiscal</TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.moduloFiscal}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Embargo Ambiental
+                </TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.statusVoucher ? "Sim" : "Não"}
+                </TableInformation.Value>
+              </TableInformation.Column>
+            </TableInformation.Row>
 
-          <TableInformation.Row columnsPerRow={3}>
-            <TableInformation.Column>
-              <TableInformation.Title>Longitude</TableInformation.Title>
-              <TableInformation.Value>
-                {String(farm.endereco?.longitude ?? "Não informado")}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Latitude</TableInformation.Title>
-              <TableInformation.Value>
-                {String(farm.endereco?.latitude ?? "Não informado")}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Caixa Postal</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.endereco?.caixaPostal || "Não informado"}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
+            <TableInformation.Row columnsPerRow={3}>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Atividade Principal
+                </TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.atividadePrincipal?.descricao || "Não informado"}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Ciclo de Produção
+                </TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.cicloProducao?.descricao || "Não informado"}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Número de Proprietários
+                </TableInformation.Title>
+                <TableInformation.Value>
+                  {String(farm.numeroProprietarios)}
+                </TableInformation.Value>
+              </TableInformation.Column>
+            </TableInformation.Row>
 
-          <TableInformation.Row columnsPerRow={3}>
-            <TableInformation.Column>
-              <TableInformation.Title>Módulo Fiscal</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.moduloFiscal}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Tamanho da Propriedade
-              </TableInformation.Title>
-              <TableInformation.Value>{`${farm.tamanhoPropriedade} ha`}</TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Embargo Ambiental</TableInformation.Title>
-              <TableInformation.Value>
-                {farm.statusVoucher ? "Sim" : "Não"}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
+            <TableInformation.Row columnsPerRow={2}>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Cadastro Ambiental Rural (CAR)
+                </TableInformation.Title>
+                <TableInformation.Value>
+                  {farm.carFederal}
+                </TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Código voucher PREM
+                </TableInformation.Title>
+                <TableInformation.Value>{farm.voucher}</TableInformation.Value>
+              </TableInformation.Column>
+            </TableInformation.Row>
+          </TableInformation.Section>
 
-          <TableInformation.Row columnsPerRow={3}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Atividade Principal
-              </TableInformation.Title>
-              <TableInformation.Value>
-                {String(farm.idAtividadePrincipal)}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Ciclo de Produção</TableInformation.Title>
-              <TableInformation.Value>
-                {String(farm.idClicloProducao)}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Número de Proprietários
-              </TableInformation.Title>
-              <TableInformation.Value>
-                {String(farm.numeroProprietarios)}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-
-          <TableInformation.Row columnsPerRow={2}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Cadastro Ambiental Rural (CAR)
-              </TableInformation.Title>
-              <TableInformation.Value>{farm.carFederal}</TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Código voucher PREM
-              </TableInformation.Title>
-              <TableInformation.Value>{farm.voucher}</TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-
-        <TableInformation.Section title="Proprietário Principal">
-          <TableInformation.Row columnsPerRow={3}>
-            <TableInformation.Column>
-              <TableInformation.Title>Nome/Razão Social</TableInformation.Title>
-              <TableInformation.Value>
-                {owner?.pessoa.nome}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>CPF/CNPJ</TableInformation.Title>
-              <TableInformation.Value>
-                {owner?.pessoa.cpfCnpj}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                RG/Inscrição Social
-              </TableInformation.Title>
-              <TableInformation.Value>
-                {owner?.pessoa.rgInscricaoSocial || "Não informado"}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-
-          <TableInformation.Row columnsPerRow={3}>
-            <TableInformation.Column>
-              <TableInformation.Title>
-                Data de Nascimento
-              </TableInformation.Title>
-              <TableInformation.Value>
-                {formatDateFromISO(owner?.pessoa.dataNascimento || "")}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Telefone</TableInformation.Title>
-              <TableInformation.Value>
-                {owner?.pessoa.telefone}
-              </TableInformation.Value>
-            </TableInformation.Column>
-            <TableInformation.Column>
-              <TableInformation.Title>Email</TableInformation.Title>
-              <TableInformation.Value>
-                {owner?.pessoa.email}
-              </TableInformation.Value>
-            </TableInformation.Column>
-          </TableInformation.Row>
-        </TableInformation.Section>
-
-        {coOwners.map((coOwner, index) => (
-          <TableInformation.Section
-            key={index}
-            title={`Coproprietário ${index + 1}`}
-          >
+          <TableInformation.Section title="Proprietário Principal">
             <TableInformation.Row columnsPerRow={3}>
               <TableInformation.Column>
                 <TableInformation.Title>
                   Nome/Razão Social
                 </TableInformation.Title>
                 <TableInformation.Value>
-                  {coOwner.pessoa.nome}
+                  {owner?.pessoa.nome}
                 </TableInformation.Value>
               </TableInformation.Column>
               <TableInformation.Column>
                 <TableInformation.Title>CPF/CNPJ</TableInformation.Title>
                 <TableInformation.Value>
-                  {coOwner.pessoa.cpfCnpj}
+                  {owner?.pessoa.cpfCnpj}
                 </TableInformation.Value>
               </TableInformation.Column>
               <TableInformation.Column>
@@ -316,7 +237,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
                   RG/Inscrição Social
                 </TableInformation.Title>
                 <TableInformation.Value>
-                  {coOwner.pessoa.rgInscricaoSocial || "—"}
+                  {owner?.pessoa.rgInscricaoSocial || "Não informado"}
                 </TableInformation.Value>
               </TableInformation.Column>
             </TableInformation.Row>
@@ -327,64 +248,124 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
                   Data de Nascimento
                 </TableInformation.Title>
                 <TableInformation.Value>
-                  {coOwner.pessoa.dataNascimento}
+                  {formatDateFromISO(owner?.pessoa.dataNascimento || "")}
                 </TableInformation.Value>
               </TableInformation.Column>
               <TableInformation.Column>
                 <TableInformation.Title>Telefone</TableInformation.Title>
                 <TableInformation.Value>
-                  {coOwner.pessoa.telefone}
+                  {owner?.pessoa.telefone}
                 </TableInformation.Value>
               </TableInformation.Column>
               <TableInformation.Column>
                 <TableInformation.Title>Email</TableInformation.Title>
                 <TableInformation.Value>
-                  {coOwner.pessoa.email}
+                  {owner?.pessoa.email}
                 </TableInformation.Value>
               </TableInformation.Column>
             </TableInformation.Row>
           </TableInformation.Section>
-        ))}
-      </TableInformation>
 
-      {!shouldShowSuccessMessage && (
-        <>
-          <div className="flex items-center gap-4 mt-6">
-            <input
-              id="accept"
-              type="checkbox"
-              className="accent-[#21801A] size-5"
-              {...register("accept")}
-            />
-            <label className="text-sm text-[#0A3503]" htmlFor="accept">
-              Declaro, para todos os fins de direito, e sob penas de lei, que os
-              dados informados e documentos apresentados são legítimos. E que
-              autorizo o compartilhamento de meus dados para consultas públicas
-              para análise socioambiental perante aos órgãos necessários.
-            </label>
-          </div>
-          <div className="mt-8 flex justify-end">
-            <Button
-              variant="green"
-              className="w-[253px]"
-              disabled={!acceptChecked || isLoading || analysisRequested}
-              onClick={handleSubmitRequest}
+          {coOwners.map((coOwner, index) => (
+            <TableInformation.Section
+              key={index}
+              title={`Coproprietário ${index + 1}`}
             >
-              {isLoading ? <FiLoader className="animate-spin" /> : "Solicitar"}
-            </Button>
-          </div>
-        </>
-      )}
+              <TableInformation.Row columnsPerRow={3}>
+                <TableInformation.Column>
+                  <TableInformation.Title>
+                    Nome/Razão Social
+                  </TableInformation.Title>
+                  <TableInformation.Value>
+                    {coOwner.pessoa.nome}
+                  </TableInformation.Value>
+                </TableInformation.Column>
+                <TableInformation.Column>
+                  <TableInformation.Title>CPF/CNPJ</TableInformation.Title>
+                  <TableInformation.Value>
+                    {coOwner.pessoa.cpfCnpj}
+                  </TableInformation.Value>
+                </TableInformation.Column>
+                <TableInformation.Column>
+                  <TableInformation.Title>
+                    RG/Inscrição Social
+                  </TableInformation.Title>
+                  <TableInformation.Value>
+                    {coOwner.pessoa.rgInscricaoSocial || "—"}
+                  </TableInformation.Value>
+                </TableInformation.Column>
+              </TableInformation.Row>
 
-      {shouldShowSuccessMessage && (
-        <div className="mt-6 p-4 bg-[#DFEEE5] border border-[#0A3503] rounded-lg">
-          <p className="text-[#0A3503] text-center">
-            Análise socioambiental já foi solicitada e está disponível. Você
-            pode visualizar os resultados na seção &quot;Análise
-            Ambiental&quot;.
-          </p>
-        </div>
-      )}
-    </div>
+              <TableInformation.Row columnsPerRow={3}>
+                <TableInformation.Column>
+                  <TableInformation.Title>
+                    Data de Nascimento
+                  </TableInformation.Title>
+                  <TableInformation.Value>
+                    {formatDateFromISO(coOwner.pessoa.dataNascimento || "")}
+                  </TableInformation.Value>
+                </TableInformation.Column>
+                <TableInformation.Column>
+                  <TableInformation.Title>Telefone</TableInformation.Title>
+                  <TableInformation.Value>
+                    {coOwner.pessoa.telefone}
+                  </TableInformation.Value>
+                </TableInformation.Column>
+                <TableInformation.Column>
+                  <TableInformation.Title>Email</TableInformation.Title>
+                  <TableInformation.Value>
+                    {coOwner.pessoa.email}
+                  </TableInformation.Value>
+                </TableInformation.Column>
+              </TableInformation.Row>
+            </TableInformation.Section>
+          ))}
+        </TableInformation>
+
+        {!shouldShowSuccessMessage && (
+          <>
+            <div className="flex items-center gap-4 mt-6">
+              <input
+                id="accept"
+                type="checkbox"
+                className="accent-[#21801A] size-5"
+                {...register("accept")}
+              />
+              <label className="text-sm text-[#0A3503]" htmlFor="accept">
+                Declaro, para todos os fins de direito, e sob penas de lei, que
+                os dados informados e documentos apresentados são legítimos. E
+                que autorizo o compartilhamento de meus dados para consultas
+                públicas para análise socioambiental perante aos órgãos
+                necessários.
+              </label>
+            </div>
+            <div className="mt-8 flex justify-end">
+              <Button
+                variant="green"
+                className="w-[253px]"
+                disabled={!acceptChecked || isLoading || analysisRequested}
+                onClick={handleSubmitRequest}
+              >
+                {isLoading ? (
+                  <FiLoader className="animate-spin" />
+                ) : (
+                  "Solicitar"
+                )}
+              </Button>
+            </div>
+          </>
+        )}
+
+        {shouldShowSuccessMessage && (
+          <div className="mt-6 p-4 bg-[#DFEEE5] border border-[#0A3503] rounded-lg">
+            <p className="text-[#0A3503] text-center">
+              Análise socioambiental já foi solicitada e está disponível. Você
+              pode visualizar os resultados na seção &quot;Análise
+              Ambiental&quot;.
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 };
