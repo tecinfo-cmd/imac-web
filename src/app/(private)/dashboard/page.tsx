@@ -3,6 +3,7 @@
 import { DashboardUserLayout } from "@/layouts/DashboardUser";
 import { ElegibilityAbattoirLayout } from "@/layouts/ElegibilityAbattoir";
 import { FarmLayout } from "@/layouts/Farm";
+import { Guidelines } from "@/layouts/Farm/EnvironmentalAnalysis/Guidelines";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 
@@ -14,11 +15,14 @@ export default function Dashboard() {
     return <FarmLayout />;
   }
 
-  if (role === "ADMINISTRATIVO" || role === "ANALISTA") {
+  if (role === "ANALISTA" || role === "ANALISTA") {
     return <DashboardUserLayout />;
   }
 
   if (cargo === "FRIGORIFICO" || role === "FRIGORIFICO") {
     return <ElegibilityAbattoirLayout />;
+  }
+  if (cargo === "ADMINISTRATIVO" || role === "ADMINISTRATIVO") {
+    return <Guidelines />;
   }
 }

@@ -16,6 +16,11 @@ interface Documento {
   descricao: string;
   dataUpload: string;
   url: string;
+  id: number;
+  nomeArquivo: string;
+  nomeArquivoOriginal: string;
+  urlArquivo: string;
+  tipo: string;
 }
 interface Endereco {
   municipio: string;
@@ -68,16 +73,20 @@ const mapResponseToPropertySummary = (prop: any): PropertySummary => {
 
   const documentos = (prop.documentos || []).map((doc: any) => ({
     descricao: doc.tipo ?? "Documento",
-    dataUpload: new Date(
-      doc.dataCriacao ?? prop.dataCriacao
-    ).toLocaleDateString("pt-BR"),
+    dataUpload: doc?.dataUpload 
+      ? new Date(doc.dataUpload).toLocaleDateString("pt-BR")
+      : "-",
     url: doc.urlArquivo,
+    id: doc.id,
+    nomeArquivo: doc.nomeArquivo,
+    nomeArquivoOriginal: doc.nomeArquivoOriginal,
+    urlArquivo: doc.urlArquivo,
+    tipo: doc.tipo,
   }));
 
   const endereco = prop.endereco ?? {};
   const cidade = prop.cidade ?? {};
-  const relatorioUrl =
-    prop?.retornoAnalises?.[0]?.urlRelatorio ?? null;
+  const relatorioUrl = prop?.retornoAnalises?.[0]?.urlRelatorio ?? null;
 
   return {
     nomePropriedade: prop.nomePropriedade ?? "-",

@@ -8,57 +8,17 @@ import {
   PiSealCheckLight,
   PiFarmLight,
 } from "react-icons/pi";
+import { TbDownload } from "react-icons/tb";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
+import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { usePropertySummary } from "@/hooks/useGetProperties/usePropertySummary";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { DownloadIcon } from "@/icons/Download";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
-
-const mockDocuments = [
-  {
-    section: "Documentos da propriedade",
-    items: [
-      { date: "06/06/2025", name: "matricula_fazendaValeSO1.pdf" },
-      { date: "06/06/2025", name: "matricula_fazendaValeSO1.pdf" },
-      { date: "06/06/2025", name: "procuracao.pdf" },
-      { date: "06/06/2025", name: "cnh_proprietario1.pdf" },
-      { date: "06/06/2025", name: "rg_proprietario2.pdf" },
-    ],
-  },
-  {
-    section: "Documentos fornecidos para analises da propriedade",
-    items: [
-      { date: "06/06/2025", name: "car.pdf" },
-      { date: "06/06/2025", name: "autorizacaodesupressao.pdf" },
-      { date: "06/06/2025", name: "art.pdf" },
-      { date: "06/06/2025", name: "laudocontestacao.pdf" },
-      { date: "06/06/2025", name: "estrategiadegerenegacao.pdf" },
-    ],
-  },
-  {
-    section: "Parecer e relatórios da propriedade",
-    items: [
-      { date: "06/06/2025", name: "car.pdf" },
-      { date: "06/06/2025", name: "autorizacaodesupressao.pdf" },
-      { date: "06/06/2025", name: "art.pdf" },
-      { date: "06/06/2025", name: "laudocontestacao.pdf" },
-      { date: "06/06/2025", name: "estrategiadegerenegacao.pdf" },
-    ],
-  },
-  {
-    section: "Revisão do Car e outros documentos",
-    items: [
-      { date: "06/06/2025", name: "car.pdf" },
-      { date: "06/06/2025", name: "autorizacaodesupressao.pdf" },
-      { date: "06/06/2025", name: "art.pdf" },
-      { date: "06/06/2025", name: "laudocontestacao.pdf" },
-    ],
-  },
-];
 
 const customMenuItems = [
   {
@@ -98,8 +58,26 @@ interface PropertyDocumentsLayoutProps {
   onGoBack?: () => void;
 }
 
+const handleDownload = (documentUrl: string, fileName: string) => {
+  const link = document.createElement("a");
+  link.href = documentUrl;
+  link.download = fileName;
+  link.target = "_blank";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return "N/A";
+  try {
+    return new Date(dateString).toLocaleDateString("pt-BR");
+  } catch {
+    return "N/A";
+  }
+};
+
 export default function PropertyDocumentsLayout({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   farmId,
   onGoBack,
 }: PropertyDocumentsLayoutProps) {
@@ -108,6 +86,16 @@ export default function PropertyDocumentsLayout({
   const propriedadeId = params?.id as string;
 
   const { role } = useUserRoleStore();
+  const {
+    data: propertySummary,
+    isLoading: isLoadingSummary,
+    error: errorSummary,
+  } = usePropertySummary();
+  const {
+    data: farmData,
+    isLoading: isLoadingFarm,
+    error: errorFarm,
+  } = useGetFarmById(farmId || 0);
 
   const menuItems = role === "ANALISTA" ? customMenuItems : undefined;
   const handleGoBack = () => {
@@ -117,6 +105,46 @@ export default function PropertyDocumentsLayout({
       router.push(`/dashboard/properties/${propriedadeId}`);
     }
   };
+
+  const isFromFarm = !!farmId;
+  const isLoading = isFromFarm ? isLoadingFarm : isLoadingSummary;
+  const error = isFromFarm ? errorFarm : errorSummary;
+
+  if (isLoading) {
+    return (
+      <LayoutContainer
+        title="Acompanhamento da Propriedade"
+        menuItems={menuItems}
+      >
+        <div className="flex justify-center items-center min-h-[400px]">
+          <p className="text-[#21801A] text-lg">Carregando documentos...</p>
+        </div>
+      </LayoutContainer>
+    );
+  }
+
+  const documents = isFromFarm
+    ? (farmData?.documentos || []).map((doc: any) => ({
+        id: doc.id,
+        dataUpload: doc.dataUpload,
+        nomeArquivoOriginal: doc.nomeArquivoOriginal || doc.nomeArquivo,
+        tipo: doc.tipo,
+        urlArquivo: doc.urlArquivo,
+      }))
+    : propertySummary?.documentos || [];
+
+  if (error) {
+    return (
+      <LayoutContainer
+        title="Acompanhamento da Propriedade"
+        menuItems={menuItems}
+      >
+        <div className="flex justify-center items-center min-h-[400px]">
+          <p className="text-red-500 text-lg">Erro ao carregar documentos</p>
+        </div>
+      </LayoutContainer>
+    );
+  }
 
   return (
     <LayoutContainer
@@ -134,37 +162,54 @@ export default function PropertyDocumentsLayout({
       <h2 className="text-center text-2xl font-semibold mb-8 text-[#21801A]">
         Documentos da Propriedade
       </h2>
-      {mockDocuments.map((section) => (
-        <div key={section.section} className="mb-8">
+      {documents.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500 text-lg">
+            Nenhum documento encontrado para esta propriedade.
+          </p>
+        </div>
+      ) : (
+        <div className="mb-8">
           <Table.Container>
             <Table.Header>
               <Table.Title
-                colspan={3}
+                colspan={4}
                 className="bg-[#21801A] text-white text-base"
               >
-                {section.section}
+                Documentos da propriedade
               </Table.Title>
             </Table.Header>
             <Table.Header>
               <Table.Title>Data de upload</Table.Title>
               <Table.Title>Nome do arquivo</Table.Title>
+              <Table.Title>Tipo</Table.Title>
               <Table.Title> </Table.Title>
             </Table.Header>
             <Table.Body>
-              {section.items.map((doc, i) => (
-                <Table.Row key={doc.name + i}>
-                  <Table.Cell>{doc.date}</Table.Cell>
-                  <Table.Cell>{doc.name}</Table.Cell>
+              {documents.map((doc, i) => (
+                <Table.Row key={doc.id || `${doc.nomeArquivoOriginal}-${i}`}>
+                  <Table.Cell>{formatDate(doc.dataUpload)}</Table.Cell>
+                  <Table.Cell>
+                    {doc.nomeArquivoOriginal || "Documento sem nome"}
+                  </Table.Cell>
+                  <Table.Cell>{doc.tipo || "N/A"}</Table.Cell>
                   <Table.Cell>
                     <Tooltip
                       message="Baixar documento"
-                      id={`download-${section.section}-${i}`}
+                      id={`download-document-${i}`}
                     >
                       <button
                         type="button"
                         className="hover:bg-[#DFEEE5] p-2 rounded transition"
+                        onClick={() =>
+                          handleDownload(
+                            doc.urlArquivo,
+                            doc.nomeArquivoOriginal || "documento"
+                          )
+                        }
+                        disabled={!doc.urlArquivo}
                       >
-                        <DownloadIcon />
+                        <TbDownload />
                       </button>
                     </Tooltip>
                   </Table.Cell>
@@ -173,7 +218,7 @@ export default function PropertyDocumentsLayout({
             </Table.Body>
           </Table.Container>
         </div>
-      ))}
+      )}
       <div className="mt-10">
         <a
           href="#"

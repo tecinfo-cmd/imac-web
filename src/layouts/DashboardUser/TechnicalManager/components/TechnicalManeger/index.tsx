@@ -2,6 +2,8 @@ import { FC } from "react";
 
 import Modal from "@/components/ui/modals/modal";
 
+import { X } from "@/icons/X";
+
 interface Props {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -19,42 +21,82 @@ export const TechnicalDetail: FC<Props> = ({
 
   return (
     <Modal
-      className="bg-[#DFEEE5] border-[1px] border-[#cac8c8]"
+      className="bg-[#ffff] border-[1px] border-[#cac8c8] !w-full !max-w-4xl"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       onClose={onClose}
+      closeIcon={<X/>}
     >
-      <div className="text-[#0A3503] space-y-2">
-        <h2 className="text-center font-bold text-xl">Detalhes do Técnico</h2>
-        <div>
-          <strong className="text-[#21801A]">Nome:</strong> {data.nome}
+      <div className="p-6">
+        <div className="bg-[#21801A] text-white text-center px-4 py-2 font-semibold mt-4">
+          Informações do Responsável Técnico
         </div>
-        <div>
-          <strong className="text-[#21801A]">CPF:</strong> {data.cpf}
+        <div className="mb-6 mt-4">
+          <h3 className="font-bold text-lg mb-4 text-[#0A3503]">
+            DADOS PESSOAIS
+          </h3>
+
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <span className="text-[#21801A] font-medium">Nome</span>
+              <div className="text-[#0A3503]">{data.nome}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">CPF</span>
+              <div className="text-[#0A3503]">{data.cpf}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">Registro CREA</span>
+              <div className="text-[#0A3503]">{data.registroCrea}</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <span className="text-[#21801A] font-medium">Profissão</span>
+              <div className="text-[#0A3503]">{data.profissao}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">Telefone</span>
+              <div className="text-[#0A3503]">{data.telefone}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">E-mail</span>
+              <div className="text-[#0A3503]">{data.email}</div>
+            </div>
+          </div>
         </div>
+
         <div>
-          <strong className="text-[#21801A]">Profissão:</strong> {data.profissao}
-        </div>
-        <div>
-          <strong className="text-[#21801A]">Registro CREA:</strong> {data.registroCrea}
-        </div>
-        <div>
-          <strong className="text-[#21801A]">Telefone:</strong> {data.telefone}
-        </div>
-        <div>
-          <strong className="text-[#21801A]">Email:</strong> {data.email}
-        </div>
-        <div>
-          <strong className="text-[#21801A]">Data de Criação:</strong>{" "}
-          {new Date(data.dataCriacao).toLocaleString()}
-        </div>
-        <div>
-          <strong className="text-[#21801A]">Endereço:</strong>
-          <div>Município: {data.endereco?.municipio}</div>
-          <div>Estado: {data.endereco?.estado}</div>
-          <div>Logradouro: {data.endereco?.logradouro}</div>
-          <div>Complemento: {data.endereco?.complemento}</div>
-          <div>CEP: {data.endereco?.cep}</div>
+          <h3 className="font-bold text-lg mb-4 text-[#0A3503]">ENDEREÇO</h3>
+
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <span className="text-[#21801A] font-medium">CEP</span>
+              <div className="text-[#0A3503]">{data.endereco?.cep}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">Logradouro</span>
+              <div className="text-[#0A3503]">{data.endereco?.logradouro}</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <span className="text-[#21801A] font-medium">
+                Complemento (Opcional)
+              </span>
+              <div className="text-[#0A3503]">{data.endereco?.complemento}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">Município</span>
+              <div className="text-[#0A3503]">{data.endereco?.municipio}</div>
+            </div>
+            <div>
+              <span className="text-[#21801A] font-medium">UF</span>
+              <div className="text-[#0A3503]">{data.endereco?.estado}</div>
+            </div>
+          </div>
         </div>
       </div>
     </Modal>

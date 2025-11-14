@@ -12,8 +12,7 @@ import { useTechnicalResponsibleContestationStore } from "@/store/useTechnicalRe
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
-import { Document, DOCUMENT_LABEL_MAP, INITIAL_DOCUMENTS } from "../types";
-import { DocumentTable } from "./DocumentTable";
+import { DocumentsTechnical } from "./Documents";
 
 const reportSchema = yup.object({
   motivo: yup.string().optional(),
@@ -27,13 +26,21 @@ interface ReportContestationSectionProps {
   disabled?: boolean;
 }
 
+type Documento = {
+  id: number;
+  nomeArquivo: string;
+  nomeArquivoOriginal: string;
+  urlArquivo: string;
+  tipo: string;
+};
+
 export const ReportContestationSection = ({
   farmId,
   analysisId,
   disabled = false,
 }: ReportContestationSectionProps) => {
-  const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
-    const [sent, setSent] = useState(false);
+  const [files, setFiles] = useState<(Documento | File)[]>([]);
+  const [sent, setSent] = useState(false);
 
   const { mutateAsync: createReportContestation, isPending } =
     useCreateReportContestation(farmId, analysisId);
@@ -61,52 +68,16 @@ export const ReportContestationSection = ({
         </div>
         <div className="p-6">
           <div className="text-center py-8">
-            <p className="text-gray-600">
-              Contestação enviada com sucesso.
-            </p>
+            <p className="text-gray-600">Contestação enviada com sucesso.</p>
           </div>
         </div>
       </div>
     );
   }
 
-  const handleToggleDocument = (index: number) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = prevDocuments.map((doc, i) => {
-        if (i === index) {
-          return { ...doc, checked: !doc.checked };
-        }
-        return doc;
-      });
-      return updatedDocuments;
-    });
-  };
-
-  const handleUploadDocument = (index: number, file: File) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = [...prevDocuments];
-      updatedDocuments[index].file = file;
-      updatedDocuments[index].uploadDate = new Date().toLocaleDateString(
-        "pt-BR"
-      );
-      return updatedDocuments;
-    });
-  };
-
-  const handleRemoveDocument = (index: number) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = [...prevDocuments];
-      updatedDocuments[index].file = undefined;
-      updatedDocuments[index].uploadDate = undefined;
-      return updatedDocuments;
-    });
-  };
-
   const handleSubmitReportContestation = async () => {
     try {
-      const documentsWithFiles = documents.filter((doc) => doc.file);
-
-      if (documentsWithFiles.length === 0) {
+      if (files.length === 0) {
         toast.error("Adicione pelo menos um arquivo!");
         return;
       }
@@ -117,27 +88,23 @@ export const ReportContestationSection = ({
       }
 
       const parametros = JSON.stringify(
-        documentsWithFiles.map((doc) => ({
-          nome: doc.file?.name || "",
-          tipo: doc.type,
+        files.map((file, index) => ({
+          nome: "name" in file ? file.name : file.nomeArquivoOriginal,
+          tipo: `documento_${index + 1}`,
         }))
       );
-
-      const arquivos = documentsWithFiles
-        .map((doc) => doc.file!)
-        .filter(Boolean);
 
       await createReportContestation(
         {
           parametros,
-          arquivos,
+          arquivos: files.filter((file): file is File => file instanceof File),
           motivo: motivo || "",
           idResponsavelTecnico: parseInt(technicalResponsible.id),
         },
         {
           onSuccess: () => {
             toast.success("Contestação por laudo enviada com sucesso!");
-            setDocuments(INITIAL_DOCUMENTS);
+            setFiles([]);
             setSent(true);
           },
           onError: (error) => {
@@ -185,13 +152,7 @@ export const ReportContestationSection = ({
             </div>
 
             <div className="mt-8">
-              <DocumentTable
-                documents={documents}
-                onCheckboxChange={handleToggleDocument}
-                onFileChange={handleUploadDocument}
-                onRemoveFile={handleRemoveDocument}
-                labelMap={DOCUMENT_LABEL_MAP}
-              />
+              <DocumentsTechnical files={files} setFiles={setFiles} />
             </div>
 
             <div className="mt-6 flex justify-end">

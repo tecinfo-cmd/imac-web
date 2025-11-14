@@ -19,8 +19,15 @@ import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
-import { Document, DOCUMENT_LABEL_MAP, INITIAL_DOCUMENTS } from "../types";
-import { DocumentTable } from "./DocumentTable";
+import { DocumentsTechnical } from "./Documents";
+
+type Documento = {
+  id: number;
+  nomeArquivo: string;
+  nomeArquivoOriginal: string;
+  urlArquivo: string;
+  tipo: string;
+};
 
 interface SuppressionData {
   dataEmissao: string;
@@ -81,7 +88,7 @@ export const SuppressionAuthorizationSection = ({
     SuppressionData[]
   >([]);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
+  const [files, setFiles] = useState<(Documento | File)[]>([]);
   const [sent, setSent] = useState(false);
   const { data: suppressionTypes } = useGetSuppressionTypes();
   const { data: issuingBodies } = useGetIssuingBodies();
@@ -98,7 +105,7 @@ export const SuppressionAuthorizationSection = ({
 
   const [justification, setJustification] = useState<string>("");
 
-  if (sent ||disabled) {
+  if (sent || disabled) {
     return (
       <div className="bg-white border border-[#CAC4D0] shadow">
         <div className="bg-[#1A6415] text-white p-4">
@@ -111,9 +118,7 @@ export const SuppressionAuthorizationSection = ({
         </div>
         <div className="p-6">
           <div className="text-center py-8">
-            <p className="text-gray-600">
-              Autorização enviada com sucesso.
-            </p>
+            <p className="text-gray-600">Autorização enviada com sucesso.</p>
           </div>
         </div>
       </div>
@@ -122,8 +127,19 @@ export const SuppressionAuthorizationSection = ({
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles((prev) => [...prev, ...files]);
-    setValue("arquivos", [...uploadedFiles, ...files]);
+    setUploadedFiles(files); // Substitui ao invés de adicionar
+    setValue("arquivos", files);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    setUploadedFiles(files); // Substitui ao invés de adicionar
+    setValue("arquivos", files);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
+    e.preventDefault();
   };
 
   const handleAddSuppressionData = (data: SuppressionFormData) => {
@@ -171,9 +187,7 @@ export const SuppressionAuthorizationSection = ({
     }
 
     try {
-      const documentsWithFiles = documents.filter((doc) => doc.file);
-
-      if (documentsWithFiles.length === 0) {
+      if (files.length === 0) {
         toast.error(
           "Adicione pelo menos um arquivo na Anotação de responsabilidade técnica!"
         );
@@ -182,13 +196,11 @@ export const SuppressionAuthorizationSection = ({
 
       const allFileParams: Array<{ nome: string; tipo: string }> = [];
 
-      documentsWithFiles.forEach((doc) => {
-        if (doc.file) {
-          allFileParams.push({
-            nome: doc.file.name,
-            tipo: doc.type,
-          });
-        }
+      files.forEach((file, index) => {
+        allFileParams.push({
+          nome: "name" in file ? file.name : file.nomeArquivoOriginal,
+          tipo: `documento_${index + 1}`,
+        });
       });
 
       suppressionDataList.forEach((suppression) => {
@@ -215,9 +227,9 @@ export const SuppressionAuthorizationSection = ({
 
       const allFiles: File[] = [];
 
-      documentsWithFiles.forEach((doc) => {
-        if (doc.file) {
-          allFiles.push(doc.file);
+      files.forEach((file) => {
+        if (file instanceof File) {
+          allFiles.push(file);
         }
       });
 
@@ -226,6 +238,20 @@ export const SuppressionAuthorizationSection = ({
           allFiles.push(file);
         });
       });
+
+      // Log dos dados que serão enviados para debug
+      console.log("=== DADOS SENDO ENVIADOS ===");
+      console.log("farmId:", farmId);
+      console.log("analysisId:", analysisId);
+      console.log("parametros:", parametros);
+      console.log("arquivos:", allFiles);
+      console.log("motivo:", justification);
+      console.log(
+        "idResponsavelTecnico:",
+        technicalResponsible?.id ? parseInt(technicalResponsible.id) : 0
+      );
+      console.log("autorizacoesSupressoes:", autorizacoesSupressoes);
+      console.log("===========================");
 
       await createSuppressionAuthorization(
         {
@@ -245,7 +271,7 @@ export const SuppressionAuthorizationSection = ({
 
             setSuppressionDataList([]);
             setUploadedFiles([]);
-            setDocuments(INITIAL_DOCUMENTS);
+            setFiles([]);
             setJustification("");
             setSent(true);
           },
@@ -258,38 +284,6 @@ export const SuppressionAuthorizationSection = ({
     } catch (error) {
       console.error(error);
     }
-  };
-
-  const handleToggleDocument = (index: number) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = prevDocuments.map((doc, i) => {
-        if (i === index) {
-          return { ...doc, checked: !doc.checked };
-        }
-        return doc;
-      });
-      return updatedDocuments;
-    });
-  };
-
-  const handleUploadDocument = (index: number, file: File) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = [...prevDocuments];
-      updatedDocuments[index].file = file;
-      updatedDocuments[index].uploadDate = new Date().toLocaleDateString(
-        "pt-BR"
-      );
-      return updatedDocuments;
-    });
-  };
-
-  const handleRemoveDocument = (index: number) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = [...prevDocuments];
-      updatedDocuments[index].file = undefined;
-      updatedDocuments[index].uploadDate = undefined;
-      return updatedDocuments;
-    });
   };
 
   const suppressionTypeOptions =
@@ -377,12 +371,16 @@ export const SuppressionAuthorizationSection = ({
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
                       className="w-full h-[48px] p-4 rounded focus:outline-none border border-[#CAC4D0] shadow-[0px_1px_3px_rgba(0,0,0,0.3)] bg-white text-left flex items-center justify-between hover:border-[#21801A] transition-colors"
                     >
                       <span className="text-gray-600">
                         {uploadedFiles.length > 0
-                          ? `${uploadedFiles.length} arquivo selecionado`
-                          : "Selecione o arquivo"}
+                          ? `${uploadedFiles.length} arquivo${
+                              uploadedFiles.length > 1 ? "s" : ""
+                            } selecionado${uploadedFiles.length > 1 ? "s" : ""}`
+                          : "Clique ou arraste arquivos aqui"}
                       </span>
                       <FiUpload className="text-gray-400" size={20} />
                     </button>
@@ -456,13 +454,7 @@ export const SuppressionAuthorizationSection = ({
               </div>
             </div>
 
-            <DocumentTable
-              documents={documents}
-              onCheckboxChange={handleToggleDocument}
-              onFileChange={handleUploadDocument}
-              onRemoveFile={handleRemoveDocument}
-              labelMap={DOCUMENT_LABEL_MAP}
-            />
+            <DocumentsTechnical files={files} setFiles={setFiles} />
 
             <div className="mt-6 flex justify-end">
               <Button
