@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { GoAlertFill } from "react-icons/go";
 import { LuFileSearch } from "react-icons/lu";
 
-import { DocumentTable } from "../Contestation/components/DocumentTable";
+import { DocumentsTechnical } from "../Contestation/components/Documents";
 import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
 import { TableInformation } from "@/components/TableInformation";
 import { TextArea } from "@/components/TextArea";
@@ -16,7 +16,13 @@ import { useTechnicalResponsibleSuitabilityPlanStore } from "@/store/useTechnica
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
-import { Document, DOCUMENT_LABEL_MAP, INITIAL_DOCUMENTS } from "./types";
+type Documento = {
+  id: number;
+  nomeArquivo: string;
+  nomeArquivoOriginal: string;
+  urlArquivo: string;
+  tipo: string;
+};
 
 interface SuitabilityPlanProps {
   farmId: number;
@@ -47,7 +53,7 @@ export const SuitabilityPlan = ({
     },
   });
 
-  const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
+  const [files, setFiles] = useState<(Documento | File)[]>([]);
   const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
     null
   );
@@ -60,24 +66,7 @@ export const SuitabilityPlan = ({
     if (existingSuitabilityPlan) {
       setValue("motivo", existingSuitabilityPlan.motivo);
       setProposeNewArea("yes");
-
-      if (
-        existingSuitabilityPlan.documentos &&
-        existingSuitabilityPlan.documentos.length > 0
-      ) {
-        const updatedDocuments = INITIAL_DOCUMENTS.map((doc) => {
-          const matchingDocument = existingSuitabilityPlan.documentos.find(
-            (d) => d.tipo === doc.type
-          );
-          return {
-            ...doc,
-            checked: !!matchingDocument,
-            nomeArquivo: matchingDocument?.nomeArquivo || "",
-            urlArquivo: matchingDocument?.urlArquivo || "",
-          };
-        });
-        setDocuments(updatedDocuments);
-      }
+      // Aqui você pode carregar arquivos existentes se necessário
     }
   }, [existingSuitabilityPlan, setValue]);
 
@@ -99,38 +88,6 @@ export const SuitabilityPlan = ({
     );
   }
 
-  const handleCheckboxChange = (index: number) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = prevDocuments.map((doc, i) => {
-        if (i === index) {
-          return { ...doc, checked: !doc.checked };
-        }
-        return doc;
-      });
-      return updatedDocuments;
-    });
-  };
-
-  const handleFileChange = (index: number, file: File) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = [...prevDocuments];
-      updatedDocuments[index].file = file;
-      updatedDocuments[index].uploadDate = new Date().toLocaleDateString(
-        "pt-BR"
-      );
-      return updatedDocuments;
-    });
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setDocuments((prevDocuments) => {
-      const updatedDocuments = [...prevDocuments];
-      updatedDocuments[index].file = undefined;
-      updatedDocuments[index].uploadDate = undefined;
-      return updatedDocuments;
-    });
-  };
-
   const handleProposeNewAreaChange = (value: "yes" | "no") => {
     setProposeNewArea(value);
   };
@@ -141,21 +98,8 @@ export const SuitabilityPlan = ({
       return;
     }
 
-    const checkedDocuments = documents.filter((doc) => doc.checked);
-
-    if (checkedDocuments.length === 0) {
-      toast.error("Selecione pelo menos um documento obrigatório!");
-      return;
-    }
-
-    const missingFiles = checkedDocuments.filter((doc) => !doc.file);
-    if (missingFiles.length > 0) {
-      const missingTypes = missingFiles
-        .map((doc) => DOCUMENT_LABEL_MAP[doc.type])
-        .join(", ");
-      toast.error(
-        `Adicione os arquivos para os seguintes documentos: ${missingTypes}`
-      );
+    if (files.length === 0) {
+      toast.error("Adicione pelo menos um arquivo!");
       return;
     }
 
@@ -164,14 +108,10 @@ export const SuitabilityPlan = ({
       return;
     }
 
-    const validDocuments = checkedDocuments.filter((doc) => doc.file);
-
-    const params = validDocuments.map((doc) => ({
-      nome: doc.file!.name,
-      tipo: doc.type,
+    const params = files.map((file, index) => ({
+      nome: "name" in file ? file.name : file.nomeArquivoOriginal,
+      tipo: `documento_${index + 1}`,
     }));
-
-    const files = validDocuments.map((doc) => doc.file!);
 
     try {
       await createSuitabilityPlan.mutateAsync({
@@ -179,7 +119,7 @@ export const SuitabilityPlan = ({
         analysisId: analysisId,
         data: {
           parametros: JSON.stringify(params),
-          arquivos: files,
+          arquivos: files.filter((file): file is File => file instanceof File),
           motivo: data.motivo,
           idResponsavelTecnico: Number(technicalResponsible.id),
         },
@@ -319,7 +259,9 @@ export const SuitabilityPlan = ({
           </div>
           <div className="p-6">
             <div className="text-center py-8">
-              <p className="text-gray-600">Estratégia de Adequação enviada com sucesso.</p>
+              <p className="text-gray-600">
+                Estratégia de Adequação enviada com sucesso.
+              </p>
             </div>
           </div>
         </div>
@@ -397,14 +339,7 @@ export const SuitabilityPlan = ({
                     />
                   </div>
 
-                  <DocumentTable
-                    documents={documents}
-                    onCheckboxChange={handleCheckboxChange}
-                    onFileChange={handleFileChange}
-                    onRemoveFile={handleRemoveFile}
-                    labelMap={DOCUMENT_LABEL_MAP}
-                    disabled={!!existingSuitabilityPlan}
-                  />
+                  <DocumentsTechnical files={files} setFiles={setFiles} />
 
                   <div className="my-6 flex justify-end">
                     <Button
