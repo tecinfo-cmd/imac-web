@@ -230,15 +230,14 @@ export default function Register() {
           onSubmit={handleSubmit(onSubmit)}
         >
           <p className="font-bold">DADOS PESSOAIS</p>
+          <Input
+            name="nome"
+            label="Nome Completo"
+            placeholder="Insira seu nome completo"
+            control={control}
+          />
           <div className="flex flex-row gap-6 w-full">
             <div className="flex flex-col gap-3 flex-1">
-              <Input
-                name="nome"
-                label="Nome Completo"
-                placeholder="Insira seu nome completo"
-                control={control}
-              />
-
               <Input
                 name="data"
                 type="text"
