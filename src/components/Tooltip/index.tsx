@@ -7,6 +7,7 @@ interface TooltipProps {
   message: string;
   id: string;
   position?: "top" | "bottom";
+  disabled?: boolean;
 }
 
 export const Tooltip = ({
@@ -14,20 +15,21 @@ export const Tooltip = ({
   message,
   id,
   position = "top",
+  disabled = false,
 }: TooltipProps) => {
   const { visibleTooltip, showTooltip, hideTooltip } = useTooltipStore();
   const [opacity, setOpacity] = useState(0);
   const [translateY, setTranslateY] = useState(-5);
 
   useEffect(() => {
-    if (visibleTooltip === id) {
+    if (visibleTooltip === id && !disabled) {
       setOpacity(1);
       setTranslateY(0);
     } else {
       setOpacity(0);
       setTranslateY(-5);
     }
-  }, [visibleTooltip, id]);
+  }, [visibleTooltip, id, disabled]);
 
   return (
     <div
@@ -36,7 +38,7 @@ export const Tooltip = ({
       onMouseLeave={hideTooltip}
     >
       {children}
-      {visibleTooltip === id && (
+      {visibleTooltip === id && !disabled && (
         <div
           style={{
             opacity,
