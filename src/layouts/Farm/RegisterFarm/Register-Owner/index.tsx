@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/Input";
 
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
-import { maskDate } from "@/utils/maskDate";
+import { formatDateToISO } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { maskRG } from "@/utils/maskRG";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -115,7 +115,7 @@ const RegisterOwnerComponent = (
         label="Data de nascimento/Abertura"
         placeholder="dd/mm/aaaa"
         control={control}
-        mask={maskDate}
+        mask={formatDateToISO}
         error={errors.dataNascimento?.message}
         disabled={disabled}
       />
