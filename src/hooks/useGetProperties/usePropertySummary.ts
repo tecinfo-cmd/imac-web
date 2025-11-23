@@ -73,9 +73,7 @@ const mapResponseToPropertySummary = (prop: any): PropertySummary => {
 
   const documentos = (prop.documentos || []).map((doc: any) => ({
     descricao: doc.tipo ?? "Documento",
-    dataUpload: doc?.dataUpload 
-      ? new Date(doc.dataUpload).toLocaleDateString("pt-BR")
-      : "-",
+    dataUpload: doc?.dataUpload,
     url: doc.urlArquivo,
     id: doc.id,
     nomeArquivo: doc.nomeArquivo,

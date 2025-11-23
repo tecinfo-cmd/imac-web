@@ -22,6 +22,7 @@ interface Documento {
   nomeArquivoOriginal: string | null;
   urlArquivo: string;
   tipo: string;
+  dataUpload: string;
 }
 
 export interface Proprietario {
