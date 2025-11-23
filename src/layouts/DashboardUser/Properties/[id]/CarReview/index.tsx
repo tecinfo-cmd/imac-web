@@ -1,4 +1,5 @@
 "use client";
+
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,14 +13,18 @@ import {
 
 import { Modal } from "../SelfInspection/components/Modal";
 import { Input } from "@/components/Input";
+import { InputFileUpload } from "@/components/InputFile";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 import { Button } from "@/components/ui/button";
 
+import { api } from "@/api";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { maskDate } from "@/utils/maskDate";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "sonner";
+import * as yup from "yup";
 
 const mockDocuments = [
   { date: "06/06/2025", name: "car.pdf" },
@@ -62,11 +67,76 @@ export const CarReviewLayout = () => {
   const router = useRouter();
   const propriedadeId = params?.id as string;
   const [openModal, setOpenModal] = useState(false);
-  const { control, handleSubmit, reset } = useForm();
+  const schema = yup.object().shape({
+    nomeArquivo: yup.string().required("Nome do arquivo é obrigatório"),
+    descricaoArquivo: yup.string().nullable(),
+    file: yup.mixed().test("required", "Arquivo é obrigatório", (value) => {
+      if (!value) return false;
+      if (value instanceof File) return true;
+      if (Array.isArray(value) && value.length > 0)
+        return value[0] instanceof File;
+      if (
+        typeof FileList !== "undefined" &&
+        value instanceof FileList &&
+        value.length > 0
+      )
+        return true;
+      return false;
+    }),
+  });
 
-  const onSubmit = () => {
-    setOpenModal(false);
-    reset();
+  const { control, handleSubmit, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const onSubmit = async (values: any) => {
+    const { nomeArquivo, descricaoArquivo, file } = values || {};
+    let arquivo: File | null = null;
+    if (file instanceof File) {
+      arquivo = file;
+    } else if (file && file.length > 0 && file[0] instanceof File) {
+      arquivo = file[0];
+    }
+
+    if (!arquivo) {
+      toast.error("Selecione um arquivo antes de enviar.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("arquivos", arquivo);
+
+    const parametros = [
+      {
+        nome: arquivo.name,
+        // tipo: use filename without extension in uppercase as fallback
+        tipo: arquivo.name.split(".").slice(0, -1).join(".").toUpperCase(),
+        descricao: descricaoArquivo || "",
+        titulo: nomeArquivo || "",
+      },
+    ];
+
+    formData.append("parametros", JSON.stringify(parametros));
+
+    try {
+      setIsSubmitting(true);
+      await api.post(
+        `/propriedade-prem/${propriedadeId}/upload-documentos`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      toast.success("Documento enviado com sucesso!");
+      reset();
+      setOpenModal(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao enviar o documento.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -158,22 +228,20 @@ export const CarReviewLayout = () => {
               placeholder="Digite o título do arquivo"
               control={control}
             />
-            <Input
-              placeholder="arraste / selecione o arquivo aqui"
+            <InputFileUpload
               name="file"
               label="Insira o Arquivo"
               control={control}
+              accept="application/pdf,image/*"
             />
 
-            <Input
-              name="dataUpload"
-              label="Data de Upload"
-              placeholder="00/00/0000"
-              control={control}
-              mask={maskDate}
-            />
-            <Button type="submit" variant="green" className="mt-4 w-40 mx-auto">
-              Salvar
+            <Button
+              type="submit"
+              variant="green"
+              className="mt-4 w-40 mx-auto"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Salvando..." : "Salvar"}
             </Button>
           </form>
         </Modal.Body>

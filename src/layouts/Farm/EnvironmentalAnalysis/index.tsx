@@ -35,6 +35,17 @@ export const EnvironmentalAnalysisLayout = () => {
   const farmId = Number(params.id);
 
   const { data: farm } = useGetFarmById(farmId);
+  const isEmpty = (obj: any) =>
+    !obj ||
+    (Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0);
+
+  const contestationTooltip = isEmpty(farm?.retornoAnalises?.[0]?.contestacaoLaudo) || isEmpty(farm?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao)
+    ? "Contestação deve ser enviada em até 10 dias."
+    : undefined;
+
+  const adequacyTooltip = farm?.status !== "Enviado" && farm?.status !== "Assinado"
+    ? "Assine o termo em até 5 dias."
+    : undefined;
 
   const menuItems: MenuItem[] = [
     {
@@ -48,11 +59,16 @@ export const EnvironmentalAnalysisLayout = () => {
       icon: FaLeaf,
       key: "environmentalAnalysisPDF",
       disabled: !farm?.retornoAnalises?.length,
+      tooltip: (f: any) =>
+        !f?.retornoAnalises?.length
+          ? "Solicite a análise para gerar o relatório."
+          : null,
     },
     {
       label: "Contestação",
       icon: FaExclamation,
       key: "contestation",
+      tooltip: contestationTooltip,
     },
     {
       label: "Estratégia de Adequação",
@@ -63,6 +79,7 @@ export const EnvironmentalAnalysisLayout = () => {
       label: "Plano de Adequação",
       icon: FaFileSignature,
       key: "AdequancyTerm",
+      tooltip: adequacyTooltip
     },
     { label: "Multas", icon: FaGavel, key: "fines" },
     {
@@ -92,6 +109,7 @@ export const EnvironmentalAnalysisLayout = () => {
     icon: any;
     key?: string;
     disabled?: boolean;
+    tooltip?: string | ((farm: any) => string | null);
   };
 
   const [activeScreen, setActiveScreen] = useState<null | string | undefined>(
@@ -127,6 +145,62 @@ export const EnvironmentalAnalysisLayout = () => {
       });
       window.open(`/getDcsStatus?${queryParams.toString()}`, "_blank");
     }
+  };
+
+  const renderMenuButton = (item: MenuItem) => {
+    const { label, icon: Icon, disabled, key } = item;
+
+    const buttonElement = (
+      <button
+        key={label}
+        disabled={disabled}
+        onClick={() => {
+          if (disabled) return;
+          if (key === "getDcsStatus") {
+            handleCommercializationAuthorization();
+          } else {
+            setActiveScreen(key);
+          }
+        }}
+        className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 transition-colors ${
+          disabled
+            ? "bg-[#CAC4D0] text-[#7A7A7A] cursor-not-allowed"
+            : "bg-[#21801A] text-white hover:bg-[#1C6A16] cursor-pointer"
+        }`}
+      >
+        <Icon size={32} />
+        <span className="mt-2 text-sm font-medium">{label}</span>
+      </button>
+    );
+
+    let tooltipMessage: string | null | undefined = undefined;
+    if (typeof item.tooltip === "function") {
+      tooltipMessage = item.tooltip(farm);
+    } else if (typeof item.tooltip === "string") {
+      tooltipMessage = item.tooltip;
+    } else if (label === "Resumo da Propriedade" && disabled) {
+      const missingEndereco = !farm?.endereco;
+      const missingTerritorios = !farm?.territorios?.length;
+      tooltipMessage =
+        missingTerritorios && !missingEndereco
+          ? "Ainda estamos cadastrando sua propriedade na base!"
+          : "Finalize o cadastro para prosseguir.";
+    }
+
+    if (tooltipMessage) {
+      return (
+        <Tooltip
+          key={label}
+          id={`${label.replace(/\s+/g, "-").toLowerCase()}-tooltip`}
+          message={tooltipMessage}
+          position="bottom"
+        >
+          {buttonElement}
+        </Tooltip>
+      );
+    }
+
+    return buttonElement;
   };
 
   const componentMap: Record<string, JSX.Element> = {
@@ -166,9 +240,7 @@ export const EnvironmentalAnalysisLayout = () => {
         onGoBack={() => setActiveScreen(null)}
       />
     ),
-    guidelines: (
-      <Guidelines />
-    ),
+    guidelines: <Guidelines />,
   };
 
   if (activeScreen === "propertyDocuments") {
@@ -245,89 +317,13 @@ export const EnvironmentalAnalysisLayout = () => {
         </div>
       </div>
       <div className="grid p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-6 mt-8">
-        {menuItems.slice(0, 8).map(({ label, icon: Icon, disabled, key }) => {
-          const buttonElement = (
-            <button
-              key={label}
-              disabled={disabled}
-              onClick={() => {
-                if (disabled) return;
-                if (key === "getDcsStatus") {
-                  handleCommercializationAuthorization();
-                } else {
-                  setActiveScreen(key);
-                }
-              }}
-              className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 transition-colors ${
-                disabled
-                  ? "bg-[#CAC4D0] text-[#7A7A7A] cursor-not-allowed"
-                  : "bg-[#21801A] text-white hover:bg-[#1C6A16] cursor-pointer"
-              }`}
-            >
-              <Icon size={32} />
-              <span className="mt-2 text-sm font-medium">{label}</span>
-            </button>
-          );
-
-          if (label === "Resumo da Propriedade" && disabled) {
-            return (
-              <Tooltip
-                key={label}
-                id="overview-tooltip"
-                message="Ainda estamos cadastrando sua propriedade na base!"
-                position="bottom"
-              >
-                {buttonElement}
-              </Tooltip>
-            );
-          }
-
-          return buttonElement;
-        })}
+        {menuItems.slice(0, 8).map((item) => renderMenuButton(item))}
       </div>
 
       <div className="w-full h-px bg-gray-300 my-8"></div>
 
       <div className="grid p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-6">
-        {menuItems.slice(8).map(({ label, icon: Icon, disabled, key }) => {
-          const buttonElement = (
-            <button
-              key={label}
-              disabled={disabled}
-              onClick={() => {
-                if (disabled) return;
-                if (key === "getDcsStatus") {
-                  handleCommercializationAuthorization();
-                } else {
-                  setActiveScreen(key);
-                }
-              }}
-              className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 transition-colors ${
-                disabled
-                  ? "bg-[#CAC4D0] text-[#7A7A7A] cursor-not-allowed"
-                  : "bg-[#21801A] text-white hover:bg-[#1C6A16] cursor-pointer"
-              }`}
-            >
-              <Icon size={32} />
-              <span className="mt-2 text-sm font-medium">{label}</span>
-            </button>
-          );
-
-          if (label === "Resumo da Propriedade" && disabled) {
-            return (
-              <Tooltip
-                key={label}
-                id="overview-tooltip"
-                message="Ainda estamos cadastrando sua propriedade na base!"
-                position="bottom"
-              >
-                {buttonElement}
-              </Tooltip>
-            );
-          }
-
-          return buttonElement;
-        })}
+        {menuItems.slice(8).map((item) => renderMenuButton(item))}
       </div>
     </LayoutContainer>
   );

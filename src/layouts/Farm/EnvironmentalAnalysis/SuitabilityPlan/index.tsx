@@ -66,7 +66,6 @@ export const SuitabilityPlan = ({
     if (existingSuitabilityPlan) {
       setValue("motivo", existingSuitabilityPlan.motivo);
       setProposeNewArea("yes");
-      // Aqui você pode carregar arquivos existentes se necessário
     }
   }, [existingSuitabilityPlan, setValue]);
 

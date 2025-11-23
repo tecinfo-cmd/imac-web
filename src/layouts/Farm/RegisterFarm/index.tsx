@@ -135,7 +135,7 @@ export const RegisterFarmLayout = () => {
   };
 
   const handleUpdateFarm = async (data: any) => {
-    if (documentos.length !== 3) {
+    if (documentos.length < 3) {
       toast.error("Adicione os 3 documentos obrigatórios antes de salvar!");
       return;
     }
@@ -164,30 +164,34 @@ export const RegisterFarmLayout = () => {
       await updateFarm(formData);
     }
 
+    let ownersLinked = false;
+
     try {
       for (const owner of owners) {
         if (!owner?.nome) continue;
-        const coOwner = farm?.proprietarios.find(
-          (co) => co.tipoProprietario === "PROPRIETARIO"
-        );
-        const id = coOwner?.id;
+
         const tipoProprietario = owner.setAsMainOwner
           ? "PROPRIETARIO"
           : "COPROPRIETARIO";
-        const payload = [
-          {
-            idProprietario: id,
-            nome: owner.nome,
-            cpfCnpj: owner.cpfCnpj,
-            rgInscricaoSocial: removeRgMask(owner.rgInscricaoSocial),
-            dataNascimento: formatDateToISO(owner.dataNascimento) || "",
-            telefone: owner.telefone,
-            email: owner.email,
-            tipoProprietario,
-          },
-        ];
+
+        const item: any = {
+          nome: owner.nome,
+          cpfCnpj: owner.cpfCnpj,
+          rgInscricaoSocial: removeRgMask(owner.rgInscricaoSocial),
+          dataNascimento: formatDateToISO(owner.dataNascimento) || "",
+          telefone: owner.telefone,
+          email: owner.email,
+          tipoProprietario,
+        };
+
+        if (owner.id) {
+          item.idProprietario = owner.id;
+        }
+
+        const payload = [item];
         await linkOwnerMutation.mutateAsync(payload);
       }
+      ownersLinked = true;
     } catch {
       toast.error("Erro ao enviar coproprietários!");
     }
@@ -195,7 +199,7 @@ export const RegisterFarmLayout = () => {
     const arquivosNovos = documentos.filter(
       (doc) => doc instanceof File
     ) as File[];
-    if (arquivosNovos.length === 3) {
+    if (arquivosNovos.length >= 3) {
       const formData = new FormData();
       arquivosNovos.forEach((file) => formData.append("arquivos", file));
       const parameters = arquivosNovos.map((file) => ({
@@ -216,6 +220,17 @@ export const RegisterFarmLayout = () => {
         refetch();
       } catch {
         toast.error("Erro ao enviar documentos!");
+      }
+    } else if (arquivosNovos.length > 0 && arquivosNovos.length < 3) {
+      toast.error(
+        "Para enviar novos documentos, selecione pelo menos 3 arquivos!"
+      );
+      return;
+    } else {
+      // não há novos arquivos para enviar — se os proprietários foram vinculados com sucesso, mostrar sucesso
+      if (ownersLinked) {
+        toast.success("Dados enviados com sucesso!");
+        refetch();
       }
     }
   };
@@ -362,7 +377,7 @@ export const RegisterFarmLayout = () => {
               onOwnerChange={(data) => {
                 setOwners((prev) => {
                   const updated = [...prev];
-                  updated[0] = data;
+                  updated[0] = { ...data, id: mainOwner.id };
                   return updated;
                 });
               }}
@@ -388,7 +403,7 @@ export const RegisterFarmLayout = () => {
               onOwnerChange={(data) => {
                 setOwners((prev) => {
                   const updated = [...prev];
-                  updated[idx + 1] = data;
+                  updated[idx + 1] = { ...data, id: coOwner.id };
                   return updated;
                 });
               }}

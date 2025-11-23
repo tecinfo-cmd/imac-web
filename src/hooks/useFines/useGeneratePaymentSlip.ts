@@ -51,12 +51,12 @@ const createPayerFromFarm = (farm: Farm) => {
 
   return {
     cep: farm.endereco.cep.replace(/\D/g, ""),
-    cidade: farm.cidade.nome,
+    cidade: farm.endereco.municipio,
     documento,
     nome: mainOwner.pessoa.nome,
     tipoPessoa,
     endereco: farm.endereco.logradouro,
-    uf: farm.cidade.uf,
+    uf: farm.endereco.estado,
   };
 };
 
