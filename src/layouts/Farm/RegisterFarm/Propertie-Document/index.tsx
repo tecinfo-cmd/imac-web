@@ -3,6 +3,9 @@ import React, { useRef } from "react";
 import { IoTrashSharp } from "react-icons/io5";
 
 import { Table } from "@/components/Table";
+import { Tooltip } from "@/components/Tooltip";
+
+import { Eye } from "@/icons/Eye";
 
 type Documento = {
   id: number;
@@ -58,7 +61,6 @@ export const PropertieDocument = ({
           <Table.Header>
             <Table.Title>Descrição do arquivo</Table.Title>
             <Table.Title>Nome do arquivo</Table.Title>
-            <Table.Title>Data de upload</Table.Title>
             <Table.Title>Ações</Table.Title>
           </Table.Header>
           <Table.Body>
@@ -77,12 +79,19 @@ export const PropertieDocument = ({
                         {file.nomeArquivoOriginal}
                       </a>
                     </Table.Cell>
-                    <Table.Cell>-</Table.Cell>
                     <Table.Cell>
-                      <button type="button" onClick={() => handleRemove(idx)}>
-                        <IoTrashSharp className="text-red-500" />
-                      </button>
-                      {/* Adicione botões de edição/substituição conforme necessário */}
+                      <Tooltip
+                        message="Visualizar arquivo"
+                        id={`view-${file.id}`}
+                      >
+                        <a
+                          href={file.urlArquivo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Eye size={30} />
+                        </a>
+                      </Tooltip>
                     </Table.Cell>
                   </Table.Row>
                 );
@@ -92,7 +101,6 @@ export const PropertieDocument = ({
                   <Table.Row key={idx}>
                     <Table.Cell>Arquivo</Table.Cell>
                     <Table.Cell>{file.name}</Table.Cell>
-                    <Table.Cell>{new Date().toLocaleDateString()}</Table.Cell>
                     <Table.Cell>
                       <button type="button" onClick={() => handleRemove(idx)}>
                         <IoTrashSharp className="text-red-500" />
