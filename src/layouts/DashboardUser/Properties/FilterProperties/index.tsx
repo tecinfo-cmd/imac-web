@@ -26,6 +26,7 @@ export const FilterProperties = ({ onFilter }: FilterUsersProps) => {
       codigoMunicipio: data.codigoMunicipio?.value,
       status: data.status?.value,
       carFederal: data.carFederal?.toUpperCase().trim(),
+      analista: data.analista?.toUpperCase().trim(),
     };
     onFilter(formattedData);
   };
@@ -67,7 +68,14 @@ export const FilterProperties = ({ onFilter }: FilterUsersProps) => {
       <Input
         name="carFederal"
         label="CAR Federal"
-        placeholder="Administrador"
+        placeholder="Digite o CAR Federal"
+        control={control}
+      />
+
+      <Input
+        name="analista"
+        label="Analista"
+        placeholder="Digite o nome do analista"
         control={control}
       />
 
