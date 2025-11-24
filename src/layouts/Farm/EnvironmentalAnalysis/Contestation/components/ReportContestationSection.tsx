@@ -86,12 +86,19 @@ export const ReportContestationSection = ({
         toast.error("Responsável técnico não encontrado!");
         return;
       }
+      
+      const stripExtension = (filename: string) =>
+        filename.replace(/\.[^/.]+$/, "");
+
 
       const parametros = JSON.stringify(
-        files.map((file, index) => ({
-          nome: "name" in file ? file.name : file.nomeArquivoOriginal,
-          tipo: `documento_${index + 1}`,
-        }))
+        files.map((file) => {
+          const originalName = "name" in file ? file.name : file.nomeArquivoOriginal;
+          return {
+            nome: originalName,
+            tipo: stripExtension(originalName).toLocaleUpperCase(),
+          };
+        })
       );
 
       await createReportContestation(

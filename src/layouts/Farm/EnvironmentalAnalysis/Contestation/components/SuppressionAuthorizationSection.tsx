@@ -127,14 +127,14 @@ export const SuppressionAuthorizationSection = ({
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(files); // Substitui ao invés de adicionar
+    setUploadedFiles(files); 
     setValue("arquivos", files);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
-    setUploadedFiles(files); // Substitui ao invés de adicionar
+    setUploadedFiles(files); 
     setValue("arquivos", files);
   };
 
@@ -195,11 +195,13 @@ export const SuppressionAuthorizationSection = ({
       }
 
       const allFileParams: Array<{ nome: string; tipo: string }> = [];
+      const stripExtension = (filename: string) =>
+        filename.replace(/\.[^/.]+$/, "");
 
-      files.forEach((file, index) => {
+      files.forEach((file) => {
         allFileParams.push({
-          nome: "name" in file ? file.name : file.nomeArquivoOriginal,
-          tipo: `documento_${index + 1}`,
+          nome: file instanceof File ? file.name : file.nomeArquivo,
+          tipo: stripExtension(file instanceof File ? file.name : file.nomeArquivo).toLocaleUpperCase(),
         });
       });
 
@@ -238,20 +240,6 @@ export const SuppressionAuthorizationSection = ({
           allFiles.push(file);
         });
       });
-
-      // Log dos dados que serão enviados para debug
-      console.log("=== DADOS SENDO ENVIADOS ===");
-      console.log("farmId:", farmId);
-      console.log("analysisId:", analysisId);
-      console.log("parametros:", parametros);
-      console.log("arquivos:", allFiles);
-      console.log("motivo:", justification);
-      console.log(
-        "idResponsavelTecnico:",
-        technicalResponsible?.id ? parseInt(technicalResponsible.id) : 0
-      );
-      console.log("autorizacoesSupressoes:", autorizacoesSupressoes);
-      console.log("===========================");
 
       await createSuppressionAuthorization(
         {
