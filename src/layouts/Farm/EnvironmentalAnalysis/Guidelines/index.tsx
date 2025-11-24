@@ -10,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import { useGuidelines } from "@/hooks/useGuidelines/useGuidelines";
+import { useUpdateGuideline } from "@/hooks/useGuidelines/useGuidelines";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
+import { toast } from "sonner";
 
 import { FilterGuidelines } from "./FiltersGuidelines";
 
@@ -50,9 +52,10 @@ const GuidelinesContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<FilterProps>({});
   const { role } = useUserRoleStore();
-  const [editingGuideline, setEditingGuideline] = useState<Guideline | null>(
+  const [confirmInactiveId, setConfirmInactiveId] = useState<number | null>(
     null
   );
+  const updateGuidelineMutation = useUpdateGuideline();
 
   const pageSize = 10;
   const isAdmin = role === "ADMINISTRATIVO";
@@ -79,8 +82,32 @@ const GuidelinesContent = () => {
     setCurrentPage(page);
   };
 
-  const handleEditGuideline = (guideline: Guideline) => {
-    setEditingGuideline(guideline);
+
+  const handleConfirmInactive = async () => {
+    if (confirmInactiveId) {
+      const guideline = guidelines.find(
+        (g: Guideline) => g.id === confirmInactiveId
+      );
+      if (!guideline) {
+        setConfirmInactiveId(null);
+        return;
+      }
+      if (!guideline.ativo) {
+        toast.warning("Documento já está inativo");
+        setConfirmInactiveId(null);
+        return;
+      }
+      try {
+        await updateGuidelineMutation.mutateAsync({
+          id: String(confirmInactiveId),
+          ativo: false,
+        });
+        toast.success("Documento inativado com sucesso");
+      } catch {
+        toast.error("Erro ao inativar documento");
+      }
+      setConfirmInactiveId(null);
+    }
   };
 
   const handleDownloadPDF = (item: Guideline) => {
@@ -126,13 +153,12 @@ const GuidelinesContent = () => {
       <h2 className="text-center text-2xl font-semibold mb-8 text-[#21801A]">
         Roteiros Orientativos
       </h2>
+
       <FilterGuidelines
         onFilter={(f) => {
           setFilters(f);
           setCurrentPage(1);
         }}
-        editingGuideline={editingGuideline}
-        onCloseEdit={() => setEditingGuideline(null)}
       />
 
       {guidelines.length === 0 ? (
@@ -185,13 +211,35 @@ const GuidelinesContent = () => {
 
                   <div className="w-full">
                     {isAdmin ? (
-                      <Button
-                        variant="green"
-                        className="w-full rounded-full py-2 text-sm font-medium "
-                        onClick={() => handleEditGuideline(item)}
-                      >
-                        Editar
-                      </Button>
+                      confirmInactiveId === item.id ? (
+                        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 bg-white border border-gray-300 rounded shadow-lg p-4 text-center z-50">
+                          <p className="text-[#21801A] mb-4">
+                            Tem certeza que deseja inativar?
+                          </p>
+                          <div className="flex justify-center gap-4">
+                            <button
+                              onClick={handleConfirmInactive}
+                              className="bg-[#21801A] hover:bg-green-700 text-white px-4 py-2 rounded"
+                            >
+                              Sim
+                            </button>
+                            <button
+                              onClick={() => setConfirmInactiveId(null)}
+                              className="bg-[#F44336] hover:bg-red-700 text-white px-4 py-2 rounded"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="green"
+                          className="w-full rounded-full py-2 text-sm font-medium "
+                          onClick={() => setConfirmInactiveId(item.id)}
+                        >
+                          Inativar
+                        </Button>
+                      )
                     ) : item.tipo === "pdf" ? (
                       <Button
                         variant="green"
