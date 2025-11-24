@@ -257,9 +257,11 @@ export default function PropertyDocumentsLayout({
         <h2 className="text-2xl font-semibold text-[#21801A] text-center w-full">
           Documentos da Propriedade
         </h2>
-        <Button variant="green" onClick={() => setOpenModal(true)}>
-          Novo
-        </Button>
+        {role === "PRODUTOR" && (
+          <Button variant="green" onClick={() => setOpenModal(true)}>
+            Novo
+          </Button>
+        )}
       </div>
       {documents.length === 0 ? (
         <div className="text-center py-8">
