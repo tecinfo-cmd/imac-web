@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import { JSX, useState } from "react";
+import { JSX, useState, useEffect, useMemo } from "react";
 import {
   FaFileAlt,
   FaLeaf,
@@ -19,6 +19,7 @@ import { Tooltip } from "@/components/Tooltip";
 import GetDcsStatus from "@/app/(public)/getDcsStatus/page";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import PropertyDocumentsLayout from "@/layouts/DashboardUser/Properties/[id]/ProprtyDocuments";
+import { hasContestationClicked, hasConfirmedClicked } from "@/utils/contestationFlags";
 
 import { AdequancyTerm } from "./AdequancyTerm";
 import { CommercializationAuthorization } from "./CommercializationAuthorization";
@@ -39,13 +40,13 @@ export const EnvironmentalAnalysisLayout = () => {
     !obj ||
     (Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0);
 
-  const contestationTooltip = isEmpty(farm?.retornoAnalises?.[0]?.contestacaoLaudo) || isEmpty(farm?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao)
-    ? "Contestação deve ser enviada em até 10 dias."
-    : undefined;
+  const contestationTooltip =
+    isEmpty(farm?.retornoAnalises?.[0]?.contestacaoLaudo) ||
+    isEmpty(farm?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao)
+      ? "Contestação deve ser enviada em até 10 dias."
+      : undefined;
 
-  const adequacyTooltip = farm?.status !== "Enviado" && farm?.status !== "Assinado"
-    ? "Assine o termo em até 5 dias."
-    : undefined;
+  const viewStatus = farm?.status === "Enviado" || farm?.status === "Assinado";
 
   const menuItems: MenuItem[] = [
     {
@@ -79,18 +80,19 @@ export const EnvironmentalAnalysisLayout = () => {
       label: "Plano de Adequação",
       icon: FaFileSignature,
       key: "AdequancyTerm",
-      tooltip: adequacyTooltip
     },
-    { label: "Multas", icon: FaGavel, key: "fines" },
+    { label: "Multas", icon: FaGavel, key: "fines", disabled: !viewStatus },
     {
       label: "Autovistoria",
       icon: FaSearch,
       key: "inspection",
+      disabled: !viewStatus,
     },
     {
       label: "Autorização de Comercialização",
       icon: FaStore,
       key: "getDcsStatus",
+      disabled: !viewStatus,
     },
     {
       label: "Roteiros Orientativos",
@@ -124,6 +126,33 @@ export const EnvironmentalAnalysisLayout = () => {
     analysisId: number;
   } | null>(null);
 
+  const [contestationEnabled, setContestationEnabled] = useState(false);
+
+  const { adequacyEnabled } = useMemo(() => {
+    const currentAnalysis = farm?.retornoAnalises?.[0];
+    const currentAnalysisId = contestationParams?.analysisId || currentAnalysis?.id;
+
+    const normalize = (s?: string) => (s || "").toString().trim().toLowerCase();
+    const isFinishedStatus = (s?: string) => {
+      const n = normalize(s);
+      return !!n && !/analise|análise/.test(n);
+    };
+
+    const confirmed = currentAnalysisId ? hasConfirmedClicked(farmId, currentAnalysisId) : false;
+    const userClickedContestation = currentAnalysisId ? hasContestationClicked(farmId, currentAnalysisId) : false;
+
+    const suppressionStatus = currentAnalysis?.contestacaoAutorizacaoSupressao?.situacao;
+    const reportStatus = currentAnalysis?.contestacaoLaudo?.situacao;
+
+    const contestFinished = isFinishedStatus(suppressionStatus) || isFinishedStatus(reportStatus);
+
+    const adequacyEnabled = confirmed || ((userClickedContestation || !!(suppressionStatus || reportStatus)) && contestFinished);
+
+    return {
+      adequacyEnabled,
+    };
+  }, [farm, contestationParams, farmId]);
+
   const handleNavigateToContestation = (farmId: number, analysisId: number) => {
     setContestationParams({ farmId, analysisId });
     setActiveScreen("contestation");
@@ -136,6 +165,24 @@ export const EnvironmentalAnalysisLayout = () => {
     setContestationParams({ farmId, analysisId });
     setActiveScreen("suitabilityPlan");
   };
+
+  useEffect(() => {
+    const currentAnalysisId =
+      contestationParams?.analysisId || farm?.retornoAnalises?.[0]?.id;
+
+    if (!currentAnalysisId) {
+      setContestationEnabled(false);
+      return;
+    }
+
+    const enabled =
+      (contestationParams?.analysisId &&
+        contestationParams.analysisId === currentAnalysisId) ||
+      (!!farm?.retornoAnalises?.length &&
+        hasContestationClicked(farmId, currentAnalysisId));
+
+    setContestationEnabled(!!enabled);
+  }, [farm, contestationParams, farmId]);
 
   const handleCommercializationAuthorization = () => {
     if (farm?.carFederal && farm?.id) {
@@ -150,12 +197,16 @@ export const EnvironmentalAnalysisLayout = () => {
   const renderMenuButton = (item: MenuItem) => {
     const { label, icon: Icon, disabled, key } = item;
 
+    const effectiveDisabled =
+      !!disabled || (key === "contestation" && !contestationEnabled) ||
+      (key === "AdequancyTerm" && !adequacyEnabled);
+
     const buttonElement = (
       <button
         key={label}
-        disabled={disabled}
+        disabled={effectiveDisabled}
         onClick={() => {
-          if (disabled) return;
+          if (effectiveDisabled) return;
           if (key === "getDcsStatus") {
             handleCommercializationAuthorization();
           } else {
@@ -163,7 +214,7 @@ export const EnvironmentalAnalysisLayout = () => {
           }
         }}
         className={`flex flex-col items-center justify-center text-center p-4 rounded-lg w-44 h-40 transition-colors ${
-          disabled
+          effectiveDisabled
             ? "bg-[#CAC4D0] text-[#7A7A7A] cursor-not-allowed"
             : "bg-[#21801A] text-white hover:bg-[#1C6A16] cursor-pointer"
         }`}
@@ -174,7 +225,19 @@ export const EnvironmentalAnalysisLayout = () => {
     );
 
     let tooltipMessage: string | null | undefined = undefined;
-    if (typeof item.tooltip === "function") {
+
+    if (
+      (key === "fines" || key === "inspection" || key === "getDcsStatus") &&
+      effectiveDisabled
+    ) {
+      tooltipMessage = "Assine o plano de adequação para prosseguir.";
+    } else if (key === "AdequancyTerm") {
+      if (!adequacyEnabled) {
+        tooltipMessage = "Confirme as detecções ou aguarde a conclusão da contestação.";
+      } else if (farm?.status !== "Enviado" && farm?.status !== "Assinado") {
+        tooltipMessage = "Assine o termo em até 5 dias.";
+      }
+    } else if (typeof item.tooltip === "function") {
       tooltipMessage = item.tooltip(farm);
     } else if (typeof item.tooltip === "string") {
       tooltipMessage = item.tooltip;
