@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoArrowLeft } from "react-icons/go";
-import { MdEngineering, MdOutlineEdit } from "react-icons/md";
+import { MdEngineering } from "react-icons/md";
 import {
   PiUserCircleThin,
   PiSealCheckLight,
@@ -20,18 +20,13 @@ import { Tooltip } from "@/components/Tooltip";
 import { Button } from "@/components/ui/button";
 
 import { api } from "@/api";
+import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
+import { Eye } from "@/icons/Eye";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 import * as yup from "yup";
-
-const mockDocuments = [
-  { date: "06/06/2025", name: "car.pdf" },
-  { date: "06/06/2025", name: "autorizacaodesupressao.pdf" },
-  { date: "06/06/2025", name: "art.pdf" },
-  { date: "06/06/2025", name: "laudocontestacao.pdf" },
-];
 
 const menuItems = [
   { label: "Dashboard", href: "/dashboard", icon: <Analityc /> },
@@ -89,6 +84,9 @@ export const CarReviewLayout = () => {
     resolver: yupResolver(schema),
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: objectionData, refetch: refetchObjection } = useObjectionData();
+  const documents =
+    objectionData?.documentosPropriedade?.filter((d: any) => !!d.enviadoPorAnalista) || [];
 
   const onSubmit = async (values: any) => {
     const { nomeArquivo, descricaoArquivo, file } = values || {};
@@ -110,7 +108,6 @@ export const CarReviewLayout = () => {
     const parametros = [
       {
         nome: arquivo.name,
-        // tipo: use filename without extension in uppercase as fallback
         tipo: arquivo.name.split(".").slice(0, -1).join(".").toUpperCase(),
         descricao: descricaoArquivo || "",
         titulo: nomeArquivo || "",
@@ -131,12 +128,23 @@ export const CarReviewLayout = () => {
       toast.success("Documento enviado com sucesso!");
       reset();
       setOpenModal(false);
+      await refetchObjection();
     } catch (err) {
       console.error(err);
       toast.error("Erro ao enviar o documento.");
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const formatDateOnly = (iso?: string) => {
+    if (!iso) return "-";
+    const datePart = iso.split("T")[0] || iso;
+    const parts = datePart.split("-");
+    if (parts.length < 3) return "-";
+    const [year, month, day] = parts;
+    if (!year || !month || !day) return "-";
+    return `${day}/${month}/${year}`;
   };
 
   return (
@@ -180,24 +188,27 @@ export const CarReviewLayout = () => {
             Nome do arquivo
           </Table.Title>
         </Table.Header>
-        <Table.Body>
-          {mockDocuments.map((doc, i) => (
-            <Table.Row key={doc.name + i}>
-              <Table.Cell>{doc.date}</Table.Cell>
-              <Table.Cell>{doc.name}</Table.Cell>
-              <Table.Cell>
-                <Tooltip message="Editar documento" id={`edit-${i}`}>
-                  <button
-                    className="border-2 border-[#CAC4D0] p-1 rounded"
-                    type="button"
-                  >
-                    <MdOutlineEdit size={20} color="#CAC4D0" />
-                  </button>
-                </Tooltip>
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
+          <Table.Body>
+            {documents.length === 0 ? (
+              <Table.Row>
+                <Table.Cell colspan={3}>Nenhum documento enviado por analista.</Table.Cell>
+              </Table.Row>
+            ) : (
+              documents.map((doc: any, i: number) => (
+                <Table.Row key={doc.id || doc.nomeArquivo + i}>
+                  <Table.Cell>{formatDateOnly(doc.dataUpload)}</Table.Cell>
+                  <Table.Cell>{doc.tipo}</Table.Cell>
+                  <Table.Cell>
+                    <Tooltip message="Visualizar documento" id={`view-${doc.id || i}`}>
+                      <a href={doc.urlArquivo} target="_blank" rel="noreferrer">
+                        <Eye size={30} />
+                      </a>
+                    </Tooltip>
+                  </Table.Cell>
+                </Table.Row>
+              ))
+            )}
+          </Table.Body>
       </Table.Container>
       <div className="mt-10">
         <a href="#" className="text-[#21801A] underline text-sm">
@@ -219,12 +230,6 @@ export const CarReviewLayout = () => {
             <Input
               name="nomeArquivo"
               label="Nome do Arquivo"
-              placeholder="Digite o título do arquivo"
-              control={control}
-            />
-            <Input
-              name="descricaoArquivo"
-              label="Descrição do Arquivo"
               placeholder="Digite o título do arquivo"
               control={control}
             />

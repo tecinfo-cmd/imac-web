@@ -21,6 +21,9 @@ export const DocumentsTechnical = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const stripExtension = (filename: string) =>
+    filename.replace(/\.[^/.]+$/, "");
+
   const handleFiles = (newFiles: FileList | null) => {
     if (!newFiles) return;
     const fileArr = Array.from(newFiles);
@@ -56,9 +59,8 @@ export const DocumentsTechnical = ({
         </div>
         <Table.Container className="!pt-0">
           <Table.Header>
-            <Table.Title>Descrição do arquivo</Table.Title>
             <Table.Title>Nome do arquivo</Table.Title>
-            <Table.Title>Data de upload</Table.Title>
+            <Table.Title>Descrição do arquivo</Table.Title>
             <Table.Title>Ações</Table.Title>
           </Table.Header>
           <Table.Body>
@@ -77,7 +79,6 @@ export const DocumentsTechnical = ({
                         {file.nomeArquivoOriginal}
                       </a>
                     </Table.Cell>
-                    <Table.Cell>-</Table.Cell>
                     <Table.Cell>
                       <button type="button" onClick={() => handleRemove(idx)}>
                         <IoTrashSharp className="text-red-500" />
@@ -88,11 +89,12 @@ export const DocumentsTechnical = ({
                 );
               } else {
                 // Novo arquivo
+                const originalName = file.name;
+                const nameWithoutExt = stripExtension(originalName);
                 return (
                   <Table.Row key={idx}>
-                    <Table.Cell>Arquivo</Table.Cell>
-                    <Table.Cell>{file.name}</Table.Cell>
-                    <Table.Cell>{new Date().toLocaleDateString()}</Table.Cell>
+                    <Table.Cell>{nameWithoutExt}</Table.Cell>
+                    <Table.Cell>{originalName}</Table.Cell>
                     <Table.Cell>
                       <button type="button" onClick={() => handleRemove(idx)}>
                         <IoTrashSharp className="text-red-500" />

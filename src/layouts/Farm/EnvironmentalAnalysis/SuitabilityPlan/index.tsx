@@ -107,10 +107,22 @@ export const SuitabilityPlan = ({
       return;
     }
 
-    const params = files.map((file, index) => ({
-      nome: "name" in file ? file.name : file.nomeArquivoOriginal,
-      tipo: `documento_${index + 1}`,
-    }));
+    const stripExtension = (filename: string) =>
+        filename.replace(/\.[^/.]+$/, "");
+
+    const params = files.map((file) => {
+      if (file instanceof File) {
+        return {
+          nome: file.name,
+          tipo: stripExtension(file.name).toLocaleUpperCase(),
+        };
+      } else {
+        return {
+          nome: file.nomeArquivo,
+          tipo: stripExtension(file.nomeArquivo).toLocaleUpperCase(),
+        };
+      }
+    });
 
     try {
       await createSuitabilityPlan.mutateAsync({

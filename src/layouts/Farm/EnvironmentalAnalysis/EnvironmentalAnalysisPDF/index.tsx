@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { setContestationClicked, setConfirmedClicked } from "@/utils/contestationFlags";
 
 interface EnvironmentalAnalysisPDFProps {
   farmId: number;
@@ -25,12 +26,20 @@ export const EnvironmentalAnalysisPDF = ({
   }
 
   const handleConfirmDetections = () => {
+    if (analysisId) {
+      setConfirmedClicked(farmId, analysisId);
+    }
+
     if (onNavigateToSuitabilityPlan && analysisId) {
       onNavigateToSuitabilityPlan(farmId, analysisId);
     }
   };
 
   const handleContestDetections = () => {
+    if (analysisId) {
+      setContestationClicked(farmId, analysisId);
+    }
+
     if (onNavigateToContestation && analysisId) {
       onNavigateToContestation(farmId, analysisId);
     }
