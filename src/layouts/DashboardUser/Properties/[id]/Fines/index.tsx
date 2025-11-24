@@ -80,12 +80,12 @@ export const FinesLayout = () => {
   const isencao = analiseData?.descontoPercentual === 100 ? "Sim" : "Não";
 
   const formatDate = (dateString: string | null) => {
-    if (!dateString) return "-";
-    try {
-      return new Date(dateString).toLocaleDateString("pt-BR");
-    } catch {
-      return "-";
+    if (dateString && dateString.includes("T")) {
+      const dt = new Date(dateString);
+      if (isNaN(dt.getTime())) return "-";
+      return dt.toLocaleDateString("pt-BR", { timeZone: "UTC" });
     }
+    return "-";
   };
   const formatCurrency = (value: number) => {
     return `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
@@ -188,7 +188,7 @@ export const FinesLayout = () => {
               <Table.Row key={boleto.id}>
                 <Table.Cell>{boleto.parcela}</Table.Cell>
                 <Table.Cell>{formatDate(boleto.dataVencimento)}</Table.Cell>
-                <Table.Cell>{formatDate(boleto.dataPagamento)}</Table.Cell>
+                <Table.Cell>{boleto.dataPagamento}</Table.Cell>
                 <Table.Cell>{formatCurrency(boleto.valor)}</Table.Cell>
                 <Table.Cell>
                   <div className="flex items-center gap-2">

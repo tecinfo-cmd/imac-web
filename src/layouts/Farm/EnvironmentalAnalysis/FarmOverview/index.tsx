@@ -254,7 +254,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
               <TableInformation.Column>
                 <TableInformation.Title>Telefone</TableInformation.Title>
                 <TableInformation.Value>
-                  {owner?.pessoa.telefone}
+                  {owner?.telefone}
                 </TableInformation.Value>
               </TableInformation.Column>
               <TableInformation.Column>

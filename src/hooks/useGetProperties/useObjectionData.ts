@@ -23,6 +23,8 @@ interface PlanoDocumento {
   nomeArquivoOriginal: string;
   urlArquivo: string;
   tipo: string;
+  dataUpload?: string;
+  enviadoPorAnalista?: boolean;
 }
 
 interface PlanoResponsavelTecnico {
@@ -103,6 +105,8 @@ interface ObjectionData {
   planoAdequacao?: PlanoAdequacao | null;
   documentosPlano: DocumentoTecnicoData[];
   retornoAnalises: RetornoAnalise[];
+  documentosPropriedade?: PlanoDocumento[];
+  documentosPropriedadeAnalista?: PlanoDocumento[];
 }
 
 interface SubmitObjectionProps {
@@ -187,6 +191,18 @@ export const useObjectionData = () => {
         url: doc.urlArquivo || "#",
       }));
 
+      const documentosPropriedade: PlanoDocumento[] = (
+        data.documentos || []
+      ).map((doc: any) => ({
+        id: doc.id,
+        nomeArquivo: doc.nomeArquivo,
+        nomeArquivoOriginal: doc.nomeArquivoOriginal,
+        urlArquivo: doc.urlArquivo,
+        tipo: doc.tipo,
+        dataUpload: doc.dataUpload,
+        enviadoPorAnalista: !!doc.enviadoPorAnalista,
+      }));
+
       const farmData = {
         car: data.carFederal || "-",
         vouches: data.vouches?.[0]?.voucher || "-",
@@ -252,7 +268,11 @@ export const useObjectionData = () => {
 
         retornoAnalises: data.retornoAnalises || [],
 
-        // Expor status das contestações
+        documentosPropriedade: documentosPropriedade,
+        documentosPropriedadeAnalista: documentosPropriedade.filter(
+          (d) => !!d.enviadoPorAnalista
+        ),
+
         contestacaoAutorizacaoSupressao: contestacaoSupressao
           ? { situacao: contestacaoSupressao.situacao ?? null }
           : null,
