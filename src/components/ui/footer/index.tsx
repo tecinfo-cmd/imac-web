@@ -1,4 +1,5 @@
 import * as React from "react";
+import {version} from '../../../../package.json';
 
 export default function Footer() {
   return (
@@ -19,6 +20,11 @@ export default function Footer() {
           Av. Dr. Hélio Ribeiro, 525 - Edifício Helbor Dual <br />
           Business Office Corporate, Sala 701 - Bairro <br />
           Alvorada, Cuiabá - MT, 78048-250
+        </p>
+      </div>
+      <div>
+        <p className="w-full max-w-[1482px] mx-auto flex flex-col md:flex-row justify-center text-center p-[40px] gap-4 sm:gap-[50px] md:gap-[50px] lg:gap-[150px] xl:gap-[206px]">
+          <span className="font-bold">{version} </span> <br />
         </p>
       </div>
     </footer>

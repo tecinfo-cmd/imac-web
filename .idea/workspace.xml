@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="70c3598f-9759-4419-98a1-c1e48b2e719f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/useBuyVoucher/useBuyVoucher.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/useBuyVoucher/useBuyVoucher.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/footer/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/footer/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

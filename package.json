@@ -1,6 +1,6 @@
 {
   "name": "imac-web",
-  "version": "0.1.0",
+  "version": "REM-DEV-V-1.0.0.20",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
