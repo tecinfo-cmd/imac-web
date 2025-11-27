@@ -14,12 +14,16 @@ export default function Footer() {
           <span className="font-bold">CONTATO</span> <br />
           Fones: (65) 9 9977-8227 / (65) 3057-9291
         </p>
+        <br />
         <p className="w-full sm:w-[200px] md:w-[300px] lg:w-[414px] h-auto text-left text-[12px] sm:text-[14px] lg:text-[15px] xl:text-[16px]">
           <span className="font-bold">ENDEREÇO</span> <br />
           Av. Dr. Hélio Ribeiro, 525 - Edifício Helbor Dual <br />
           Business Office Corporate, Sala 701 - Bairro <br />
           Alvorada, Cuiabá - MT, 78048-250
         </p>
+      </div>
+      <div className="w-full text-center mt-4 pt-4">
+        <strong>PREM-HOM-V-1.0.0.20</strong>
       </div>
     </footer>
   );
