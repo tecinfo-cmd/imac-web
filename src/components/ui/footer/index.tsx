@@ -23,10 +23,8 @@ export default function Footer() {
           Alvorada, Cuiabá - MT, 78048-250
         </p>
       </div>
-      <div>
-        <p className="w-full max-w-[1482px] mx-auto flex flex-col md:flex-row justify-center text-center p-[40px] gap-4 sm:gap-[50px] md:gap-[50px] lg:gap-[150px] xl:gap-[206px]">
+      <div className="w-full text-center mt-4 pt-4">
           <span className="font-bold">{version} </span> <br />
-        </p>
       </div>
     </footer>
   );
