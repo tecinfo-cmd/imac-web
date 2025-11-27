@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { MdEngineering } from "react-icons/md";
 import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
+import { TbFileOrientation } from "react-icons/tb";
 
 import { Input } from "@/components/Input";
 import { InputSelect } from "@/components/InputSelect";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useUserDetail } from "@/hooks/useGetUsers/useUserDetail";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
 
 export const UserDetailLayout = () => {
   const { email } = useParams();
@@ -24,6 +26,27 @@ export const UserDetailLayout = () => {
     isDirty,
     isSaving,
   } = useUserDetail(email);
+  const { role } = useUserRoleStore();
+
+  const isAdmin = role === "ADMINISTRATIVO";
+
+  const customMenu = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: <Analityc />,
+    },
+    {
+      label: "Usuários",
+      href: "/dashboard/maneger/users-maneger",
+      icon: <PiUser size={44} />,
+    },
+    {
+      label: "Roteiros Orientativos",
+      href: "/dashboard/maneger/guidelines",
+      icon: <TbFileOrientation size={44} />,
+    },
+  ];
 
   const customMenuItems = [
     {
@@ -67,7 +90,7 @@ export const UserDetailLayout = () => {
   if (isLoading || !userData) return <p className="p-4">Carregando...</p>;
 
   return (
-    <LayoutContainer title="Detalhes do Usuário" menuItems={customMenuItems}>
+    <LayoutContainer title="Detalhes do Usuário" menuItems={isAdmin ? customMenu : customMenuItems}>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="grid grid-cols-1 md:grid-cols-3 gap-4"

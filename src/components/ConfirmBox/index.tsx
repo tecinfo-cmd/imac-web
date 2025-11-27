@@ -1,45 +1,63 @@
 // src/components/ConfirmBox.tsx
 
 import { useState } from "react";
+import { MdPauseCircleFilled, MdPlayCircleFilled } from "react-icons/md";
 
 import { Trash } from "@/icons/Trash";
-import { toast } from "sonner";
+import { useUserRoleStore } from "@/store/useUserRoleStore";
 
 interface ConfirmBoxProps {
   onConfirm: () => void;
-  status: string; 
+  onActivate?: () => void;
+  status: string;
 }
 
-export function ConfirmBox({ onConfirm , status}: ConfirmBoxProps) {
+export function ConfirmBox({ onConfirm, onActivate, status }: ConfirmBoxProps) {
   const [showBox, setShowBox] = useState(false);
+  const { role } = useUserRoleStore();
+
+  const isAdmin = role === "ADMINISTRATIVO";
+  const isActive = status === "ATIVO";
 
   const handleClick = () => {
-    console.log("STATUS RECEBIDO:", status);
-    if (status !== "ATIVO") {
-      toast.warning("Este usuário já está inativo."); 
-      return;
+    if (status === "ATIVO") {
+      setShowBox(true);
+    } else if (status === "INATIVO" && onActivate) {
+      setShowBox(true);
     }
-
-    setShowBox(true);
   };
 
   const handleConfirm = () => {
+    if (isActive ){
     onConfirm();
     setShowBox(false);
+    } else {
+      if (onActivate) {
+        onActivate();
+      }
+      setShowBox(false);
+    }
   };
 
   return (
     <div className="relative inline-block">
-      <button
-        onClick={ handleClick }
-        className="text-[#21801A] hover:underline"
-      >
-        <Trash />
+      <button onClick={handleClick} className="text-[#21801A] hover:underline">
+        {isAdmin ? (
+          status === "ATIVO" ? (
+            <MdPauseCircleFilled size={24} />
+          ) : (
+            <MdPlayCircleFilled size={24} />
+          )
+        ) : (
+          <Trash />
+        )}
       </button>
 
       {showBox && (
         <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 bg-white border border-gray-300 rounded shadow-lg p-4 text-center">
-          <p className="text-[#21801A] mb-4">Tem certeza que deseja inativar?</p>
+          <p className="text-[#21801A] mb-4">
+            Tem certeza que deseja {isActive ? "pausar" : "ativar"}?
+          </p>
           <div className="flex justify-center gap-4">
             <button
               onClick={handleConfirm}
