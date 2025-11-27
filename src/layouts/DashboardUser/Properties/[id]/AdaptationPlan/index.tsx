@@ -16,6 +16,7 @@ import {
 
 import { InfoGrid } from "@/components/InfoGrid";
 import { Input } from "@/components/Input";
+import { InputFileUpload } from "@/components/InputFile";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Radio } from "@/components/RadioBox";
 import { Table } from "@/components/Table";
@@ -28,6 +29,7 @@ import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 //import { Taxa } from "@/icons/Taxa";
+import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
 import { toast } from "sonner";
 
 type Parecer =
@@ -599,6 +601,32 @@ export const PlanoAdequacaoLayout = () => {
           <Table.Container className="!pt-0">
             <Table.Body>
               <Table.Row>
+                <Table.Cell>
+                  <InputFileUpload
+                    name="file"
+                    control={control}
+                    label="Conversor"
+                    onFileChange={async (files) => {
+                      const file = files?.[0];
+                      if (file) {
+                        const wkt = await convertShapefileToWkt(file);
+                        if (wkt) {
+                          setValue("wkt", wkt, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                          toast.success("Arquivo convertido para WKT!", {
+                            duration: 4000,
+                          });
+                        } else {
+                          toast.error("Nenhum WKT encontrado no arquivo.", {
+                            duration: 4000,
+                          });
+                        }
+                      }
+                    }}
+                  />
+                </Table.Cell>
                 <Table.Cell>
                   <Input
                     label="Wkt"

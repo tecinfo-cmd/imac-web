@@ -11,6 +11,7 @@ interface InputFileUploadProps {
   accept?: string;
   onRemove?: () => void;
   disabled?: boolean;
+  onFileChange?: (files: FileList | File[] | null) => void;
 }
 
 export const InputFileUpload = ({
@@ -20,6 +21,7 @@ export const InputFileUpload = ({
   accept,
   onRemove,
   disabled = false,
+  onFileChange,
 }: InputFileUploadProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isDragActive, setIsDragActive] = useState(false);
@@ -75,7 +77,12 @@ export const InputFileUpload = ({
               ref={inputRef}
               type="file"
               accept={accept}
-              onChange={(e) => !disabled && field.onChange(e.target.files?.[0])}
+              onChange={(e) => {
+                if (!disabled) {
+                  field.onChange(e.target.files?.[0]);
+                  onFileChange?.(e.target.files);
+                }
+              }}
               className="absolute inset-0 opacity-0 cursor-pointer"
               tabIndex={-1}
               style={{ pointerEvents: "none" }}
