@@ -3,7 +3,7 @@
 import { DashboardUserLayout } from "@/layouts/DashboardUser";
 import { ElegibilityAbattoirLayout } from "@/layouts/ElegibilityAbattoir";
 import { FarmLayout } from "@/layouts/Farm";
-import { Guidelines } from "@/layouts/Farm/EnvironmentalAnalysis/Guidelines";
+import { DashboardAdmin } from "@/layouts/Maneger/DashboardAdmin";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 
@@ -23,6 +23,6 @@ export default function Dashboard() {
     return <ElegibilityAbattoirLayout />;
   }
   if (cargo === "ADMINISTRATIVO" || role === "ADMINISTRATIVO") {
-    return <Guidelines />;
+    return <DashboardAdmin />;
   }
 }

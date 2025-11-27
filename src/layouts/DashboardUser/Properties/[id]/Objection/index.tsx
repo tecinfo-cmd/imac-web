@@ -16,6 +16,7 @@ import {
 
 import { InfoGrid } from "@/components/InfoGrid";
 import { Input } from "@/components/Input";
+import { InputFileUpload } from "@/components/InputFile";
 import { InputSelect } from "@/components/InputSelect";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Radio } from "@/components/RadioBox";
@@ -28,6 +29,7 @@ import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
+import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
 import { toast } from "sonner";
 
 type SelectOption = { label: string; value: string } | string | undefined;
@@ -951,6 +953,7 @@ export const ObjectionLayout = () => {
               <Table.Title>Área identificada</Table.Title>
               <Table.Title>Área a regenerar</Table.Title>
               <Table.Title>Tipo</Table.Title>
+              <Table.Title>Conversor</Table.Title>
               <Table.Title>WKT</Table.Title>
             </Table.Header>
             <Table.Body>
@@ -1054,6 +1057,33 @@ export const ObjectionLayout = () => {
                             value: "Autorização supressao",
                           },
                         ]}
+                      />
+                    </Table.Cell>
+
+                    <Table.Cell>
+                      <InputFileUpload
+                        control={control}
+                        name={`deteccoes.${index}.file`}
+                        label=""
+                        onFileChange={async (files) => {
+                          const file = files?.[0];
+                          if (file) {
+                            const wkt = await convertShapefileToWkt(file);
+                            if (wkt) {
+                              setValue(`deteccoes.${index}.wkt`, wkt, {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              });
+                              toast.success("Arquivo convertido para WKT!", {
+                                duration: 4000,
+                              });
+                            } else {
+                              toast.error("Nenhum WKT encontrado no arquivo.", {
+                                duration: 4000,
+                              });
+                            }
+                          }
+                        }}
                       />
                     </Table.Cell>
 

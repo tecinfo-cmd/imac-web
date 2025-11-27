@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { PiUser } from "react-icons/pi";
 import { TbFileOrientation } from "react-icons/tb";
 
 import { LayoutContainer } from "@/components/LayoutContainer";
@@ -11,6 +12,7 @@ import { Card } from "@/components/ui/card";
 
 import { useGuidelines } from "@/hooks/useGuidelines/useGuidelines";
 import { useUpdateGuideline } from "@/hooks/useGuidelines/useGuidelines";
+import { Analityc } from "@/icons/Analityc";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 import { toast } from "sonner";
 
@@ -18,8 +20,18 @@ import { FilterGuidelines } from "./FiltersGuidelines";
 
 const menuItems = [
   {
-    label: "Roteiros Orientativos",
+    label: "Dashboard",
     href: "/dashboard",
+    icon: <Analityc />,
+  },
+  {
+    label: "Usuários",
+    href: "/dashboard/maneger/users-maneger",
+    icon: <PiUser size={44} />,
+  },
+  {
+    label: "Roteiros Orientativos",
+    href: "/dashboard/maneger/guidelines",
     icon: <TbFileOrientation size={44} />,
   },
 ];
@@ -81,7 +93,6 @@ const GuidelinesContent = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
-
 
   const handleConfirmInactive = async () => {
     if (confirmInactiveId) {
