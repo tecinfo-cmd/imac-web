@@ -12,13 +12,12 @@ import {
   createPayerFromFarm,
 } from "@/hooks/useFines/useGeneratePaymentSlip";
 import { useGetPaymentStatus } from "@/hooks/useFines/useGetPaymentStatus";
+import { formatDateToISO } from "@/utils/maskDate";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface FinesProps {
   farmId: number;
 }
-
-
 
 export const Fines = ({ farmId }: FinesProps) => {
   const queryClient = useQueryClient();
@@ -55,6 +54,10 @@ export const Fines = ({ farmId }: FinesProps) => {
 
   const hasPaymentStatus = paymentStatus && paymentStatus.length > 0;
   const isAccepted = watch("accept") || hasPaymentStatus;
+
+  const formatCurrency = (value: number) => {
+    return `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
+  };
 
   const handlePrintPaymentSlip = async (linhaDigitavel: string) => {
     try {
@@ -203,7 +206,7 @@ export const Fines = ({ farmId }: FinesProps) => {
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Valor multa:</h2>
-            <p>R${fineValue.toFixed(2).replace(".", ",")}</p>
+            <p>{formatCurrency(fineValue)}</p>
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Possui isenção?</h2>
@@ -215,7 +218,7 @@ export const Fines = ({ farmId }: FinesProps) => {
           </div>
           <div className="flex gap-2">
             <h2 className="text-[#21801A]">Valor total da multa:</h2>
-            <p>R${totalFineValue.toFixed(2).replace(".", ",")}</p>
+            <p>{formatCurrency(totalFineValue)}</p>
           </div>
         </div>
       </div>
@@ -288,7 +291,7 @@ export const Fines = ({ farmId }: FinesProps) => {
                       .filter((opt) => opt.n > 1)
                       .map((opt) => (
                         <option key={opt.n} value={opt.n}>
-                          {opt.n} x R$ {opt.value.toFixed(2).replace(".", ",")}
+                          {opt.n} x {formatCurrency(opt.value)}
                         </option>
                       ))}
                   </select>
@@ -340,19 +343,13 @@ export const Fines = ({ farmId }: FinesProps) => {
                     >
                       <div className="text-[#0A3503]">{payment.parcela}</div>
                       <div className="text-[#0A3503]">
-                        {new Date(payment.dataVencimento).toLocaleDateString(
-                          "pt-BR"
-                        )}
+                        {formatDateToISO(payment.dataVencimento) || "-"}
                       </div>
                       <div className="text-[#0A3503]">
-                        {payment.dataPagamento
-                          ? new Date(payment.dataPagamento).toLocaleDateString(
-                              "pt-BR"
-                            )
-                          : "-"}
+                        {formatDateToISO(payment.dataPagamento) || "-"}
                       </div>
                       <div className="text-[#0A3503]">
-                        {payment.valor || "-"}
+                        {formatCurrency(payment.valor) || "-"}
                       </div>
                       <div className="text-[#0A3503]">
                         <span
