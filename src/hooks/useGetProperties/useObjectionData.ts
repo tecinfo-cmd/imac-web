@@ -205,10 +205,10 @@ export const useObjectionData = () => {
 
       const farmData = {
         car: data.carFederal || "-",
-        vouches: data.vouches?.[0]?.voucher || "-",
+        voucher: data.voucher || "-",
         nome: data.nomePropriedade || "-",
-        municipio: data.cidade?.nome || "-",
-        estado: data.cidade?.uf || "-",
+        municipio: data.endereco?.municipio || "-",
+        estado: data.endereco?.estado || "-",
         etapa: data.etapa || "-",
         status: data.status || "-",
       };

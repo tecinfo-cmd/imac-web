@@ -14,11 +14,22 @@ interface AdequancyTermProps {
   farmId: number;
 }
 
+const termoStatuses = [
+  "Termo Enviado",
+  "Termo Assinado",
+  "Multa disponível",
+  "Autovistoria Disponível",
+  "Autovistoria Realizado",
+  "Autovistoria Não realizado",
+  "Autorização de Comercialização Vigente",
+  "Autorização de Comercialização Expirada",
+];
+
 export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
   const { data: farm, refetch } = useGetFarmById(farmId);
   const imagemBase64 = farm?.territorios?.[0]?.imagemAdequacao;
 
-  const status = farm?.status === "Enviado" || farm?.status === "Assinado";
+  const status = termoStatuses.includes(farm?.status ?? "");
 
   const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
     null
@@ -26,10 +37,10 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   useEffect(() => {
-    if (farm?.status === "Enviado" || farm?.status === "Assinado") {
+    if (status) {
       setProposeNewArea("yes");
     }
-  }, [farm?.status]);
+  }, [farm?.status, status]);
 
   const termoCompromissoAssinado = farm?.urlTermoCompromisso;
 
@@ -102,11 +113,11 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
             </div>
             <div>
               <h2 className="text-[#21801A]">Município</h2>
-              <p>{farm?.cidade?.nome}</p>
+              <p>{farm?.endereco?.municipio}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Estado</h2>
-              <p>MT</p>
+              <p>{farm?.endereco?.estado}</p>
             </div>
           </div>
         </div>

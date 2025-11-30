@@ -121,7 +121,7 @@ export const FinesLayout = () => {
   const farmInfoRows = [
     [
       { label: "Cadastro Ambiental Rural (CAR)", value: farmData.car },
-      { label: "Código Voucher PREM", value: farmData.vouches },
+      { label: "Código Voucher PREM", value: farmData.voucher },
     ],
     [
       { label: "Nome da propriedade", value: farmData.nome },
@@ -173,7 +173,7 @@ export const FinesLayout = () => {
       <div className="flex justify-center items-center bg-[#21801A] font-bold text-white px-4 py-2 text-sm">
         Status do pagamento
       </div>
-      <Table.Container className="mt-4">
+      <Table.Container className="!pt-0">
         <Table.Header>
           <Table.Title>Parcela</Table.Title>
           <Table.Title>Data de vencimento</Table.Title>

@@ -55,11 +55,11 @@ export const Inspection = ({ farmId }: InspectionProps) => {
             </div>
             <div>
               <h2 className="text-[#21801A]">Município</h2>
-              <p>{farm?.cidade?.nome}</p>
+              <p>{farm?.endereco?.municipio}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Estado</h2>
-              <p>MT</p>
+              <p>{farm?.endereco?.estado}</p>
             </div>
           </div>
         </div>

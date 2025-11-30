@@ -122,7 +122,7 @@ export const SelfInspectionLayout = () => {
   const farmInfoRows = [
     [
       { label: "Cadastro Ambiental Rural (CAR)", value: farmData.car },
-      { label: "Código Voucher PREM", value: farmData.vouches },
+      { label: "Código Voucher PREM", value: farmData.voucher },
     ],
     [
       { label: "Nome da propriedade", value: farmData.nome },
