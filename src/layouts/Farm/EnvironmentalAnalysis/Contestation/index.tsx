@@ -81,11 +81,11 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
             </div>
             <div>
               <h2 className="text-[#21801A]">Município</h2>
-              <p>{farm?.cidade?.nome}</p>
+              <p>{farm?.endereco?.municipio}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Estado</h2>
-              <p>MT</p>
+              <p>{farm?.endereco?.estado}</p>
             </div>
           </div>
         </div>
@@ -141,6 +141,75 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
                   </span>
                   <p className="text-gray-800">
                     {suppressionContestation.observacao ||
+                      "Prazo estimado de análise é de até 10 dias úteis."}
+                  </p>
+                </div>
+              </div>
+
+              {currentAnalysis?.documentos &&
+                currentAnalysis.documentos.filter(
+                  (doc) => doc.tipo === "CONTESTACAO"
+                ).length > 0 && (
+                  <div className="mt-4 flex justify-start">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const contestacaoDoc = currentAnalysis.documentos.find(
+                          (doc) => doc.tipo === "CONTESTACAO"
+                        );
+                        if (contestacaoDoc) {
+                          window.open(contestacaoDoc.urlArquivo, "_blank");
+                        }
+                      }}
+                    >
+                      <LuFileSearch size={20} />
+                      Acessar parecer
+                    </Button>
+                  </div>
+                )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {currentAnalysis?.contestacaoLaudo && (
+        <div className="mb-6">
+          <div className="bg-white border border-[#CAC4D0] shadow">
+            <div className="bg-[#1A6415] text-white p-4">
+              <h2 className="text-center font-semibold uppercase">
+                Situação da Contestação
+              </h2>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <span className="text-[#21801A] font-medium">
+                    Protocolo da Contestação:
+                  </span>
+                  <p className="text-gray-800">{currentAnalysis.contestacaoLaudo.id}</p>
+                </div>
+                <div>
+                  <span className="text-[#21801A] font-medium">
+                    Data de envio da contestação:
+                  </span>
+                  <p className="text-gray-800">
+                     {formatDate(currentAnalysis.contestacaoLaudo.dataCriacao)}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[#21801A] font-medium">
+                    Situação da contestação:
+                  </span>
+                  <p className="text-gray-800">
+                    {currentAnalysis.contestacaoLaudo.situacao}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-[#21801A] font-medium">
+                    Observação:
+                  </span>
+                  <p className="text-gray-800">
+                    {currentAnalysis.contestacaoLaudo.observacao ||
                       "Prazo estimado de análise é de até 10 dias úteis."}
                   </p>
                 </div>

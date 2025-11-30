@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { LiaRandomSolid } from "react-icons/lia";
+import { useState } from "react";
 import { PiUser } from "react-icons/pi";
 import { TbFileOrientation } from "react-icons/tb";
 
@@ -15,6 +14,7 @@ import { Tooltip } from "@/components/Tooltip";
 import { useActivateUser } from "@/hooks/useGetUsers/useActiveUser";
 import { useDeleteUser } from "@/hooks/useGetUsers/useDeleteUser";
 import { useGetUsers } from "@/hooks/useGetUsers/useGetUsers";
+import { useRedistributeUser } from "@/hooks/useGetUsers/useRedistributeUser";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
@@ -33,15 +33,11 @@ export const UsersManegerLayout = () => {
   });
   const users = data?.data ?? [];
   const totalItems = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   const router = useRouter();
-
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages);
-  }, [page, totalPages]);
 
   const deleteUserMutation = useDeleteUser();
   const activateUserMutation = useActivateUser();
+  const redistributeUserMutation = useRedistributeUser();
 
   const customMenuItems = [
     {
@@ -154,13 +150,26 @@ export const UsersManegerLayout = () => {
                             status={user.status}
                           />
                         </Tooltip>
-                        <Tooltip message="Distribuir" id={`delete-${user.id}`}>
-                          <button
-                            disabled={true}
-                            className="border border-[#21801A] opacity-50 cursor-not-allowed"
-                          >
-                            <LiaRandomSolid size={20} />
-                          </button>
+                        <Tooltip
+                          message="Redistribuir"
+                          id={`delete-${user.id}`}
+                        >
+                          <ConfirmBox
+                            status="REDISTRIBUIR"
+                            onRedistribute={() =>
+                              redistributeUserMutation.mutate(user.id)
+                            }
+                            disabled={
+                              user.status !== "INATIVO" ||
+                              user.roles?.[0]?.nome !== "ANALISTA"
+                            }
+                            className={`border border-[#21801A] ${
+                              user.status !== "INATIVO" ||
+                              user.roles?.[0]?.nome !== "ANALISTA"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                          />
                         </Tooltip>
                       </div>
                     </Table.Cell>

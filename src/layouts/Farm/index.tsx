@@ -10,7 +10,6 @@ import { Tooltip } from "@/components/Tooltip";
 import { useGetFarms } from "@/hooks/useFarms/useGetFarms";
 import { Eye } from "@/icons/Eye";
 import { VoucherIcon } from "@/icons/Voucher";
-import { X } from "@/icons/X";
 import { useFarmFilterStore } from "@/store/useFarmFilterStore";
 import { useFarmStore } from "@/store/useFarmStore";
 
@@ -62,23 +61,20 @@ export const FarmLayout = () => {
               <Table.Cell>
                 <div className="flex items-center gap-3">
                   {farm.statusVoucher === false ? (
-                  <Tooltip
-                    message="Validar voucher"
-                    id={`Validar voucher ${farm.id}`}
-                  >
-                    <Link href={"/validVoucher"}>
-                      <VoucherIcon />
-                    </Link>
-                  </Tooltip>
+                    <Tooltip
+                      message="Validar voucher"
+                      id={`Validar voucher ${farm.id}`}
+                    >
+                      <Link href={"/validVoucher"}>
+                        <VoucherIcon />
+                      </Link>
+                    </Tooltip>
                   ) : (
-                     <Tooltip
-                    message=""
-                    id={`Voucher ativo ${farm.id}`}
-                  >
-                    <div className="opacity-40 cursor-not-allowed">
-                      <VoucherIcon />
-                    </div>
-                  </Tooltip>
+                    <Tooltip message="" id={`Voucher ativo ${farm.id}`}>
+                      <div className="opacity-40 cursor-not-allowed">
+                        <VoucherIcon />
+                      </div>
+                    </Tooltip>
                   )}
                   {farm.statusVoucher === false ? (
                     <Tooltip
@@ -118,12 +114,6 @@ export const FarmLayout = () => {
                     >
                       <Eye />
                     </Link>
-                  </Tooltip>
-                  <Tooltip
-                    message="Inativar propriedade"
-                    id={`Inativar propriedade ${farm.id}`}
-                  >
-                    <X />
                   </Tooltip>
                 </div>
               </Table.Cell>
