@@ -47,8 +47,8 @@ export const Fines = ({ farmId }: FinesProps) => {
     { length: maxInstallments },
     (_, i) => {
       const n = i + 1;
-      const value = totalFineValue / n;
-      return value >= MIN_INSTALLMENT_VALUE ? { n, value } : undefined;
+      const value = (totalFineValue / n).toFixed(2);
+      return parseFloat(value) >= MIN_INSTALLMENT_VALUE ? { n, value: parseFloat(value) } : undefined;
     }
   ).filter((opt): opt is { n: number; value: number } => !!opt);
 
