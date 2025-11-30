@@ -19,7 +19,10 @@ import { Tooltip } from "@/components/Tooltip";
 import GetDcsStatus from "@/app/(public)/getDcsStatus/page";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import PropertyDocumentsLayout from "@/layouts/DashboardUser/Properties/[id]/ProprtyDocuments";
-import { hasContestationClicked, hasConfirmedClicked } from "@/utils/contestationFlags";
+import {
+  hasContestationClicked,
+  hasConfirmedClicked,
+} from "@/utils/contestationFlags";
 
 import { AdequancyTerm } from "./AdequancyTerm";
 import { CommercializationAuthorization } from "./CommercializationAuthorization";
@@ -30,12 +33,25 @@ import { Fines } from "./Fines";
 import { Guidelines } from "./Guidelines";
 import { Inspection } from "./Inspection";
 import { SuitabilityPlan } from "./SuitabilityPlan";
+const termoStatuses = [
+  "Termo Enviado",
+  "Termo Assinado",
+  "Multa disponível",
+  "Autovistoria Disponível",
+  "Autovistoria Realizado",
+  "Autovistoria Não realizado",
+  "Autorização de Comercialização Vigente",
+  "Autorização de Comercialização Expirada",
+];
 
 export const EnvironmentalAnalysisLayout = () => {
   const params = useParams();
   const farmId = Number(params.id);
 
   const { data: farm } = useGetFarmById(farmId);
+
+  const [analysisClicked, setAnalysisClicked] = useState(false);
+
   const isEmpty = (obj: any) =>
     !obj ||
     (Array.isArray(obj) ? obj.length === 0 : Object.keys(obj).length === 0);
@@ -46,7 +62,7 @@ export const EnvironmentalAnalysisLayout = () => {
       ? "Contestação deve ser enviada em até 10 dias."
       : undefined;
 
-  const viewStatus = farm?.status === "Enviado" || farm?.status === "Assinado";
+  const viewStatus = termoStatuses.includes(farm?.status ?? "");
 
   const menuItems: MenuItem[] = [
     {
@@ -130,23 +146,32 @@ export const EnvironmentalAnalysisLayout = () => {
 
   const { adequacyEnabled } = useMemo(() => {
     const currentAnalysis = farm?.retornoAnalises?.[0];
-    const currentAnalysisId = contestationParams?.analysisId || currentAnalysis?.id;
-
+    const currentAnalysisId =
+      contestationParams?.analysisId || currentAnalysis?.id;
+    /*
     const normalize = (s?: string) => (s || "").toString().trim().toLowerCase();
     const isFinishedStatus = (s?: string) => {
       const n = normalize(s);
       return !!n && !/analise|análise/.test(n);
     };
+    */
 
-    const confirmed = currentAnalysisId ? hasConfirmedClicked(farmId, currentAnalysisId) : false;
-    const userClickedContestation = currentAnalysisId ? hasContestationClicked(farmId, currentAnalysisId) : false;
-
-    const suppressionStatus = currentAnalysis?.contestacaoAutorizacaoSupressao?.situacao;
+    const confirmed = currentAnalysisId
+      ? hasConfirmedClicked(farmId, currentAnalysisId)
+      : false;
+    const userClickedContestation = currentAnalysisId
+      ? hasContestationClicked(farmId, currentAnalysisId)
+      : false;
+    /*
+    const suppressionStatus =
+      currentAnalysis?.contestacaoAutorizacaoSupressao?.situacao;
     const reportStatus = currentAnalysis?.contestacaoLaudo?.situacao;
+    */
+    //const contestFinished =
+    //  isFinishedStatus(suppressionStatus) || isFinishedStatus(reportStatus);
 
-    const contestFinished = isFinishedStatus(suppressionStatus) || isFinishedStatus(reportStatus);
-
-    const adequacyEnabled = confirmed || ((userClickedContestation || !!(suppressionStatus || reportStatus)) && contestFinished);
+    const adequacyEnabled =
+      confirmed || userClickedContestation;
 
     return {
       adequacyEnabled,
@@ -167,22 +192,21 @@ export const EnvironmentalAnalysisLayout = () => {
   };
 
   useEffect(() => {
-    const currentAnalysisId =
-      contestationParams?.analysisId || farm?.retornoAnalises?.[0]?.id;
+    const currentAnalysis = farm?.retornoAnalises?.[0];
+    const contestacaoLaudoPreenchido = !!(
+      currentAnalysis && !isEmpty(currentAnalysis.contestacaoLaudo)
+    );
+    const contestacaoAutorizacaoSupressaoPreenchido = !!(
+      currentAnalysis &&
+      !isEmpty(currentAnalysis.contestacaoAutorizacaoSupressao)
+    );
 
-    if (!currentAnalysisId) {
-      setContestationEnabled(false);
-      return;
-    }
-
-    const enabled =
-      (contestationParams?.analysisId &&
-        contestationParams.analysisId === currentAnalysisId) ||
-      (!!farm?.retornoAnalises?.length &&
-        hasContestationClicked(farmId, currentAnalysisId));
-
-    setContestationEnabled(!!enabled);
-  }, [farm, contestationParams, farmId]);
+    setContestationEnabled(
+      !!analysisClicked ||
+        contestacaoLaudoPreenchido ||
+        contestacaoAutorizacaoSupressaoPreenchido
+    );
+  }, [analysisClicked, farm]);
 
   const handleCommercializationAuthorization = () => {
     if (farm?.carFederal && farm?.id) {
@@ -198,8 +222,10 @@ export const EnvironmentalAnalysisLayout = () => {
     const { label, icon: Icon, disabled, key } = item;
 
     const effectiveDisabled =
-      !!disabled || (key === "contestation" && !contestationEnabled) ||
-      (key === "AdequancyTerm" && !adequacyEnabled);
+      !!disabled ||
+      (key === "contestation" && !contestationEnabled) ||
+      (key === "AdequancyTerm" && !adequacyEnabled) ||
+      (key === "suitabilityPlan" && !adequacyEnabled);
 
     const buttonElement = (
       <button
@@ -231,10 +257,11 @@ export const EnvironmentalAnalysisLayout = () => {
       effectiveDisabled
     ) {
       tooltipMessage = "Assine o plano de adequação para prosseguir.";
-    } else if (key === "AdequancyTerm") {
+    } else if (key === "AdequancyTerm" || key === "suitabilityPlan") {
       if (!adequacyEnabled) {
-        tooltipMessage = "Confirme as detecções ou aguarde a conclusão da contestação.";
-      } else if (farm?.status !== "Enviado" && farm?.status !== "Assinado") {
+        tooltipMessage =
+          "Confirme as detecções ou aguarde a conclusão da contestação.";
+      } else if (!viewStatus) {
         tooltipMessage = "Assine o termo em até 5 dias.";
       }
     } else if (typeof item.tooltip === "function") {
@@ -275,6 +302,7 @@ export const EnvironmentalAnalysisLayout = () => {
         farmId={farmId}
         onNavigateToContestation={handleNavigateToContestation}
         onNavigateToSuitabilityPlan={handleNavigateToSuitabilityPlan}
+        onAnalysisClick={() => setAnalysisClicked(true)}
       />
     ),
     suitabilityPlan: (
@@ -358,11 +386,11 @@ export const EnvironmentalAnalysisLayout = () => {
             </div>
             <div>
               <h2 className="text-[#21801A]">Município</h2>
-              <p>{farm?.cidade?.nome}</p>
+              <p>{farm?.endereco?.municipio}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Estado</h2>
-              <p>MT</p>
+              <p>{farm?.endereco?.estado}</p>
             </div>
           </div>
         </div>
