@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { MdEngineering } from "react-icons/md";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
@@ -30,12 +30,8 @@ export const UsersLayout = () => {
   });
   const users = data?.data ?? [];
   const totalItems = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   const router = useRouter();
 
-  useEffect(() => {
-    if (page > totalPages) setPage(1);
-  }, [page, totalPages]);
 
   const deleteUserMutation = useDeleteUser();
 

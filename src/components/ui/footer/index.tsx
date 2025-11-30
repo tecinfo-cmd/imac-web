@@ -1,5 +1,6 @@
 import * as React from "react";
-import {version} from '../../../../package.json';
+
+import pkg from "../../../../package.json";
 
 export default function Footer() {
   return (
@@ -24,7 +25,7 @@ export default function Footer() {
         </p>
       </div>
       <div className="w-full text-center mt-4 pt-4">
-          <span className="font-bold">{version} </span> <br />
+        <span className="font-bold">{pkg.version} </span> <br />
       </div>
     </footer>
   );

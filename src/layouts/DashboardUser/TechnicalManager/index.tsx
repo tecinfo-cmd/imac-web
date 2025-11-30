@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MdEngineering } from "react-icons/md";
 import { PiSealCheckLight, PiUser, PiFarmLight } from "react-icons/pi";
 
@@ -28,11 +28,8 @@ export const TechnicalManagerLayout = () => {
 
   const technicalManagers = data?.data ?? [];
   const totalItems = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
 
-  useEffect(() => {
-    if (page > totalPages) setPage(1);
-  }, [page, totalPages]);
+  
 
   const [selectedData, setSelectedData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
