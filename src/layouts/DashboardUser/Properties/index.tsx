@@ -1,15 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MdEngineering } from "react-icons/md";
 import { PiFarmLight, PiSealCheckLight, PiUser } from "react-icons/pi";
 
+import { ConfirmBox } from "@/components/ConfirmBox";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { Pagination } from "@/components/Pagination";
 import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
+import { useInvalidateProperties } from "@/hooks/useGetProperties/useInvalidateProperties";
 import { useGetPropriedades } from "@/hooks/useGetProperties/userGetProperties";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
@@ -32,10 +34,9 @@ export const PropertiesLayout = () => {
 
   const properties = data?.data ?? [];
   const totalItems = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / limit));
   const router = useRouter();
   const userEmail = useAuthEmail();
-
+  const invalidatePropertyMutation = useInvalidateProperties();
   const getFirstAndLastName = (fullName: string) => {
     if (!fullName) return "-";
     const names = fullName.trim().split(" ");
@@ -43,10 +44,6 @@ export const PropertiesLayout = () => {
       ? names[0]
       : `${names[0]} ${names[names.length - 1]}`;
   };
-
-  useEffect(() => {
-    if (page > totalPages) setPage(1);
-  }, [page, totalPages]);
 
   const customMenuItems = [
     {
@@ -83,92 +80,111 @@ export const PropertiesLayout = () => {
 
   const statusOptions = [
     { label: "Ativo", value: "ATIVO", color: "#21801A" },
-    { label: "Inativo", value: "INATIVO", color: "#F44336" },
+    { label: "Inativo", value: "Inativa", color: "#F44336" },
     {
-      label: "Voucher Adquirido",
-      value: "VOUCHER_ADQUIRIDO",
+      label: "Voucher Crendenciamento pendente",
+      value: "Voucher Crendenciamento pendente",
+      color: "#F3BF45",
+    },
+
+    {
+      label: "Cadastro incompleto",
+      value: "Cadastro incompleto",
+      color: "#F44336",
+    },
+    {
+      label: "Cadastro completo",
+      value: "Cadastro completo",
       color: "#21801A",
     },
+
     {
-      label: "Análise Solicitada",
-      value: "ANALISE_SOLICITADA",
+      label: "Análise solicitada",
+      value: "Análise solicitada",
       color: "#F3BF45",
     },
-    { label: "Desistiu do PREM", value: "DESISTIU_PREM", color: "#F44336" },
     {
-      label: "Análise Socioambiental Solicitada",
-      value: "ANALISE_SOCIOAMBIENTAL_SOLICITADA",
-      color: "#F3BF45",
+      label: "Análise disponível",
+      value: "Análise disponível",
+      color: "#21801A",
     },
+
     {
       label: "Contestação Solicitada",
-      value: "CONTESTACAO_SOLICITADA",
+      value: "Contestação Solicitada",
       color: "#F3BF45",
     },
     {
       label: "Contestação Pendente",
-      value: "CONTESTACAO_PENDENTE",
-      color: "#F44336",
+      value: "Contestação Pendente",
+      color: "#F3BF45",
     },
     {
       label: "Contestação Analisada",
-      value: "CONTESTACAO_ANALISADA",
+      value: "Contestação Analisada",
       color: "#21801A",
     },
+
     {
-      label: "Estratégia de Adequação Solicitado",
-      value: "ESTRATEGIA_ADEQUACAO_SOLICITADO",
+      label: "Estratégia Solicitada",
+      value: "Estratégia Solicitada",
       color: "#F3BF45",
     },
     {
-      label: "Estratégia de Adequação Pendente",
-      value: "ESTRATEGIA_ADEQUACAO_PENDENTE",
-      color: "#F44336",
-    },
-    {
-      label: "Estratégia de Adequação Analisada",
-      value: "ESTRATEGIA_ADEQUACAO_ANALISADA",
-      color: "#21801A",
-    },
-    {
-      label: "Plano de Adequação Solicitado",
-      value: "PLANO_ADEQUACAO_SOLICITADO",
+      label: "Estratégia Pendente",
+      value: "Estratégia Pendente",
       color: "#F3BF45",
     },
     {
-      label: "Plano de Adequação Aceito",
-      value: "PLANO_ADEQUACAO_ACEITO",
+      label: "Estratégia Analisada",
+      value: "Estratégia Analisada",
+      color: "#21801A",
+    },
+
+    { label: "Plano Solicitado", value: "Plano Solicitado", color: "#F3BF45" },
+    { label: "Plano Disponível", value: "Plano Disponível", color: "#21801A" },
+
+    { label: "Termo Enviado", value: "Termo Enviado", color: "#F3BF45" },
+    { label: "Termo Assinado", value: "Termo Assinado", color: "#21801A" },
+
+    { label: "Multa disponível", value: "Multa disponível", color: "#21801A" },
+
+    {
+      label: "Autovistoria Disponível",
+      value: "Autovistoria Disponível",
+      color: "#F3BF45",
+    },
+    {
+      label: "Autovistoria Realizado",
+      value: "Autovistoria Realizado",
       color: "#21801A",
     },
     {
-      label: "Termo de Adequação Assinado",
-      value: "TERMO_ADEQUACAO_ASSINADO",
-      color: "#21801A",
-    },
-    {
-      label: "Valores da multa aceitado",
-      value: "VALORES_MULTA_ACEITO",
-      color: "#21801A",
-    },
-    {
-      label: "Autovistoria Realizada",
-      value: "AUTOVISTORIA_REALIZADA",
-      color: "#21801A",
-    },
-    {
-      label: "Autovistoria Não Realizada",
-      value: "AUTOVISTORIA_NAO_REALIZADA",
+      label: "Autovistoria Não realizado",
+      value: "Autovistoria Não realizado",
       color: "#F44336",
     },
+
     {
-      label: "Autorização de Comercialização Ativo (AC Ativa)",
-      value: "AC_ATIVA",
+      label: "Autorização de Comercialização Vigente",
+      value: "Autorização de Comercialização Vigente",
       color: "#21801A",
     },
     {
-      label: "Autorização de Comercialização Bloqueado (AC Bloqueada)",
-      value: "AC_BLOQUEADA",
+      label: "Autorização de Comercialização Expirada",
+      value: "Autorização de Comercialização Expirada",
       color: "#F44336",
+    },
+
+    {
+      label: "Voucher Frigorifico pendente",
+      value: "Voucher Frigorifico pendente",
+      color: "#F3BF45",
+    },
+    {
+      label: "Ativado Frigorifico",
+      value: "Ativado Frigorifico",
+      color: "#21801A",
     },
   ];
 
@@ -205,7 +221,8 @@ export const PropertiesLayout = () => {
                     <Table.Cell>{properties.cidade?.nome || "-"}</Table.Cell>
                     <Table.Cell>{properties.carFederal}</Table.Cell>
                     <Table.Cell>
-                      {getFirstAndLastName(properties.analista?.pessoa.nome) || "-"}
+                      {getFirstAndLastName(properties.analista?.pessoa.nome) ||
+                        "-"}
                     </Table.Cell>
                     <Table.Cell>
                       <div className="flex items-center gap-2">
@@ -258,15 +275,21 @@ export const PropertiesLayout = () => {
                           </button>
                         </Tooltip>
                         <Tooltip
-                          message={
-                            canEdit
-                              ? "Inativar propriedade"
-                              : "Você não tem permissão para inativar esta propriedade"
-                          }
+                          message="Inativar"
                           id={`delete-${properties.id}`}
-                          disabled={!canEdit}
                         >
-                          <X />
+                          <ConfirmBox
+                            status={properties.status}
+                            onConfirm={() =>
+                              invalidatePropertyMutation.mutate(properties.id)
+                            }
+                            disabled={
+                              !canEdit || invalidatePropertyMutation.isPending
+                            }
+                            className="p-1"
+                            mode="simple"
+                            icon={<X />}
+                          />
                         </Tooltip>
                       </div>
                     </Table.Cell>

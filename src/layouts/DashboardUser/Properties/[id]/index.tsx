@@ -27,6 +27,17 @@ import { SalesPermit } from "@/icons/SalesPermit";
 import { SelfInspection } from "@/icons/SelfInspection";
 import { toast } from "sonner";
 
+const termoStatuses = [
+  "Termo Enviado",
+  "Termo Assinado",
+  "Multa disponível",
+  "Autovistoria Disponível",
+  "Autovistoria Realizado",
+  "Autovistoria Não realizado",
+  "Autorização de Comercialização Vigente",
+  "Autorização de Comercialização Expirada",
+];
+
 export const MonitoringLayout = () => {
   const router = useRouter();
   const params = useParams();
@@ -43,8 +54,10 @@ export const MonitoringLayout = () => {
     propriedade?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao;
   const retorno = propriedade?.retornoAnalises;
   const Adequacao = propriedade?.retornoAnalises?.[0]?.planoAdequacao;
-  const status =
-    propriedade?.status === "Enviado" || propriedade?.status === "Assinado";
+  const status = termoStatuses.includes(
+    propriedade?.status ?? ""
+  );
+
   const multas = fines;
 
   const isEmpty = (obj: any) =>
@@ -244,7 +257,7 @@ export const MonitoringLayout = () => {
           </Card>
         ))}
       </div>
-      
+
       <div className="w-full h-px bg-gray-300 my-8"></div>
 
       <div className="grid p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-y-16 gap-x-6">
