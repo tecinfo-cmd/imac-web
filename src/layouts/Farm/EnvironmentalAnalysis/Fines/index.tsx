@@ -18,6 +18,8 @@ interface FinesProps {
   farmId: number;
 }
 
+
+
 export const Fines = ({ farmId }: FinesProps) => {
   const queryClient = useQueryClient();
   const { data: farm } = useGetFarmById(farmId);
@@ -36,8 +38,20 @@ export const Fines = ({ farmId }: FinesProps) => {
   const hasExemption = discountPercentage === 100;
   const discountValue = (fineValue * discountPercentage) / 100;
   const totalFineValue = fineValue - discountValue;
-  const installmentValue2x = totalFineValue / 2;
-  const installmentValue3x = totalFineValue / 3;
+  const MIN_INSTALLMENT_VALUE = 250;
+  const maxInstallments = Math.min(
+    24,
+    totalFineValue > 0 ? Math.floor(totalFineValue / MIN_INSTALLMENT_VALUE) : 0
+  );
+
+  const installmentOptions: { n: number; value: number }[] = Array.from(
+    { length: maxInstallments },
+    (_, i) => {
+      const n = i + 1;
+      const value = totalFineValue / n;
+      return value >= MIN_INSTALLMENT_VALUE ? { n, value } : undefined;
+    }
+  ).filter((opt): opt is { n: number; value: number } => !!opt);
 
   const hasPaymentStatus = paymentStatus && paymentStatus.length > 0;
   const isAccepted = watch("accept") || hasPaymentStatus;
@@ -78,7 +92,7 @@ export const Fines = ({ farmId }: FinesProps) => {
         farmId,
         payload: {
           parcela: 1,
-          valor: fineValue,
+          valor: totalFineValue,
           boleto: {
             pagador: payer,
             informativos: ["Pagamento de multa"],
@@ -99,8 +113,9 @@ export const Fines = ({ farmId }: FinesProps) => {
     if (!farm) return;
 
     const installments = parseInt(selectedInstallments);
-    const valueInstallment =
-      installments === 2 ? installmentValue2x : installmentValue3x;
+    const valueInstallment = totalFineValue / installments;
+
+    if (valueInstallment < MIN_INSTALLMENT_VALUE) return;
 
     const payer = createPayerFromFarm(farm);
 
@@ -156,11 +171,11 @@ export const Fines = ({ farmId }: FinesProps) => {
             </div>
             <div>
               <h2 className="text-[#21801A]">Município</h2>
-              <p>{farm?.cidade?.nome}</p>
+              <p>{farm?.endereco?.municipio}</p>
             </div>
             <div>
               <h2 className="text-[#21801A]">Estado</h2>
-              <p>MT</p>
+              <p>{farm?.endereco?.estado}</p>
             </div>
           </div>
         </div>
@@ -216,7 +231,7 @@ export const Fines = ({ farmId }: FinesProps) => {
         </label>
       </div>
 
-      {isAccepted && (
+      {isAccepted && totalFineValue > 0 && (
         <>
           <div className="mt-8">
             <div className="bg-[#21801A] text-white font-semibold p-4 text-center">
@@ -263,19 +278,25 @@ export const Fines = ({ farmId }: FinesProps) => {
                     onChange={(e) => setSelectedInstallments(e.target.value)}
                     className="border border-[#CAC4D0] rounded px-2 py-1 text-sm"
                   >
-                    <option value="2">
-                      2 x R$ {installmentValue2x.toFixed(2).replace(".", ",")}
-                    </option>
-                    <option value="3">
-                      3 x R$ {installmentValue3x.toFixed(2).replace(".", ",")}
-                    </option>
+                    {installmentOptions.filter((opt) => opt.n > 1).length ===
+                      0 && <option value="">Nenhuma opção disponível</option>}
+                    {installmentOptions
+                      .filter((opt) => opt.n > 1)
+                      .map((opt) => (
+                        <option key={opt.n} value={opt.n}>
+                          {opt.n} x R$ {opt.value.toFixed(2).replace(".", ",")}
+                        </option>
+                      ))}
                   </select>
+
                   <Button
                     variant="dark"
                     className="text-sm"
                     onClick={handleGenerateInstallmentPayments}
                     disabled={
-                      installmentPaymentMutation.isPending || hasPaymentStatus
+                      installmentPaymentMutation.isPending ||
+                      hasPaymentStatus ||
+                      installmentOptions.length === 0
                     }
                   >
                     {installmentPaymentMutation.isPending
