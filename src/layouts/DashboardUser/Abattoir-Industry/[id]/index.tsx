@@ -32,6 +32,7 @@ import { Analityc } from "@/icons/Analityc";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
+import { formatDateToISO } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
@@ -117,6 +118,18 @@ const AbattoirEditLayout = () => {
       status: { value: "", label: "" },
     },
   });
+
+  function formatDate(dateStr: string) {
+    if (!dateStr) return "";
+    if (dateStr.includes("T")) {
+      dateStr = dateStr.split("T")[0];
+    }
+    const [day, month, year] = dateStr.split(/[\/\-]/);
+    if (day && month && year) {
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    return dateStr;
+  }
 
   const cep = watch("cep");
 
@@ -213,12 +226,15 @@ const AbattoirEditLayout = () => {
 
   const handleEditSubmit = async (data: any) => {
     try {
-      console.log("Dados para atualização:", data);
-      console.log("ID do frigorífico:", abattoir.id);
+      const payload = {
+        ...data,
+        dataInicioVigencia: formatDate(data.dataInicioVigencia),
+        dataFimVigencia: formatDate(data.dataFimVigencia),
+      };
 
       const result = await updateAbattoir.mutateAsync({
         id: abattoir.id,
-        ...data,
+        ...payload,
       });
 
       console.log("Frigorífico atualizado com sucesso na API:", result);
@@ -427,6 +443,7 @@ const AbattoirEditLayout = () => {
               label="Status"
               placeholder="Digite o status"
               control={control}
+              disabled={true}
             />
 
             <InputFileUpload
@@ -435,6 +452,22 @@ const AbattoirEditLayout = () => {
               control={control}
               accept=".pdf"
               disabled={isEditing}
+            />
+
+            <Input
+              name="dataInicioVigencia"
+              label="Data de Início da Vigência"
+              placeholder="Digite a data de início da vigência"
+              control={control}
+              mask={formatDateToISO}
+            />
+
+            <Input
+              name="dataFimVigencia"
+              label="Data de Fim da Vigência"
+              placeholder="Digite a data de fim da vigência"
+              control={control}
+              mask={formatDateToISO}
             />
 
             <div className="flex justify-end gap-2 md:col-span-3">

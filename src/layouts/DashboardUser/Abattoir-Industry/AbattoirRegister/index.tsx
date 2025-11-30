@@ -32,6 +32,7 @@ import { Analityc } from "@/icons/Analityc";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
+import { formatDateToISO } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
@@ -55,9 +56,29 @@ const schema = yup.object({
   cep: yup.string().required(),
   endereco: yup.string().required(),
   municipio: yup.string().required(),
-  quantidadeVoucher: yup.number().required(),
+  quantidadeVoucher: yup.number().required("!"),
   termoCooperacao: yup.mixed().required(),
   status: yup.string().optional(),
+  dataInicioVigencia: yup
+    .string()
+    .required()
+    .test(
+      "data-inicio-menor-que-fim",
+      "A data de início deve ser menor que a data de término",
+      function (value) {
+        const { dataFimVigencia } = this.parent;
+        if (!value || !dataFimVigencia) return true;
+        const parse = (str: string) => {
+          if (str.includes("/")) {
+            const [d, m, y] = str.split("/");
+            return new Date(`${y}-${m}-${d}`);
+          }
+          return new Date(str);
+        };
+        return parse(value) < parse(dataFimVigencia);
+      }
+    ),
+  dataFimVigencia: yup.string().required(),
 });
 
 const userSchema = yup.object({
@@ -83,6 +104,8 @@ const defaultValues = {
   municipio: "",
   quantidadeVoucher: null,
   termoCooperacao: null,
+  dataInicioVigencia: "",
+  dataFimVigencia: "",
 };
 
 export const AbattoirRegisterLayout = ({
@@ -103,6 +126,18 @@ export const AbattoirRegisterLayout = ({
   const createUserAbattoir = useCreateUserAbattoir();
   const updateUserAbattoir = useUpdateUserAbattoir();
   const updateAbattoir = useUpdateAbattoir();
+
+  function formatDate(dateStr: string) {
+    if (!dateStr) return "";
+    if (dateStr.includes("T")) {
+      dateStr = dateStr.split("T")[0];
+    }
+    const [day, month, year] = dateStr.split(/[\/\-]/);
+    if (day && month && year) {
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    }
+    return dateStr;
+  }
 
   const { data: abattoirData, refetch: refetchAbattoir } =
     useAbattoirById(createdAbattoirId);
@@ -248,11 +283,18 @@ export const AbattoirRegisterLayout = ({
 
   const handleAbattoirSubmit = async (data: any) => {
     try {
-      const response = await createAbattoir.mutateAsync(data);
+      const payload = {
+        ...data,
+        dataInicioVigencia: formatDate(data.dataInicioVigencia),
+        dataFimVigencia: formatDate(data.dataFimVigencia),
+      };
+      const response = await createAbattoir.mutateAsync(payload);
       setCreatedAbattoirId(response?.id);
       setRegisteredData({
         ...data,
         ...response,
+        dataInicioVigencia: payload.dataInicioVigencia,
+        dataFimVigencia: payload.dataFimVigencia,
       });
       setIsRegistered(true);
       setIsEditing(false);
@@ -272,11 +314,15 @@ export const AbattoirRegisterLayout = ({
 
   const handleEditSubmit = async (data: any) => {
     try {
-      console.log("Dados para atualização:", data);
+      const payload = {
+        ...data,
+        dataInicioVigencia: formatDate(data.dataInicioVigencia),
+        dataFimVigencia: formatDate(data.dataFimVigencia),
+      };
 
       await updateAbattoir.mutateAsync({
         id: registeredData.id,
-        ...data,
+        ...payload,
       });
 
       await refetchAbattoir();
@@ -607,6 +653,22 @@ export const AbattoirRegisterLayout = ({
             control={control}
             accept=".pdf"
             disabled={isRegistered && isEditing}
+          />
+
+          <Input
+            name="dataInicioVigencia"
+            label="Data de Início da Vigência"
+            placeholder="Digite a data de início da vigência"
+            control={control}
+            mask={formatDateToISO}
+          />
+
+          <Input
+            name="dataFimVigencia"
+            label="Data de Fim da Vigência"
+            placeholder="Digite a data de fim da vigência"
+            control={control}
+            mask={formatDateToISO}
           />
 
           <div className="flex justify-end gap-2 md:col-span-3">

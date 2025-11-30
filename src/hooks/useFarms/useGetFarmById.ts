@@ -104,6 +104,7 @@ export interface ContestacaoAutorizacaoSupressao {
 }
 
 export interface ContestacaoLaudo {
+  dataCriacao: string | null;
   id: number;
   motivo: string;
   situacao: string;
