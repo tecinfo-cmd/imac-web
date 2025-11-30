@@ -64,6 +64,8 @@ export const InputFileUpload = ({
                 setIsDragActive(false);
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
                   field.onChange(e.dataTransfer.files[0]);
+                  onFileChange?.(e.dataTransfer.files);
+
                   if (inputRef.current) inputRef.current.value = "";
                 }
               }
