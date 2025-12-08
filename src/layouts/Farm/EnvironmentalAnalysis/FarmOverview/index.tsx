@@ -58,7 +58,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
         "/agrotools/analise/protocolo"
       );
 
-      const protocol = data[2]?.id;
+      const protocol = data[data.length - 1]?.id;
 
       if (!protocol) {
         toast.error("Protocolo não encontrado.", { id: toastId });
