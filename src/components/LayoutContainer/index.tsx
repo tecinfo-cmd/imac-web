@@ -15,7 +15,7 @@ import { LogoWhite } from "@/icons/LogoWhite";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
 
-import { version } from "../../../package.json";
+import packageJson from "../../../package.json";
 
 interface MenuItem {
   label: string;
@@ -133,7 +133,7 @@ export const LayoutContainer = ({
                 {userData?.pessoa?.nome}
               </p>
               <p className="text-sm">{userData?.email}</p>
-              <p>{version}</p>
+              <p>{packageJson.version}</p>
             </div>
             <button onClick={signOut}>
               <FiLogOut size={26} />

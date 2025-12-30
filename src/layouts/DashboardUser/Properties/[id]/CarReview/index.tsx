@@ -197,7 +197,7 @@ export const CarReviewLayout = () => {
               documents.map((doc: any, i: number) => (
                 <Table.Row key={doc.id || doc.nomeArquivo + i}>
                   <Table.Cell>{formatDateOnly(doc.dataUpload)}</Table.Cell>
-                  <Table.Cell>{doc.tipo}</Table.Cell>
+                  <Table.Cell>{doc.nomeArquivoOriginal}</Table.Cell>
                   <Table.Cell>
                     <Tooltip message="Visualizar documento" id={`view-${doc.id || i}`}>
                       <a href={doc.urlArquivo} target="_blank" rel="noreferrer">

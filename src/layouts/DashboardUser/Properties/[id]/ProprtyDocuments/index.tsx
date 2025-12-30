@@ -289,7 +289,7 @@ export default function PropertyDocumentsLayout({
               {documents.map((doc, i) => (
                 <Table.Row key={doc.id || `${doc.nomeArquivoOriginal}-${i}`}>
                   <Table.Cell>{formatDate(doc.dataUpload)}</Table.Cell>
-                  <Table.Cell>{doc.tipo || "-"}</Table.Cell>
+                  <Table.Cell>{doc.nomeArquivoOriginal || "-"}</Table.Cell>
                   <Table.Cell>
                     <Tooltip
                       message="Baixar documento"
@@ -337,7 +337,7 @@ export default function PropertyDocumentsLayout({
                 documentAnalises.map((doc, i) => (
                   <Table.Row key={doc.id || `analise-${i}`}>
                     <Table.Cell>{formatDate(doc.dataUpload) || "-"}</Table.Cell>
-                    <Table.Cell>{doc.tipo || "N/A"}</Table.Cell>
+                    <Table.Cell>{doc.nomeArquivoOriginal || "N/A"}</Table.Cell>
                     <Table.Cell>
                       <Tooltip
                         message="Baixar documento"

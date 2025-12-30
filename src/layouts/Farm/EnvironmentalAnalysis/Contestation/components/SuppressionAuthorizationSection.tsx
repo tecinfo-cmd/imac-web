@@ -80,7 +80,7 @@ interface SuppressionAuthorizationSectionProps {
   suppressionContestation?: {
     situacao: string;
     dataCriacao: string | null;
- } | null;
+  } | null;
 }
 
 export const SuppressionAuthorizationSection = ({

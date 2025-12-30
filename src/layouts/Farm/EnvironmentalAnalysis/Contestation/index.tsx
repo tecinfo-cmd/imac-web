@@ -46,7 +46,6 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
   const reportContestation = currentAnalysis?.contestacaoLaudo;
 
   const finalAnalysisId = analysisId || currentAnalysis?.id || 0;
-  
 
   return (
     <>
@@ -189,14 +188,16 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
                   <span className="text-[#21801A] font-medium">
                     Protocolo da Contestação:
                   </span>
-                  <p className="text-gray-800">{currentAnalysis.contestacaoLaudo.id}</p>
+                  <p className="text-gray-800">
+                    {currentAnalysis.contestacaoLaudo.id}
+                  </p>
                 </div>
                 <div>
                   <span className="text-[#21801A] font-medium">
                     Data de envio da contestação:
                   </span>
                   <p className="text-gray-800">
-                     {formatDate(currentAnalysis.contestacaoLaudo.dataCriacao)}
+                    {formatDate(currentAnalysis.contestacaoLaudo.dataCriacao)}
                   </p>
                 </div>
                 <div>
