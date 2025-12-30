@@ -45,6 +45,9 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
     currentAnalysis?.contestacaoAutorizacaoSupressao;
   const reportContestation = currentAnalysis?.contestacaoLaudo;
 
+  const finalAnalysisId = analysisId || currentAnalysis?.id || 0;
+  
+
   return (
     <>
       <div className="w-fit mx-auto flex justify-center items-center gap-3 border border-[#CAC4D0] p-4 rounded">
@@ -108,7 +111,7 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
           <div className="bg-white border border-[#CAC4D0] shadow">
             <div className="bg-[#1A6415] text-white p-4">
               <h2 className="text-center font-semibold uppercase">
-                Situação da Contestação
+                Situação da Autorização de sepressão
               </h2>
             </div>
             <div className="p-6">
@@ -245,13 +248,13 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
         <TechnicalResponsibleSection />
         <SuppressionAuthorizationSection
           farmId={farmId}
-          analysisId={analysisId || 0}
-          disabled={!!suppressionContestation}
+          analysisId={finalAnalysisId}
+          suppressionContestation={suppressionContestation}
         />
         <ReportContestationSection
           farmId={farmId}
-          analysisId={analysisId!}
-          disabled={!!reportContestation}
+          analysisId={finalAnalysisId}
+          reportContestation={reportContestation}
         />
       </div>
     </>

@@ -24,6 +24,10 @@ interface ReportContestationSectionProps {
   farmId: number;
   analysisId: number;
   disabled?: boolean;
+  reportContestation?: {
+    situacao: string;
+    dataCriacao: string | null;
+  } | null;
 }
 
 type Documento = {
@@ -34,10 +38,17 @@ type Documento = {
   tipo: string;
 };
 
+const isSuccessfulStatus = (situacao: string | undefined): boolean => {
+  if (!situacao) return false;
+  const normalizedStatus = situacao;
+  return normalizedStatus === "Em Análise" || normalizedStatus === "DEFERIDO";
+};
+
 export const ReportContestationSection = ({
   farmId,
   analysisId,
   disabled = false,
+  reportContestation,
 }: ReportContestationSectionProps) => {
   const [files, setFiles] = useState<(Documento | File)[]>([]);
   const [sent, setSent] = useState(false);
@@ -55,7 +66,11 @@ export const ReportContestationSection = ({
 
   const motivo = watch("motivo");
 
-  if (sent || disabled) {
+  const shouldShowSuccessMessage =
+    sent ||
+    (reportContestation && isSuccessfulStatus(reportContestation.situacao));
+
+  if (shouldShowSuccessMessage) {
     return (
       <div className="bg-white border border-[#CAC4D0] shadow">
         <div className="bg-[#1A6415] text-white p-4">
@@ -86,14 +101,14 @@ export const ReportContestationSection = ({
         toast.error("Responsável técnico não encontrado!");
         return;
       }
-      
+
       const stripExtension = (filename: string) =>
         filename.replace(/\.[^/.]+$/, "");
 
-
       const parametros = JSON.stringify(
         files.map((file) => {
-          const originalName = "name" in file ? file.name : file.nomeArquivoOriginal;
+          const originalName =
+            "name" in file ? file.name : file.nomeArquivoOriginal;
           return {
             nome: originalName,
             tipo: stripExtension(originalName).toLocaleUpperCase(),

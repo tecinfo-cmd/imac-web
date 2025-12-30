@@ -77,12 +77,16 @@ interface SuppressionAuthorizationSectionProps {
   farmId: number;
   analysisId: number;
   disabled?: boolean;
+  suppressionContestation?: {
+    situacao: string;
+    dataCriacao: string | null;
+ } | null;
 }
 
 export const SuppressionAuthorizationSection = ({
   farmId,
   analysisId,
-  disabled = false,
+  suppressionContestation,
 }: SuppressionAuthorizationSectionProps) => {
   const [suppressionDataList, setSuppressionDataList] = useState<
     SuppressionData[]
@@ -105,7 +109,13 @@ export const SuppressionAuthorizationSection = ({
 
   const [justification, setJustification] = useState<string>("");
 
-  if (sent || disabled) {
+  const shouldShowSuccessMessage =
+    sent ||
+    (suppressionContestation &&
+      (suppressionContestation?.situacao === "Em Análise" ||
+        suppressionContestation?.situacao === "DEFERIDO"));
+
+  if (shouldShowSuccessMessage) {
     return (
       <div className="bg-white border border-[#CAC4D0] shadow">
         <div className="bg-[#1A6415] text-white p-4">
@@ -127,14 +137,14 @@ export const SuppressionAuthorizationSection = ({
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(files); 
+    setUploadedFiles(files);
     setValue("arquivos", files);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
-    setUploadedFiles(files); 
+    setUploadedFiles(files);
     setValue("arquivos", files);
   };
 
@@ -201,7 +211,9 @@ export const SuppressionAuthorizationSection = ({
       files.forEach((file) => {
         allFileParams.push({
           nome: file instanceof File ? file.name : file.nomeArquivo,
-          tipo: stripExtension(file instanceof File ? file.name : file.nomeArquivo).toLocaleUpperCase(),
+          tipo: stripExtension(
+            file instanceof File ? file.name : file.nomeArquivo
+          ).toLocaleUpperCase(),
         });
       });
 

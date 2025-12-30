@@ -59,7 +59,6 @@ export const PropertieDocument = ({
         </div>
         <Table.Container className="!pt-0">
           <Table.Header>
-            <Table.Title>Descrição do arquivo</Table.Title>
             <Table.Title>Nome do arquivo</Table.Title>
             <Table.Title>Ações</Table.Title>
           </Table.Header>
@@ -69,7 +68,6 @@ export const PropertieDocument = ({
                 // Documento do backend
                 return (
                   <Table.Row key={file.id}>
-                    <Table.Cell>{file.tipo}</Table.Cell>
                     <Table.Cell>
                       <a
                         href={file.urlArquivo}

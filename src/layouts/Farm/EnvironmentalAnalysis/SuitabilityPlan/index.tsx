@@ -36,6 +36,12 @@ const suitabilityPlanSchema = yup.object({
 
 type SuitabilityPlanFormData = yup.InferType<typeof suitabilityPlanSchema>;
 
+const isSuccessfulStatus = (situacao: string | undefined): boolean => {
+  if (!situacao) return false;
+  const normalizedStatus = situacao;
+  return normalizedStatus === "Em Análise" || normalizedStatus === "DEFERIDO";
+};
+
 export const SuitabilityPlan = ({
   farmId,
   analysisId,
@@ -108,7 +114,7 @@ export const SuitabilityPlan = ({
     }
 
     const stripExtension = (filename: string) =>
-        filename.replace(/\.[^/.]+$/, "");
+      filename.replace(/\.[^/.]+$/, "");
 
     const params = files.map((file) => {
       if (file instanceof File) {
@@ -195,70 +201,74 @@ export const SuitabilityPlan = ({
         </div>
       </div>
 
-      {existingSuitabilityPlan && (
-        <div className="mb-6">
-          <div className="bg-white border border-[#CAC4D0] shadow">
-            <div className="bg-[#1A6415] text-white p-4">
-              <h2 className="text-center font-semibold uppercase">
-                Situação da Estratégia de Adequação
-              </h2>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <span className="text-[#21801A] font-medium">
-                    Protocolo da Estratégia:
-                  </span>
-                  <p className="text-gray-800">{existingSuitabilityPlan.id}</p>
-                </div>
-
-                <div>
-                  <span className="text-[#21801A] font-medium">
-                    Situação da estratégia:
-                  </span>
-                  <p className="text-gray-800">
-                    {existingSuitabilityPlan.situacao}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-[#21801A] font-medium">
-                    Observação:
-                  </span>
-                  <p className="text-gray-800">
-                    {existingSuitabilityPlan.observacao ||
-                      "Prazo estimado de análise é de até 10 dias úteis."}
-                  </p>
-                </div>
+      {existingSuitabilityPlan &&
+        isSuccessfulStatus(existingSuitabilityPlan.situacao) && (
+          <div className="mb-6">
+            <div className="bg-white border border-[#CAC4D0] shadow">
+              <div className="bg-[#1A6415] text-white p-4">
+                <h2 className="text-center font-semibold uppercase">
+                  Situação da Estratégia de Adequação
+                </h2>
               </div>
-
-              {existingSuitabilityPlan.documentos &&
-                existingSuitabilityPlan.documentos.filter(
-                  (doc) => doc.tipo === "ADEQUACAO"
-                ).length > 0 && (
-                  <div className="mt-4 flex justify-start">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        const adequacaoDoc =
-                          existingSuitabilityPlan.documentos.find(
-                            (doc) => doc.tipo === "ADEQUACAO"
-                          );
-                        if (adequacaoDoc) {
-                          window.open(adequacaoDoc.urlArquivo, "_blank");
-                        }
-                      }}
-                    >
-                      <LuFileSearch size={20} />
-                      Acessar parecer
-                    </Button>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-[#21801A] font-medium">
+                      Protocolo da Estratégia:
+                    </span>
+                    <p className="text-gray-800">
+                      {existingSuitabilityPlan.id}
+                    </p>
                   </div>
-                )}
+
+                  <div>
+                    <span className="text-[#21801A] font-medium">
+                      Situação da estratégia:
+                    </span>
+                    <p className="text-gray-800">
+                      {existingSuitabilityPlan.situacao}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-[#21801A] font-medium">
+                      Observação:
+                    </span>
+                    <p className="text-gray-800">
+                      {existingSuitabilityPlan.observacao ||
+                        "Prazo estimado de análise é de até 10 dias úteis."}
+                    </p>
+                  </div>
+                </div>
+
+                {existingSuitabilityPlan.documentos &&
+                  existingSuitabilityPlan.documentos.filter(
+                    (doc) => doc.tipo === "ADEQUACAO"
+                  ).length > 0 && (
+                    <div className="mt-4 flex justify-start">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          const adequacaoDoc =
+                            existingSuitabilityPlan.documentos.find(
+                              (doc) => doc.tipo === "ADEQUACAO"
+                            );
+                          if (adequacaoDoc) {
+                            window.open(adequacaoDoc.urlArquivo, "_blank");
+                          }
+                        }}
+                      >
+                        <LuFileSearch size={20} />
+                        Acessar parecer
+                      </Button>
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {existingSuitabilityPlan ? (
+      {existingSuitabilityPlan &&
+      isSuccessfulStatus(existingSuitabilityPlan.situacao) ? (
         <div className="bg-white border border-[#CAC4D0] shadow">
           <div className="bg-[#1A6415] text-white p-4">
             <h2 className="font-semibold text-lg">Estratégia de Adequação</h2>
@@ -346,7 +356,6 @@ export const SuitabilityPlan = ({
                       label="Justificativa"
                       placeholder="Digite a justificativa..."
                       control={control}
-                      disabled={!!existingSuitabilityPlan}
                     />
                   </div>
 
@@ -356,9 +365,7 @@ export const SuitabilityPlan = ({
                     <Button
                       type="submit"
                       disabled={
-                        createSuitabilityPlan.isPending ||
-                        !technicalResponsible ||
-                        !!existingSuitabilityPlan
+                        createSuitabilityPlan.isPending || !technicalResponsible
                       }
                       variant="green"
                       className="w-[320px]"
