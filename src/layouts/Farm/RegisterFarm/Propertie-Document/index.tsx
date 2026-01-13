@@ -6,6 +6,21 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { Eye } from "@/icons/Eye";
+import { toast } from "sonner";
+
+// Validação de caracteres especiais em nomes de arquivo
+function validateFileName(fileName: string): boolean {
+  // Permite apenas: letras (com acentos), números, underscore (_), hífen (-) e ponto (.)
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._]+$/;
+  return validPattern.test(fileName);
+}
+
+function getInvalidCharacters(fileName: string): string {
+  // Remove caracteres válidos e retorna os inválidos
+  const validChars = /[\w\-\u00C0-\u017FA-Za-z0-9._]/g;
+  const invalidChars = fileName.replace(validChars, "");
+  return [...new Set(invalidChars)].join("");
+}
 
 type Documento = {
   id: number;
@@ -27,7 +42,24 @@ export const PropertieDocument = ({
   const handleFiles = (newFiles: FileList | null) => {
     if (!newFiles) return;
     const fileArr = Array.from(newFiles);
-    const merged = [...files, ...fileArr].slice(0, 3);
+
+    // Validar nomes de arquivos
+    const invalidFiles = fileArr.filter((file) => !validateFileName(file.name));
+    if (invalidFiles.length > 0) {
+      invalidFiles.forEach((file) => {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
+          { duration: 5000 }
+        );
+      });
+      // Filtrar apenas arquivos válidos
+      const validFiles = fileArr.filter((file) => validateFileName(file.name));
+      if (validFiles.length === 0) return;
+    }
+
+    const validFiles = fileArr.filter((file) => validateFileName(file.name));
+    const merged = [...files, ...validFiles].slice(0, 3);
     setFiles(merged);
   };
 
@@ -97,7 +129,6 @@ export const PropertieDocument = ({
                 // Novo arquivo
                 return (
                   <Table.Row key={idx}>
-                    <Table.Cell>Arquivo</Table.Cell>
                     <Table.Cell>{file.name}</Table.Cell>
                     <Table.Cell>
                       <button type="button" onClick={() => handleRemove(idx)}>

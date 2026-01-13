@@ -32,6 +32,24 @@ import { Eye } from "@/icons/Eye";
 import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
 import { toast } from "sonner";
 
+const validateFileName = (fileName: string): boolean => {
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ]+$/;
+  return validPattern.test(fileName);
+};
+
+const getInvalidCharacters = (fileName: string): string => {
+  const invalidChars = new Set<string>();
+  const blockedChars = ["@", "!", "\\", "?", "/", "|", "$", "&", "*", "#"];
+
+  for (const char of fileName) {
+    if (blockedChars.includes(char)) {
+      invalidChars.add(char);
+    }
+  }
+
+  return Array.from(invalidChars).join(", ");
+};
+
 type Parecer =
   | "deferido"
   | "deferido_parcial"
@@ -86,6 +104,14 @@ export const PlanoAdequacaoLayout = () => {
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file && file.type === "application/pdf") {
+      if (!validateFileName(file.name)) {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
+          { duration: 5000 }
+        );
+        return;
+      }
       setValue("parecerTecnicoFile", file, { shouldValidate: true });
     }
   };
@@ -101,6 +127,15 @@ export const PlanoAdequacaoLayout = () => {
 
   const onFileChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const file = e.target.files?.[0] ?? null;
+    if (file && !validateFileName(file.name)) {
+      const invalidChars = getInvalidCharacters(file.name);
+      toast.error(
+        `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
+        { duration: 5000 }
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     setValue("parecerTecnicoFile", file, { shouldValidate: true });
   };
 

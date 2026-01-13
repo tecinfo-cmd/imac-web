@@ -32,6 +32,24 @@ import { Eye } from "@/icons/Eye";
 import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
 import { toast } from "sonner";
 
+const validateFileName = (fileName: string): boolean => {
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ]+$/;
+  return validPattern.test(fileName);
+};
+
+const getInvalidCharacters = (fileName: string): string => {
+  const invalidChars = new Set<string>();
+  const blockedChars = ["@", "!", "\\", "?", "/", "|", "$", "&", "*", "#"];
+
+  for (const char of fileName) {
+    if (blockedChars.includes(char)) {
+      invalidChars.add(char);
+    }
+  }
+
+  return Array.from(invalidChars).join(", ");
+};
+
 type SelectOption = { label: string; value: string } | string | undefined;
 
 type FormValues = {
@@ -65,8 +83,8 @@ export const ObjectionLayout = () => {
 
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const { control, handleSubmit, reset, register, setValue, watch } =
-    useForm<FormValues>({
+  const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>(
+    {
       mode: "onChange",
       defaultValues: {
         justificativa: "",
@@ -79,7 +97,8 @@ export const ObjectionLayout = () => {
         deteccoes: [],
         parecerTecnico: { pdf: undefined },
       },
-    });
+    }
+  );
 
   const {
     data,
@@ -256,6 +275,14 @@ export const ObjectionLayout = () => {
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file && file.type === "application/pdf") {
+      if (!validateFileName(file.name)) {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
+          { duration: 5000 }
+        );
+        return;
+      }
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(file);
       setValue("parecerTecnico.pdf", dataTransfer.files, {
@@ -898,7 +925,30 @@ export const ObjectionLayout = () => {
                       accept="application/pdf"
                       id="parecer-tecnico-input"
                       className="hidden"
-                      {...register("parecerTecnico.pdf" as const)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && !validateFileName(file.name)) {
+                          const invalidChars = getInvalidCharacters(file.name);
+                          toast.error(
+                            `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
+                            { duration: 5000 }
+                          );
+                          const input = e.target as HTMLInputElement;
+                          input.value = "";
+                          return;
+                        }
+                        if (file) {
+                          const dataTransfer = new DataTransfer();
+                          dataTransfer.items.add(file);
+                          setValue(
+                            "parecerTecnico.pdf" as const,
+                            dataTransfer.files,
+                            {
+                              shouldValidate: true,
+                            }
+                          );
+                        }
+                      }}
                     />
                     <div className="flex items-center gap-2">
                       <button

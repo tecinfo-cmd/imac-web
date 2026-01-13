@@ -3,6 +3,21 @@ import { Controller } from "react-hook-form";
 import { FiUpload } from "react-icons/fi";
 
 import { Trash } from "@/icons/Trash";
+import { toast } from "sonner";
+
+// Validação de caracteres especiais em nomes de arquivo
+function validateFileName(fileName: string): boolean {
+  // Permite apenas: letras (com acentos), números, underscore (_), hífen (-) e ponto (.)
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._]+$/;
+  return validPattern.test(fileName);
+}
+
+function getInvalidCharacters(fileName: string): string {
+  // Remove caracteres válidos e retorna os inválidos
+  const validChars = /[\w\-\u00C0-\u017FA-Za-z0-9._]/g;
+  const invalidChars = fileName.replace(validChars, "");
+  return [...new Set(invalidChars)].join("");
+}
 
 interface InputFileUploadProps {
   name: string;
@@ -63,7 +78,16 @@ export const InputFileUpload = ({
                 e.preventDefault();
                 setIsDragActive(false);
                 if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                  field.onChange(e.dataTransfer.files[0]);
+                  const file = e.dataTransfer.files[0];
+                  if (!validateFileName(file.name)) {
+                    const invalidChars = getInvalidCharacters(file.name);
+                    toast.error(
+                      `Nome de arquivo inválido. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
+                      { duration: 5000 }
+                    );
+                    return;
+                  }
+                  field.onChange(file);
                   onFileChange?.(e.dataTransfer.files);
 
                   if (inputRef.current) inputRef.current.value = "";
@@ -81,7 +105,17 @@ export const InputFileUpload = ({
               accept={accept}
               onChange={(e) => {
                 if (!disabled) {
-                  field.onChange(e.target.files?.[0]);
+                  const file = e.target.files?.[0];
+                  if (file && !validateFileName(file.name)) {
+                    const invalidChars = getInvalidCharacters(file.name);
+                    toast.error(
+                      `Nome de arquivo inválido. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
+                      { duration: 5000 }
+                    );
+                    if (inputRef.current) inputRef.current.value = "";
+                    return;
+                  }
+                  field.onChange(file);
                   onFileChange?.(e.target.files);
                 }
               }}

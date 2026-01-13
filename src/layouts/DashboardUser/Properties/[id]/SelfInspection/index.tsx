@@ -38,6 +38,24 @@ import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
+const validateFileName = (fileName: string): boolean => {
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ]+$/;
+  return validPattern.test(fileName);
+};
+
+const getInvalidCharacters = (fileName: string): string => {
+  const invalidChars = new Set<string>();
+  const blockedChars = ["@", "!", "\\", "?", "/", "|", "$", "&", "*", "#"];
+
+  for (const char of fileName) {
+    if (blockedChars.includes(char)) {
+      invalidChars.add(char);
+    }
+  }
+
+  return Array.from(invalidChars).join(", ");
+};
+
 const PARECER_LABEL = "Parecer Técnico da Contestação";
 
 const customMenuItems = [
@@ -172,6 +190,16 @@ export const SelfInspectionLayout = () => {
         return;
       }
 
+      if (!validateFileName(file.name)) {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
+          { duration: 5000 }
+        );
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
       setSelectedFile(file);
     }
   };
@@ -203,6 +231,15 @@ export const SelfInspectionLayout = () => {
 
       if (file.type !== "application/pdf") {
         toast.error("Por favor, selecione apenas arquivos PDF");
+        return;
+      }
+
+      if (!validateFileName(file.name)) {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
+          { duration: 5000 }
+        );
         return;
       }
 

@@ -21,6 +21,20 @@ import { toast } from "sonner";
 
 import { DocumentsTechnical } from "./Documents";
 
+// Validação de caracteres especiais em nomes de arquivo
+function validateFileName(fileName: string): boolean {
+  // Permite apenas: letras (com acentos), números, underscore (_), hífen (-), ponto (.) e espaço
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ]+$/;
+  return validPattern.test(fileName);
+}
+
+function getInvalidCharacters(fileName: string): string {
+  // Remove caracteres válidos e retorna os inválidos
+  const validChars = /[\w\-\u00C0-\u017FA-Za-z0-9._]/g;
+  const invalidChars = fileName.replace(validChars, "");
+  return [...new Set(invalidChars)].join("");
+}
+
 type Documento = {
   id: number;
   nomeArquivo: string;
@@ -137,15 +151,71 @@ export const SuppressionAuthorizationSection = ({
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    setUploadedFiles(files);
-    setValue("arquivos", files);
+
+    if (files.length === 0) return;
+
+    // Validar nomes de arquivos
+    const validFiles = files.filter((file) => validateFileName(file.name));
+    const invalidFiles = files.filter((file) => !validateFileName(file.name));
+
+    // Se há arquivos inválidos, rejeitar todos
+    if (invalidFiles.length > 0) {
+      invalidFiles.forEach((file) => {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
+          { duration: 5000 }
+        );
+      });
+      // Limpar input e estado
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setUploadedFiles([]);
+      setValue("arquivos", []);
+      return;
+    }
+
+    // Apenas aceitar se TODOS os arquivos forem válidos
+    if (validFiles.length > 0) {
+      setUploadedFiles(validFiles);
+      setValue("arquivos", validFiles);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
-    setUploadedFiles(files);
-    setValue("arquivos", files);
+
+    if (files.length === 0) return;
+
+    // Validar nomes de arquivos
+    const validFiles = files.filter((file) => validateFileName(file.name));
+    const invalidFiles = files.filter((file) => !validateFileName(file.name));
+
+    // Se há arquivos inválidos, rejeitar todos
+    if (invalidFiles.length > 0) {
+      invalidFiles.forEach((file) => {
+        const invalidChars = getInvalidCharacters(file.name);
+        toast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
+          { duration: 5000 }
+        );
+      });
+      // Limpar input e estado
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setUploadedFiles([]);
+      setValue("arquivos", []);
+      return;
+    }
+
+    // Apenas aceitar se TODOS os arquivos forem válidos
+    if (validFiles.length > 0) {
+      setUploadedFiles(validFiles);
+      setValue("arquivos", validFiles);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
