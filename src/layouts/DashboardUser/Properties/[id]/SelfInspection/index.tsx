@@ -56,7 +56,7 @@ const getInvalidCharacters = (fileName: string): string => {
   return Array.from(invalidChars).join(", ");
 };
 
-const PARECER_LABEL = "Parecer Técnico da Contestação";
+const PARECER_LABEL = "Parecer Técnico da autovistoria";
 
 const customMenuItems = [
   { label: "Dashboard", href: "/dashboard", icon: <Analityc /> },
@@ -431,7 +431,7 @@ export const SelfInspectionLayout = () => {
                 <Table.Container className="!pt-0">
                   <Table.Header>
                     <Table.Title colspan={4}>
-                      Qual é o parecer da analise do Plano de Adequação?
+                      Qual é o parecer da analise da autovistoria?
                     </Table.Title>
                   </Table.Header>
                   <Table.Body>
