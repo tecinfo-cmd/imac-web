@@ -169,12 +169,12 @@ export const SelfInspectionLayout = () => {
 
   const handleViewDCS = () => {
     const primeiraUrl =
-      selfInspections?.[0]?.formularios?.reportUrl || "https://chatgpt.com/";
+      selfInspections?.[0]?.formularios?.reportUrl;
 
     if (primeiraUrl) {
       setReportUrl(primeiraUrl);
     } else {
-      alert("Nenhum documento encontrado");
+      toast.error("Nenhum documento encontrado");
     }
   };
 
