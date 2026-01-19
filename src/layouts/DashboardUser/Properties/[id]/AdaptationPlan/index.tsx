@@ -222,7 +222,7 @@ export const PlanoAdequacaoLayout = () => {
 
   const handleDownloadSelectedDocs = () => {
     if (!documentosPlano.length || !selectedDocsIds.length) {
-      alert("Selecione pelo menos um documento para baixar.");
+      toast.error("Selecione pelo menos um documento para baixar.");
       return;
     }
     documentosPlano

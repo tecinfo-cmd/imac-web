@@ -174,7 +174,7 @@ export const SelfInspectionLayout = () => {
     if (primeiraUrl) {
       setReportUrl(primeiraUrl);
     } else {
-      toast.error("Nenhum documento encontrado");
+      toast.error("Relatório de autovistoria ainda não foi finalizado");
     }
   };
 

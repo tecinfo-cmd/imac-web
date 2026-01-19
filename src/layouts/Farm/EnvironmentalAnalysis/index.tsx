@@ -34,7 +34,6 @@ import { Guidelines } from "./Guidelines";
 import { Inspection } from "./Inspection";
 import { SuitabilityPlan } from "./SuitabilityPlan";
 const termoStatuses = [
-  "Termo Enviado",
   "Termo Assinado",
   "Multa disponível",
   "Autovistoria Disponível",
@@ -143,18 +142,13 @@ export const EnvironmentalAnalysisLayout = () => {
   } | null>(null);
 
   const [contestationEnabled, setContestationEnabled] = useState(false);
+      
+  const adjustment = farm?.retornoAnalises?.[0]?.planoAdequacao?.situacao === "Em Análise";
 
   const { adequacyEnabled } = useMemo(() => {
     const currentAnalysis = farm?.retornoAnalises?.[0];
     const currentAnalysisId =
       contestationParams?.analysisId || currentAnalysis?.id;
-    /*
-    const normalize = (s?: string) => (s || "").toString().trim().toLowerCase();
-    const isFinishedStatus = (s?: string) => {
-      const n = normalize(s);
-      return !!n && !/analise|análise/.test(n);
-    };
-    */
 
     const confirmed = currentAnalysisId
       ? hasConfirmedClicked(farmId, currentAnalysisId)
@@ -162,13 +156,6 @@ export const EnvironmentalAnalysisLayout = () => {
     const userClickedContestation = currentAnalysisId
       ? hasContestationClicked(farmId, currentAnalysisId)
       : false;
-    /*
-    const suppressionStatus =
-      currentAnalysis?.contestacaoAutorizacaoSupressao?.situacao;
-    const reportStatus = currentAnalysis?.contestacaoLaudo?.situacao;
-    */
-    //const contestFinished =
-    //  isFinishedStatus(suppressionStatus) || isFinishedStatus(reportStatus);
 
     const adequacyEnabled =
       confirmed || userClickedContestation;
@@ -224,7 +211,7 @@ export const EnvironmentalAnalysisLayout = () => {
     const effectiveDisabled =
       !!disabled ||
       (key === "contestation" && !contestationEnabled) ||
-      (key === "AdequancyTerm" && !adequacyEnabled) ||
+      (key === "AdequancyTerm" && adjustment) ||
       (key === "suitabilityPlan" && !adequacyEnabled);
 
     const buttonElement = (
