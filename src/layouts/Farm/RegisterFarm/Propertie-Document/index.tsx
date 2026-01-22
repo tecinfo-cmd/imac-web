@@ -8,16 +8,13 @@ import { Tooltip } from "@/components/Tooltip";
 import { Eye } from "@/icons/Eye";
 import { toast } from "sonner";
 
-// Validação de caracteres especiais em nomes de arquivo
 function validateFileName(fileName: string): boolean {
-  // Permite apenas: letras (com acentos), números, underscore (_), hífen (-) e ponto (.)
-  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._]+$/;
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ()]+$/;
   return validPattern.test(fileName);
 }
 
 function getInvalidCharacters(fileName: string): string {
-  // Remove caracteres válidos e retorna os inválidos
-  const validChars = /[\w\-\u00C0-\u017FA-Za-z0-9._]/g;
+  const validChars = /[\w\-\u00C0-\u017FA-Za-z0-9._ ()]/g;
   const invalidChars = fileName.replace(validChars, "");
   return [...new Set(invalidChars)].join("");
 }

@@ -39,7 +39,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
 
 const validateFileName = (fileName: string): boolean => {
-  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ]+$/;
+  const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._() ]+$/;
   return validPattern.test(fileName);
 };
 
