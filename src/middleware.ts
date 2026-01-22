@@ -5,8 +5,9 @@ export default function middleware(req: NextRequest) {
   const user = req.cookies.get("@IMAC:T")?.value;
   const { pathname } = req.nextUrl;
   const isLoginPage = pathname === "/auth";
+  const isPublicDcsPage = pathname === "/getDcsStatus";
 
-  if (!user && !isLoginPage) {
+  if (!user && !isLoginPage && !isPublicDcsPage) {
     return NextResponse.redirect(new URL("/auth", req.url));
   }
 
@@ -22,5 +23,6 @@ export const config = {
     "/dashboard/:path*",
     "/propriedade/:path*",
     "/auth",
+    "/getDcsStatus",
   ],
 };

@@ -5,8 +5,8 @@ import { Suspense, useEffect, useState } from "react";
 import { Table } from "@/components/Table";
 import { Button } from "@/components/ui/button";
 
-import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
-import { usePremCompliance } from "@/hooks/useTrackProducers/useTrackProducers";
+import { useGetFarmByIdPublic } from "@/hooks/useTrackProducers/useGetFarmById";
+import { usePremCompliancePublic } from "@/hooks/useTrackProducers/usePremCompliancePublic";
 import { Imac } from "@/icons/Imac";
 import { LogoSideName } from "@/icons/LogoSideName";
 import { toast } from "sonner";
@@ -16,26 +16,35 @@ function GetDcsStatusContent() {
   const carFederal = searchParams.get("carFederal") || "";
   const idPropriedade = searchParams.get("idPropriedade") || "";
 
-  const { data: farmData } = useGetFarmById(Number(idPropriedade));
+  const { data: farmData } = useGetFarmByIdPublic(Number(idPropriedade));
 
   const [dataHoraAbertura, setDataHoraAbertura] = useState<string>("");
   const [showPdfViewer, setShowPdfViewer] = useState<boolean>(false);
   const [pdfUrl, setPdfUrl] = useState<string>("");
 
-  const { data, isLoading } = usePremCompliance({
+  const { data, isLoading } = usePremCompliancePublic({
     carFederal: carFederal || undefined,
     idPropriedade: idPropriedade ? Number(idPropriedade) : undefined,
   });
 
+  const getStatusColor = (status: string) => {
+    if (status?.toUpperCase() === "APTO") {
+      return "bg-green-100 text-green-700";
+    }
+    return "bg-[#f8d7da] text-[#721c24]";
+  };
+
   const handleViewDCS = () => {
     const primeiraUrl =
-      farmData?.documentos?.find((doc) => doc.tipo === "DCS")?.urlArquivo || "";
+      farmData?.documentos?.find((doc: { tipo: string; }) => doc.tipo === "DCS")?.urlArquivo || "";
 
     if (primeiraUrl) {
       setPdfUrl(primeiraUrl);
       setShowPdfViewer(true);
     } else {
-      toast.error("Nenhum documento encontrado, por favor assine o termo de adequação e compromisso.");
+      toast.error(
+        "Nenhum documento encontrado, por favor assine o termo de adequação e compromisso."
+      );
     }
   };
 
@@ -82,7 +91,7 @@ function GetDcsStatusContent() {
           <br />
           SOCIOAMBIENTAL
         </h2>
-        <div className="bg-[#f8d7da] text-[#721c24] px-2 py-2 md:px-4 md:py-2 font-bold mb-6 rounded text-center text-sm md:text-base">
+        <div className={`${getStatusColor(data.status)} px-2 py-2 md:px-4 md:py-2 font-bold mb-6 rounded text-center text-sm md:text-base`}>
           SITUAÇÃO: {data.status} - Data/Hora da consulta: {dataHoraAbertura}
         </div>
         <Table.Container className="!pt-0">
