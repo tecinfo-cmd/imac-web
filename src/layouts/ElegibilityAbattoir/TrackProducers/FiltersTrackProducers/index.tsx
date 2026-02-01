@@ -69,6 +69,7 @@ export const FilterTrackProducers = ({ onFilter }: FilterUsersProps) => {
       status: data.status?.value,
       cpfCnpj: data.cpfCnpj ? unmaskCPFOrCNPJ(data.cpfCnpj) : undefined,
       carFederal: data.carFederal?.toUpperCase().trim(),
+      carEstadual: data.carEstadual?.toUpperCase().trim(),
     };
 
     onFilter(formattedData);
@@ -88,7 +89,7 @@ export const FilterTrackProducers = ({ onFilter }: FilterUsersProps) => {
     if (conformidadeData && !isLoading) {
       router.push(
         `/getDcsStatus?carFederal=${encodeURIComponent(conformidadeData.carFederal ?? "")}` +
-        `&idPropriedade=${encodeURIComponent(conformidadeData.id ?? "")}`
+          `&idPropriedade=${encodeURIComponent(conformidadeData.id ?? "")}`
       );
     }
   }, [conformidadeData, isLoading, router]);
@@ -99,7 +100,7 @@ export const FilterTrackProducers = ({ onFilter }: FilterUsersProps) => {
         className="flex items-center gap-4 py-6 px-4 z-0"
         onSubmit={handleSubmit(handleFilterFarm)}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full pr-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pr-4">
           <Input
             name="nomeProdutor"
             label="Nome Produtor"
@@ -113,6 +114,14 @@ export const FilterTrackProducers = ({ onFilter }: FilterUsersProps) => {
             control={control}
             mask={maskCPFOrCNPJ}
           />
+
+          <Input
+            name="carEstadual"
+            label="CAR Estadual"
+            placeholder="Digite o CAR Estadual"
+            control={control}
+          />
+
           <Input
             name="carFederal"
             label="CAR"

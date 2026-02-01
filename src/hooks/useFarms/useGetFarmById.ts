@@ -178,6 +178,7 @@ export interface AtividadePrincipal {
 export interface Farm {
   id: number;
   carFederal: string;
+  carEstadual: string;
   idAtividadePrincipal: number;
   idClicloProducao: number;
   proprietarios: Proprietario[];

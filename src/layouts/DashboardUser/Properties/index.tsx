@@ -207,6 +207,7 @@ export const PropertiesLayout = () => {
               <Table.Title>Nome da Propriedade </Table.Title>
               <Table.Title>Município</Table.Title>
               <Table.Title>CAR Federal</Table.Title>
+              <Table.Title>CAR Estadual</Table.Title>
               <Table.Title>Analista</Table.Title>
               <Table.Title>Status</Table.Title>
               <Table.Title>Ações</Table.Title>
@@ -220,6 +221,7 @@ export const PropertiesLayout = () => {
                     <Table.Cell>{properties.nomePropriedade}</Table.Cell>
                     <Table.Cell>{properties.cidade?.nome || "-"}</Table.Cell>
                     <Table.Cell>{properties.carFederal}</Table.Cell>
+                    <Table.Cell>{properties.carEstadual || "-"}</Table.Cell>
                     <Table.Cell>
                       {getFirstAndLastName(properties.analista?.pessoa.nome) ||
                         "-"}

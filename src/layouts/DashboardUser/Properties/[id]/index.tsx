@@ -176,6 +176,7 @@ export const MonitoringLayout = () => {
 
   const farmData = {
     car: propriedade.carFederal,
+    carEstadual: propriedade.carEstadual || "-",
     voucher: propriedade.voucher,
     nome: propriedade.nomePropriedade,
     municipio: propriedade.endereco?.municipio,
@@ -188,6 +189,7 @@ export const MonitoringLayout = () => {
     [
       { label: "Cadastro Ambiental Rural (CAR)", value: farmData.car },
       { label: "Código Voucher PREM", value: farmData.voucher },
+      { label: "CAR Estadual", value: farmData.carEstadual },
     ],
     [
       { label: "Nome da propriedade*", value: farmData.nome },

@@ -86,6 +86,7 @@ interface ObjectionData {
 
   farmData: {
     car: string;
+    carEstadual: string;
     voucher: string;
     nome: string;
     municipio: string;

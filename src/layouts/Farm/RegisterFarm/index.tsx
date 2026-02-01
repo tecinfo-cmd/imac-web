@@ -273,6 +273,10 @@ export const RegisterFarmLayout = () => {
         <div>
           <h2 className="text-[#21801A]">Cadastro Ambiental Rural (CAR)</h2>
           <p>{farmStore?.carFederal}</p>
+        </div>        
+        <div>
+          <h2 className="text-[#21801A]">CAR Estadual</h2>
+          <p>{farm?.carEstadual || "-"}</p>
         </div>
         <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>

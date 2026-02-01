@@ -22,12 +22,16 @@ export const SuitabilityTerm = ({ farmId }: SuitabilityTermProps) => {
         </p>
       </div>
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
-         Plano de Adequação
+        Plano de Adequação
       </h1>
       <div className="grid grid-cols-3 gap-8 p-6 border border-[#CAC4D0] rounded shadow">
         <div>
           <h2 className="text-[#21801A]">Cadastro Ambiental Rural (CAR)</h2>
           <p>{farm?.carFederal}</p>
+        </div>
+        <div>
+          <h2 className="text-[#21801A]">Car Estadual</h2>
+          <p>{farm?.carEstadual || "-"}</p>
         </div>
         <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>

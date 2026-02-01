@@ -147,12 +147,14 @@ export const PropertySummaryLayout = () => {
 
             <Table.Header className="bg-[#D7EADD]">
               <Table.Title>Cadastro Ambiental Rural (CAR)</Table.Title>
-              <Table.Title colspan={3}>Código voucher PREM</Table.Title>
+              <Table.Title>CAR Estadual</Table.Title>
+              <Table.Title colspan={2}>Código voucher PREM</Table.Title>
             </Table.Header>
             <Table.Body>
               <Table.Row>
                 <Table.Cell>{data?.cadastroAmbientalRural}</Table.Cell>
-                <Table.Cell colspan={3}>{data?.codigoVoucherPrem}</Table.Cell>
+                <Table.Cell>{data?.carEstadual }</Table.Cell>
+                <Table.Cell colspan={2}>{data?.codigoVoucherPrem}</Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table.Container>

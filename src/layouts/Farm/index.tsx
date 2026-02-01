@@ -29,6 +29,7 @@ export const FarmLayout = () => {
           <Table.Title>Nome da Propriedade</Table.Title>
           <Table.Title>Município</Table.Title>
           <Table.Title>CAR Federal</Table.Title>
+          <Table.Title>CAR Estadual</Table.Title>
           <Table.Title>Voucher</Table.Title>
           <Table.Title>Ações</Table.Title>
         </Table.Header>
@@ -38,6 +39,7 @@ export const FarmLayout = () => {
               <Table.Cell>{farm.nomePropriedade}</Table.Cell>
               <Table.Cell>{farm.cidade.nome || "N/A"}</Table.Cell>
               <Table.Cell>{farm.carFederal}</Table.Cell>
+              <Table.Cell>{farm.carEstadual}</Table.Cell>
               <Table.Cell>
                 <div className="flex items-center gap-2">
                   <span

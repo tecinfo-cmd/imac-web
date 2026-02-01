@@ -1,11 +1,12 @@
 import { create } from "zustand";
 
 export interface FarmFilter {
-  nomeFazenda?: string;
+  nomePropriedade?: string;
   codigoMunicipio?: string;
   carFederal?: string;
+  carEstadual?: string;
   statusVoucher?: boolean;
-};
+}
 
 export interface FarmFilterStore {
   farmFilterValues: FarmFilter;

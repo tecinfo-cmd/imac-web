@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 interface FarmData {
   id: number;
   carFederal: string;
+  carEstadual: string;
   voucher: string;
   cidade: string;
   nomePropriedade: string;

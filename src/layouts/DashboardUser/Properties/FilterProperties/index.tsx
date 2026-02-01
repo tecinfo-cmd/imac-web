@@ -71,6 +71,13 @@ export const FilterProperties = ({ onFilter }: FilterUsersProps) => {
         placeholder="Digite o CAR Federal"
         control={control}
       />
+      
+      <Input
+        name="carEstadual"
+        label="CAR Estadual"
+        placeholder="Digite o CAR Estadual"
+        control={control}
+      />
 
       <Input
         name="analista"

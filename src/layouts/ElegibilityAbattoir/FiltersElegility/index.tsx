@@ -47,6 +47,7 @@ export const FilterElegibilityAbattoir = ({ onFilter }: FilterUsersProps) => {
     const formattedData = {
       ...data,
       status: data.status?.value,
+      carEstadual: data.numeroCarEstadual?.toUpperCase().trim(),
       numeroCar: data.numeroCar?.toUpperCase().trim(),
     };
 
@@ -75,62 +76,69 @@ export const FilterElegibilityAbattoir = ({ onFilter }: FilterUsersProps) => {
   return (
     <>
       <form
-  className="
+        className="
     flex flex-col md:flex-row 
     md:items-center md:justify-between
     gap-4 py-6 px-4
   "
-  onSubmit={handleSubmit(handleFilterFarm)}
->
-  {/* Inputs */}
-  <div className="flex flex-col md:flex-row gap-4 flex-1">
-    <Input
-      name="numeroCar"
-      label="CAR"
-      placeholder="Digite o Car"
-      control={control}
-      mask={maskCAR}
-    />
-
-    <InputSelect
-      name="status"
-      label="Status"
-      placeholder="Selecione"
-      control={control}
-      options={[
-        { label: "Aprovado", value: "APROVADO", color: "#21801A" },
-        { label: "Reprovado", value: "REPROVADO", color: "#F44336" },
-        { label: "Pendente", value: "PENDENTE", color: "#F3BF45" },
-      ]}
-      formatOptionLabel={(option: any) => (
-        <div className="flex items-center gap-2">
-          <span
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: option.color }}
+        onSubmit={handleSubmit(handleFilterFarm)}
+      >
+        {/* Inputs */}
+        <div className="flex flex-col md:flex-row gap-4 flex-1">
+          <Input
+            name="numeroCar"
+            label="CAR federal"
+            placeholder="Digite o Car"
+            control={control}
+            mask={maskCAR}
           />
-          <span>{option.label}</span>
-        </div>
-      )}
-    />
-  </div>
 
-  {/* Buttons */}
-  <div className="flex gap-4 mt-4 md:mt-0 md:justify-end">
-    <Button type="submit" variant="green">
-      Buscar <IoSearchSharp size={20} />
-    </Button>
-    <Button type="button" variant="danger" onClick={clearFilter}>
-      Limpar
-    </Button>
-    <Button
-      type="button"
-      variant="green"
-      onClick={() => setIsModalOpen(true)}
-    >
-      Nova Consulta
-    </Button>
-  </div>
-</form>
+          <Input
+            name="numeroCarEstadual"
+            label="CAR Estadual"
+            placeholder="Digite o Car"
+            control={control}
+          />
+
+          <InputSelect
+            name="status"
+            label="Status"
+            placeholder="Selecione"
+            control={control}
+            options={[
+              { label: "Aprovado", value: "APROVADO", color: "#21801A" },
+              { label: "Reprovado", value: "REPROVADO", color: "#F44336" },
+              { label: "Pendente", value: "PENDENTE", color: "#F3BF45" },
+            ]}
+            formatOptionLabel={(option: any) => (
+              <div className="flex items-center gap-2">
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: option.color }}
+                />
+                <span>{option.label}</span>
+              </div>
+            )}
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex gap-4 mt-4 md:mt-0 md:justify-end">
+          <Button type="submit" variant="green">
+            Buscar <IoSearchSharp size={20} />
+          </Button>
+          <Button type="button" variant="danger" onClick={clearFilter}>
+            Limpar
+          </Button>
+          <Button
+            type="button"
+            variant="green"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Nova Consulta
+          </Button>
+        </div>
+      </form>
 
       <Modal.Container
         isOpen={isModalOpen}

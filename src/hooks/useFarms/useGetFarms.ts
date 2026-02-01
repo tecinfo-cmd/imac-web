@@ -102,6 +102,7 @@ interface Territorio {
 export interface Propriedade {
   id: number;
   carFederal: string;
+  carEstadual: string;
   nomePropriedade: string;
   codigoMunicipio: number;
   idSolicitacaoElegibilidade: number;
@@ -126,21 +127,61 @@ export interface Propriedade {
 
 export interface GetFarmsParams {
   carFederal?: string;
-  nomeFazenda?: string;
-  codigoMunicipio?: string;
+  carEstadual?: string;
+  nomePropriedade?: string;
+  codigoMunicipio?: string | number;
+  statusVoucher?: boolean;
   email?: string;
 }
 
 export const getFarms = async (params: GetFarmsParams = {}) => {
   try {
-    const { data } = await api.get("/propriedade-prem/proprietario", { params });
+    const cleanParams = Object.fromEntries(
+      Object.entries(params).filter(
+        ([, value]) => value !== undefined && value !== "" && value !== null
+      )
+    ) as GetFarmsParams;
+
+    const { data } = await api.get("/propriedade-prem/proprietario", { params: cleanParams });
+    if (data && Array.isArray(data)) {
+      let filtered = data;
+      
+      if (params.carFederal) {
+        filtered = filtered.filter(f => 
+          f.carFederal?.toUpperCase().includes(params.carFederal!.toUpperCase())
+        );
+      }
+      
+      if (params.carEstadual) {
+        filtered = filtered.filter(f => 
+          f.carEstadual?.toUpperCase().includes(params.carEstadual!.toUpperCase())
+        );
+      }
+      
+      if (params.nomePropriedade) {
+        filtered = filtered.filter(f => 
+          f.nomePropriedade?.toUpperCase().includes(params.nomePropriedade!.toUpperCase())
+        );
+      }
+      
+      if (params.codigoMunicipio) {
+        const codigo = Number(params.codigoMunicipio);
+        filtered = filtered.filter(f => f.codigoMunicipio === codigo);
+      }
+      
+      if (params.statusVoucher !== undefined) {
+        filtered = filtered.filter(f => f.statusVoucher === params.statusVoucher);
+      }
+            return filtered as Propriedade[];
+    }
+
     return data as Propriedade[];
 
   } catch (error) {
-    console.error("Error fetching farms:", error);
-    return Promise.reject(error);
+    console.error("[getFarms] Erro:", error);
+    return [];
   }
-};
+};;
 
 export function useGetFarms(params?: GetFarmsParams) {
   const email = useAuthEmail();
@@ -151,7 +192,7 @@ export function useGetFarms(params?: GetFarmsParams) {
   };
 
   return useQuery({
-    queryKey: [QUERY_KEY_GET_FARMS, finalParams],
+    queryKey: [QUERY_KEY_GET_FARMS, email, params?.carFederal, params?.carEstadual, params?.nomePropriedade, params?.codigoMunicipio, params?.statusVoucher],
     queryFn: () => getFarms(finalParams),
     enabled: !!finalParams.email,
     select: (data) => data || [],

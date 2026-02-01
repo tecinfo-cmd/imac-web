@@ -167,6 +167,10 @@ export const SuitabilityPlan = ({
           <p>{farm?.carFederal}</p>
         </div>
         <div>
+          <h2 className="text-[#21801A]">Car Estadual</h2>
+          <p>{farm?.carEstadual || "-"}</p>
+        </div>
+        <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>
           <p>{farm?.voucher}</p>
         </div>

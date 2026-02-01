@@ -48,7 +48,9 @@ export const Fines = ({ farmId }: FinesProps) => {
     (_, i) => {
       const n = i + 1;
       const value = (totalFineValue / n).toFixed(2);
-      return parseFloat(value) >= MIN_INSTALLMENT_VALUE ? { n, value: parseFloat(value) } : undefined;
+      return parseFloat(value) >= MIN_INSTALLMENT_VALUE
+        ? { n, value: parseFloat(value) }
+        : undefined;
     }
   ).filter((opt): opt is { n: number; value: number } => !!opt);
 
@@ -160,6 +162,10 @@ export const Fines = ({ farmId }: FinesProps) => {
         <div>
           <h2 className="text-[#21801A]">Cadastro Ambiental Rural (CAR)</h2>
           <p>{farm?.carFederal}</p>
+        </div>
+        <div>
+          <h2 className="text-[#21801A]">Car Estadual</h2>
+          <p>{farm?.carEstadual || "-"}</p>
         </div>
         <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>
@@ -357,12 +363,12 @@ export const Fines = ({ farmId }: FinesProps) => {
                             payment.status === "LIQUIDADO"
                               ? "bg-green-100 text-green-800"
                               : payment.status === "PENDENTE"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : payment.status === "VENCIDO"
-                              ? "bg-red-100 text-red-800"
-                              : payment.status === "BAIXADO"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-gray-100 text-gray-800"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : payment.status === "VENCIDO"
+                                  ? "bg-red-100 text-red-800"
+                                  : payment.status === "BAIXADO"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-gray-100 text-gray-800"
                           }`}
                         >
                           {payment.status}

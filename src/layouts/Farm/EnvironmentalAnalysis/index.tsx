@@ -142,8 +142,9 @@ export const EnvironmentalAnalysisLayout = () => {
   } | null>(null);
 
   const [contestationEnabled, setContestationEnabled] = useState(false);
-      
-  const adjustment = farm?.retornoAnalises?.[0]?.planoAdequacao?.situacao === "Em Análise";
+
+  const adjustment =
+    farm?.retornoAnalises?.[0]?.planoAdequacao?.situacao === "Em Análise";
 
   const { adequacyEnabled } = useMemo(() => {
     const currentAnalysis = farm?.retornoAnalises?.[0];
@@ -157,8 +158,7 @@ export const EnvironmentalAnalysisLayout = () => {
       ? hasContestationClicked(farmId, currentAnalysisId)
       : false;
 
-    const adequacyEnabled =
-      confirmed || userClickedContestation;
+    const adequacyEnabled = confirmed || userClickedContestation;
 
     return {
       adequacyEnabled,
@@ -359,6 +359,10 @@ export const EnvironmentalAnalysisLayout = () => {
         <div>
           <h2 className="text-[#21801A]">Cadastro Ambiental Rural (CAR)</h2>
           <p>{farm?.carFederal}</p>
+        </div>
+        <div>
+          <h2 className="text-[#21801A]">Car Estadual</h2>
+          <p>{farm?.carEstadual || "-"}</p>
         </div>
         <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>

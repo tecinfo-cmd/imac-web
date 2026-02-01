@@ -27,7 +27,10 @@ export function useAbattoirElegibilities(
       });
       console.log(data);
       return {
-        data: data[0] ?? [],
+         data: (data[0] ?? []).map((item: any) => ({
+          ...item,
+          carEstadual: item.propriedades?.[0]?.carEstadual,
+        })),
         total: data[1] ?? 0,
         page,
         size: limit,

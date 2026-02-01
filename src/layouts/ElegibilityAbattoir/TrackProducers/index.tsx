@@ -80,6 +80,7 @@ export const TrackProducersLayout = () => {
               <Table.Title>CPF/CNPJ</Table.Title>
               <Table.Title>Email</Table.Title>
               <Table.Title>CAR Federal</Table.Title>
+              <Table.Title>CAR Estadual</Table.Title>
               <Table.Title>Status</Table.Title>
               <Table.Title>Ações</Table.Title>
             </Table.Header>
@@ -93,6 +94,8 @@ export const TrackProducersLayout = () => {
                   </Table.Cell>
                   <Table.Cell>{voucher.propriedade.proprietarios?.[0]?.pessoa?.email}</Table.Cell>
                   <Table.Cell>{voucher.propriedade.carFederal}</Table.Cell>
+
+                  <Table.Cell>{voucher.propriedade.carEstadual || "-"}</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-2">
                       <span

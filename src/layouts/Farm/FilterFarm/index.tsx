@@ -15,9 +15,16 @@ export const FilterFarm = () => {
 
   const handleFilterFarm = (data: any) => {
     const formattedData = {
-      ...data,
+      nomePropriedade: data.nomeFazenda,
+      carFederal: data.carFederal,
+      carEstadual: data.carEstadual,
       codigoMunicipio: data.codigoMunicipio?.value,
-      statusVoucher: data.statusVoucher?.value,
+      statusVoucher:
+        data.statusVoucher?.value === "active"
+          ? true
+          : data.statusVoucher?.value === "inactive"
+            ? false
+            : undefined,
     };
     addFilterValues(formattedData);
   };
@@ -58,6 +65,13 @@ export const FilterFarm = () => {
         control={control}
       />
 
+      <Input
+        name="carEstadual"
+        label="CAR Estadual"
+        placeholder="Insira o seu CAR Estadual"
+        control={control}
+      />
+
       <InputSelect
         name="statusVoucher"
         label="Status do Voucher"
@@ -74,7 +88,7 @@ export const FilterFarm = () => {
           Filtrar <IoSearchSharp size={20} />
         </Button>
         <Button
-          type="submit"
+          type="button"
           variant="danger"
           className="mt-4"
           onClick={clearFilter}

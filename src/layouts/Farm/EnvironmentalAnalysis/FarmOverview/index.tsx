@@ -198,7 +198,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
               </TableInformation.Column>
             </TableInformation.Row>
 
-            <TableInformation.Row columnsPerRow={2}>
+            <TableInformation.Row columnsPerRow={3}>
               <TableInformation.Column>
                 <TableInformation.Title>
                   Cadastro Ambiental Rural (CAR)
@@ -212,6 +212,12 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
                   Código voucher PREM
                 </TableInformation.Title>
                 <TableInformation.Value>{farm.voucher}</TableInformation.Value>
+              </TableInformation.Column>
+              <TableInformation.Column>
+                <TableInformation.Title>
+                  Car Estadual
+                </TableInformation.Title>
+                <TableInformation.Value>{farm.carEstadual}</TableInformation.Value>
               </TableInformation.Column>
             </TableInformation.Row>
           </TableInformation.Section>

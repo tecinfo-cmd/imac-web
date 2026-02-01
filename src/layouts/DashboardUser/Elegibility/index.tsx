@@ -122,6 +122,7 @@ export const ElegibilityLayout = () => {
               <Table.Title>CPF/CNPJ</Table.Title>
               <Table.Title>Email</Table.Title>
               <Table.Title>CAR Federal</Table.Title>
+              <Table.Title>CAR Estadual</Table.Title>
               <Table.Title>Status</Table.Title>
               <Table.Title>Ações</Table.Title>
             </Table.Header>
@@ -137,6 +138,7 @@ export const ElegibilityLayout = () => {
                   </Table.Cell>
                   <Table.Cell>{elegibilities.email}</Table.Cell>
                   <Table.Cell>{elegibilities.carFederal}</Table.Cell>
+                  <Table.Cell>{elegibilities.carEstadual || "-"}</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-2">
                       <span

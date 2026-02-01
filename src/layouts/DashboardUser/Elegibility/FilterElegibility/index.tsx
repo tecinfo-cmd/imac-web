@@ -71,13 +71,18 @@ export const FilterElegibility = ({ onFilter }: FilterUsersProps) => {
         />
         <Input
           name="carFederal"
-          label="CAR"
-          placeholder="Digite o Car"
+          label="CAR Federal"
+          placeholder="Digite o Car Federal"
           control={control}
           mask={maskCAR}
         />
-      </div>
-      <div className="flex flex-col gap-4 items-start z-10">
+        <Input
+          name="carEstadual"
+          label="CAR Estadual"
+          placeholder="Digite o Car Estadual"
+          control={control}
+          mask={maskCAR}
+        />
         <InputSelect
           name="status"
           label="Status"
@@ -98,7 +103,8 @@ export const FilterElegibility = ({ onFilter }: FilterUsersProps) => {
             </div>
           )}
         />
-
+      </div>
+      <div className="flex flex-col gap-4 items-start z-10">
         <div className="pt-4 flex items-center gap-4 z-0">
           <Button type="submit" variant="green" className="mt-4">
             Buscar <IoSearchSharp size={20} />

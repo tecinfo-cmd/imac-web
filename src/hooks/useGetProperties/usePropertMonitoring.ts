@@ -24,6 +24,7 @@ interface PropriedadeResponse {
   id: number;
   nomePropriedade: string;
   carFederal: string;
+  carEstadual?: string;
   endereco: Endereco;
   voucher: string;
   etapa: string;

@@ -43,6 +43,7 @@ interface PropertySummary {
   cicloProducao: string;
   numeroProprietarios: string;
   cadastroAmbientalRural: string;
+  carEstadual: string;
   codigoVoucherPrem: string;
   proprietarioPrincipal: Pessoa;
   coproprietarios: Pessoa[];
@@ -108,6 +109,7 @@ const mapResponseToPropertySummary = (prop: any): PropertySummary => {
     documentos,
     relatorioUrl,
     endereco: endereco,
+    carEstadual: prop.carEstadual ?? "-",
   };
 };
 

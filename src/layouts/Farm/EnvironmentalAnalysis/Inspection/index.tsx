@@ -18,7 +18,7 @@ export const Inspection = ({ farmId }: InspectionProps) => {
   const { data: autoInspection, isLoading } =
     useGetAutoInspection(idPropriedade);
 
-    console.log("autoInspection", autoInspection);
+  console.log("autoInspection", autoInspection);
 
   if (isLoading) return <p>Carregando dados da vistoria...</p>;
 
@@ -41,6 +41,10 @@ export const Inspection = ({ farmId }: InspectionProps) => {
         <div>
           <h2 className="text-[#21801A]">Cadastro Ambiental Rural (CAR)</h2>
           <p>{farm?.carFederal}</p>
+        </div>
+        <div>
+          <h2 className="text-[#21801A]">Car Estadual</h2>
+          <p>{farm?.carEstadual || "-"}</p>
         </div>
         <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>

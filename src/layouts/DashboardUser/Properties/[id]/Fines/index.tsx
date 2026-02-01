@@ -88,6 +88,7 @@ export const FinesLayout = () => {
     return "-";
   };
   const formatCurrency = (value: number) => {
+    if (!value && value !== 0) return "";
     return `R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`;
   };
 
@@ -121,6 +122,7 @@ export const FinesLayout = () => {
   const farmInfoRows = [
     [
       { label: "Cadastro Ambiental Rural (CAR)", value: farmData.car },
+      { label: "CAR Estadual", value: farmData.carEstadual || "-" },
       { label: "Código Voucher PREM", value: farmData.voucher },
     ],
     [
