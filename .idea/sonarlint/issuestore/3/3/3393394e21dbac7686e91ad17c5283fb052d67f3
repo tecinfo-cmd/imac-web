@@ -1,0 +1,10 @@
+
+„typescript:S3863"a'D:\PROJETOS\CONNECT\PROJETOS\IMAC\imac-web\node_modules\react\index.js' imported multiple times.(‚Ñ·8 Úò€æ2
+‰typescript:S3863"a'D:\PROJETOS\CONNECT\PROJETOS\IMAC\imac-web\node_modules\react\index.js' imported multiple times.(÷ğ¹÷şÿÿÿÿ8¡Úò€æ2
+ƒtypescript:S6582G"[Prefer using an optional chain expression instead, as it's more concise and easier to read.(ç‰ŒÕùÿÿÿÿ8¡Úò€æ2
+ztypescript:S4325\"RThis assertion is unnecessary since it does not change the type of the expression.(¾õú¤ıÿÿÿÿ8¡Úò€æ2
+ƒtypescript:S6582a"[Prefer using an optional chain expression instead, as it's more concise and easier to read.(ø¤¹¬øÿÿÿÿ8¡Úò€æ2
+typescript:S6606Ø"jPrefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.(ŞÙş¸8¢Úò€æ2
+typescript:S6844ß"dAnchor used as a button. Anchors are primarily expected to navigate. Use the button element instead.(­ÈÎ´üÿÿÿÿ8¢Úò€æ2
+€typescript:S3923…"]This conditional operation returns the same value whether the condition is "true" or "false".( Ï¾'8£Úò€æ2
+Gtypescript:S6479–"Do not use Array index in keys(ƒ¾‡Öùÿÿÿÿ8£Úò€æ2

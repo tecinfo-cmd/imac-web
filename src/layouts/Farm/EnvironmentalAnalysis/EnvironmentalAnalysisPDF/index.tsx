@@ -1,0 +1,78 @@
+import { Button } from "@/components/ui/button";
+
+import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import {
+  setContestationClicked,
+  setConfirmedClicked,
+} from "@/utils/contestationFlags";
+
+interface EnvironmentalAnalysisPDFProps {
+  farmId: number;
+  onNavigateToContestation?: (farmId: number, analysisId: number) => void;
+  onNavigateToSuitabilityPlan?: (farmId: number, analysisId: number) => void;
+  onAnalysisClick: () => void;
+}
+
+export const EnvironmentalAnalysisPDF = ({
+  farmId,
+  onNavigateToContestation,
+  onNavigateToSuitabilityPlan,
+  onAnalysisClick,
+}: EnvironmentalAnalysisPDFProps) => {
+  const { data: farm, isLoading } = useGetFarmById(farmId);
+
+  if (isLoading) return <p>Carregando...</p>;
+
+  const pdfUrl = farm?.retornoAnalises?.[0]?.urlRelatorio;
+  const analysisId = farm?.retornoAnalises?.[0]?.id;
+
+  if (!pdfUrl) {
+    return <p>Nenhuma análise socioambiental disponível.</p>;
+  }
+
+  const handleConfirmDetections = () => {
+    if (analysisId) {
+      setConfirmedClicked(farmId, analysisId);
+    }
+
+    if (onNavigateToSuitabilityPlan && analysisId) {
+      onNavigateToSuitabilityPlan(farmId, analysisId);
+    }
+    
+    if (onAnalysisClick) {
+    onAnalysisClick();
+  }
+  };
+
+  const handleContestDetections = () => {
+    if (analysisId) {
+      setContestationClicked(farmId, analysisId);
+    }
+
+    if (onNavigateToContestation && analysisId) {
+      onNavigateToContestation(farmId, analysisId);
+    }
+
+    if (onAnalysisClick) {
+      onAnalysisClick();
+    }
+  };
+
+  return (
+    <div className="w-full h-[80vh] p-4">
+      <iframe
+        src={pdfUrl}
+        title="Relatório Socioambiental"
+        className="w-full h-full border rounded-lg shadow"
+      />
+      <div className="py-4 flex justify-end gap-4">
+        <Button onClick={handleConfirmDetections} variant="green">
+          Confirmar detecções informadas
+        </Button>
+        <Button onClick={handleContestDetections} variant="danger">
+          Contestar detecções informadas
+        </Button>
+      </div>
+    </div>
+  );
+};
