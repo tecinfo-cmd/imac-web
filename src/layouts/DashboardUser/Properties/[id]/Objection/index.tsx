@@ -70,6 +70,7 @@ type FormValues = {
     tipo?: string | { label: string; value: string };
     areaARegenerar?: string;
     wkt?: string;
+    tipoDeteccao?: number;
   }[];
   parecerTecnico: {
     pdf?: FileList;
@@ -454,6 +455,7 @@ export const ObjectionLayout = () => {
         idTad: number | string;
         areaARegenerar: number;
         wkt: string;
+        tipoDeteccao: number;
       }[] = [];
       const arquivosOut: { pdf: File; tipo: string }[] = [];
 
@@ -484,6 +486,7 @@ export const ObjectionLayout = () => {
         }
 
         const hasPolygonData = hasTipo || hasWKT || hasArea;
+        
         if (!hasPolygonData) return;
 
         const originalTipo = String(original?.tipo ?? "");
@@ -496,12 +499,24 @@ export const ObjectionLayout = () => {
           ? Math.min(Math.max(areaNum, 0), maxVal)
           : 0;
 
+        let tipoDeteccao: number;
+        if (clamped === 0) {
+          tipoDeteccao = 1;
+        } else if (clamped === maxVal) {
+          tipoDeteccao = 3;
+        } else if (clamped > 0 && clamped < maxVal) {
+          tipoDeteccao = 2;
+        } else {
+          tipoDeteccao = 1;
+        }
+
         poligonosOut.push({
           tipo: hasTipo ? String(selectedValue) : "",
           poligono: originalTipo,
           idTad: originalIdAgrotools,
           areaARegenerar: hasArea ? clamped : 0,
           wkt: hasWKT ? sanitizeWKT(wktRaw) : "",
+          tipoDeteccao: tipoDeteccao,
         });
       });
 
@@ -530,6 +545,7 @@ export const ObjectionLayout = () => {
         parametros,
         descontoPercentual: desconto.value,
         valorMulta: valorBruto,
+        poligonos: poligonosOut,
       };
       if (arquivosOut.length) payload.deteccoes = arquivosOut;
       if (poligonosOut.length) payload.poligonos = poligonosOut;
@@ -867,24 +883,8 @@ export const ObjectionLayout = () => {
                 <Table.Cell>
                   <Radio
                     name="status"
-                    value="DEFERIDO_PARCIAL"
-                    label="Deferido Parcialmente"
-                    control={control}
-                  />
-                </Table.Cell>
-                <Table.Cell>
-                  <Radio
-                    name="status"
                     value="INDEFERIDO"
                     label="Indeferido"
-                    control={control}
-                  />
-                </Table.Cell>
-                <Table.Cell>
-                  <Radio
-                    name="status"
-                    value="COM_PENDENCIAS"
-                    label="Com Pendências"
                     control={control}
                   />
                 </Table.Cell>

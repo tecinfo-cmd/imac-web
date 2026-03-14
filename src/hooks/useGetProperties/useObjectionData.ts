@@ -118,6 +118,7 @@ interface SubmitObjectionProps {
     poligono: string;
     idTad: number | string;
     areaARegenerar: number | string;
+    tipoDeteccao: string | number ;
   }[];
   parametros: { nome: string; tipo: string }[];
   descontoPercentual?: number;
