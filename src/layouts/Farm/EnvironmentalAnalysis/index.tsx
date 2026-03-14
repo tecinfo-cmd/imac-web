@@ -283,7 +283,11 @@ export const EnvironmentalAnalysisLayout = () => {
   const componentMap: Record<string, JSX.Element> = {
     overview: <FarmOverview farmId={farmId} />,
     getDcsStatus: <GetDcsStatus />,
-    AdequancyTerm: <AdequancyTerm farmId={farmId} />,
+    AdequancyTerm: (
+      <AdequancyTerm
+        farmId={farmId}
+      />
+    ),
     environmentalAnalysisPDF: (
       <EnvironmentalAnalysisPDF
         farmId={farmId}
@@ -310,6 +314,9 @@ export const EnvironmentalAnalysisLayout = () => {
       <Contestation
         farmId={farmId}
         analysisId={contestationParams?.analysisId}
+        onNavigateToSuitabilityPlan={handleNavigateToSuitabilityPlan}
+        onNavigateToAdequancyTerm={handleNavigateToAdequancyTerm}
+        onAnalysisClick={() => setAnalysisClicked(true)}
       />
     ),
     propertyDocuments: (

@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { GoAlertFill } from "react-icons/go";
 import { LuFileSearch } from "react-icons/lu";
 
@@ -8,14 +9,24 @@ import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSe
 import { Button } from "@/components/ui/button";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { setConfirmedClicked } from "@/utils/contestationFlags";
 import { formatDate } from "@/utils/formatters/formatDate";
 
 interface ContestationProps {
   farmId: number;
   analysisId?: number;
+  onNavigateToSuitabilityPlan?: (farmId: number, analysisId: number) => void;
+  onNavigateToAdequancyTerm?: (farmId: number, analysisId: number) => void;
+  onAnalysisClick: () => void;
 }
 
-export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
+export const Contestation = ({
+  farmId,
+  analysisId,
+  onNavigateToSuitabilityPlan,
+  onNavigateToAdequancyTerm,
+  onAnalysisClick,
+}: ContestationProps) => {
   const { data: farm, isLoading } = useGetFarmById(farmId);
 
   if (isLoading) return <p>Carregando...</p>;
@@ -24,6 +35,7 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
     farm?.retornoAnalises && farm.retornoAnalises.length > 0;
 
   const hasValidParams = farmId && analysisId;
+  const imgbase64 = farm?.territorios?.[0]?.imagemAdequacao;
 
   const canAccess = hasAnalysisInProgress || hasValidParams;
 
@@ -46,6 +58,38 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
   const reportContestation = currentAnalysis?.contestacaoLaudo;
 
   const finalAnalysisId = analysisId || currentAnalysis?.id || 0;
+
+  const handleConfirmDetections = () => {
+    const idToUse = analysisId || currentAnalysis?.id;
+
+    if (idToUse) {
+      setConfirmedClicked(farmId, idToUse);
+    }
+
+    if (onNavigateToSuitabilityPlan && idToUse) {
+      onNavigateToSuitabilityPlan(farmId, idToUse);
+    }
+
+    if (onAnalysisClick) {
+      onAnalysisClick();
+    }
+  };
+
+  const handleNavigateToAdequancyTerm = () => {
+    const idToUse = analysisId || currentAnalysis?.id;
+
+    if (idToUse) {
+      setConfirmedClicked(farmId, idToUse);
+    }
+
+    if (onNavigateToAdequancyTerm && idToUse) {
+      onNavigateToAdequancyTerm(farmId, idToUse);
+    }
+
+    if (onAnalysisClick) {
+      onAnalysisClick();
+    }
+  };
 
   return (
     <>
@@ -174,6 +218,17 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
                   </div>
                 )}
             </div>
+            {imgbase64 && (
+              <div className="flex justify-center py-4">
+                <Image
+                  src={`${imgbase64}`}
+                  alt="Área destinada à Regeneração"
+                  width={900}
+                  height={700}
+                  className="max-w-full rounded-[20px] shadow"
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -244,6 +299,30 @@ export const Contestation = ({ farmId, analysisId }: ContestationProps) => {
                     </Button>
                   </div>
                 )}
+            </div>
+
+            {imgbase64 && (
+              <div className="flex justify-center py-4">
+                <Image
+                  src={`${imgbase64}`}
+                  alt="Área destinada à Regeneração"
+                  width={900}
+                  height={700}
+                  className="max-w-full rounded-[20px] shadow"
+                />
+              </div>
+            )}
+            <div className="flex justify-end gap-4 mb-4 mr-4">
+              <Button
+                variant="danger"
+                className="px-4 py-2 text-sm"
+                onClick={handleConfirmDetections}
+              >
+                Solicitar Estrategia de Adequação
+              </Button>
+              <Button variant="green" className="px-4 py-2 text-sm" onClick={handleNavigateToAdequancyTerm}>
+                Assinar termo de Compromisso
+              </Button>
             </div>
           </div>
         </div>
