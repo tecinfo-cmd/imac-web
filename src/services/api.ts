@@ -7,7 +7,7 @@ export const fetchCARData = async (
     formattedValue = documentValue.replace(/[^\w\s]/gi, "");
   }
 
-  const url = `https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/consulta-car?${documentType}=${formattedValue}`;
+  const url = `https://imac-app-hom-3lq2b.ondigitalocean.app/mac/api/v1/elegibilidades/consulta-car?${documentType}=${formattedValue}`;
 
   try {
     const response = await fetch(url);

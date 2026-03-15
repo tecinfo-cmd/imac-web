@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       {
         source: "/api/:path*",
         destination:
-          "https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/consulta-car?:path*",
+          "https://imac-app-hom-3lq2b.ondigitalocean.app/mac/api/v1/elegibilidades/consulta-car?:path*",
       },
     ];
   },

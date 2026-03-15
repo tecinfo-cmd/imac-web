@@ -169,7 +169,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          "https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes",
+          "https://imac-app-hom-3lq2b.ondigitalocean.app/mac/api/v1/elegibilidades/solicitacoes",
           {
             method: "POST",
             headers: {

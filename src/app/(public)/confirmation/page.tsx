@@ -44,7 +44,7 @@ function ConfirmationContent() {
     }
 
     fetch(
-      `https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/agrotools/solicitacoes/${id}/validar?token=${token}`,
+      `https://imac-app-hom-3lq2b.ondigitalocean.app/mac/api/v1/agrotools/solicitacoes/${id}/validar?token=${token}`,
       {
         method: "GET",
         headers: {
