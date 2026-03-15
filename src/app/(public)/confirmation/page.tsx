@@ -44,7 +44,7 @@ function ConfirmationContent() {
     }
 
     fetch(
-      `https://imac-api-homol-dhflh.ondigitalocean.app/mac/api/v1/agrotools/solicitacoes/${id}/validar?token=${token}`,
+      `https://imac-api-homol-dhflh.ondigitalocean.app/imac/api/v1/agrotools/solicitacoes/${id}/validar?token=${token}`,
       {
         method: "GET",
         headers: {
