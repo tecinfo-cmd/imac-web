@@ -435,7 +435,7 @@ export const ObjectionLayout = () => {
           }
         } else if (wktObrigatorio) {
           const deveObrigarWkt =
-            areaOriginal !== areaRegenerar && areaOriginal !== 0;
+            areaRegenerar > 0 && areaRegenerar !== areaOriginal;
 
           if (deveObrigarWkt) {
             erros.push(`Polígono ${i + 1}: WKT é obrigatório.`);
