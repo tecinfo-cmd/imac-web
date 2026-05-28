@@ -27,7 +27,7 @@ const termoStatuses = [
 
 export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
   const { data: farm, refetch } = useGetFarmById(farmId);
-  const imagemBase64 = farm?.territorios?.[0]?.imagemAdequacao;
+  const imagemBase64 = farm?.territorios?.[0]?.imagemAnalise;
 
   const status = termoStatuses.includes(farm?.status ?? "");
 
