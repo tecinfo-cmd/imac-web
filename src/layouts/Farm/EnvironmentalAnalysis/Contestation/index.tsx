@@ -35,7 +35,7 @@ export const Contestation = ({
     farm?.retornoAnalises && farm.retornoAnalises.length > 0;
 
   const hasValidParams = farmId && analysisId;
-  const imgbase64 = farm?.territorios?.[0]?.imagemAdequacao;
+  const imgContestationBase64 = farm?.territorios?.[0]?.imagemContestacao;
 
   const canAccess = hasAnalysisInProgress || hasValidParams;
 
@@ -218,10 +218,10 @@ export const Contestation = ({
                   </div>
                 )}
             </div>
-            {imgbase64 && (
+            {imgContestationBase64 && (
               <div className="flex justify-center py-4">
                 <Image
-                  src={`${imgbase64}`}
+                  src={`${imgContestationBase64}`}
                   alt="Área destinada à Regeneração"
                   width={900}
                   height={700}
@@ -301,10 +301,10 @@ export const Contestation = ({
                 )}
             </div>
 
-            {imgbase64 && (
+            {imgContestationBase64 && (
               <div className="flex justify-center py-4">
                 <Image
-                  src={`${imgbase64}`}
+                  src={`${imgContestationBase64}`}
                   alt="Área destinada à Regeneração"
                   width={900}
                   height={700}

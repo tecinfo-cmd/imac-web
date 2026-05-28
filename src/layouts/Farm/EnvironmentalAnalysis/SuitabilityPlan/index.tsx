@@ -1,3 +1,5 @@
+"use client";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { GoAlertFill } from "react-icons/go";
@@ -77,6 +79,7 @@ export const SuitabilityPlan = ({
 
   const hasValidParams = farmId && analysisId;
   const hasSuitabilityPlanInProgress = farm?.analise?.planoAdequacao;
+  const imgAdequancyBase64 = farm?.territorios?.[0]?.imagemAdequacao;
 
   const canAccess = hasValidParams || hasSuitabilityPlanInProgress;
 
@@ -267,6 +270,17 @@ export const SuitabilityPlan = ({
                     </div>
                   )}
               </div>
+              {imgAdequancyBase64 && (
+                <div className="flex justify-center py-4">
+                  <Image
+                    src={`${imgAdequancyBase64}`}
+                    alt="Área destinada à Regeneração"
+                    width={900}
+                    height={700}
+                    className="max-w-full rounded-[20px] shadow"
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -377,8 +391,8 @@ export const SuitabilityPlan = ({
                       {existingSuitabilityPlan
                         ? "Plano de Adequação já solicitado"
                         : createSuitabilityPlan.isPending
-                        ? "Salvando..."
-                        : "Solicitar Plano de Adequação"}
+                          ? "Salvando..."
+                          : "Solicitar Plano de Adequação"}
                     </Button>
                   </div>
                 </form>

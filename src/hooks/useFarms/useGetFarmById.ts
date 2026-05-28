@@ -62,6 +62,8 @@ export interface Territorio {
   geometry: string;
   voucher: string;
   imagemAdequacao: string;
+  imagemContestacao: string;
+  imagemAnalise: string;
 }
 
 
