@@ -14,6 +14,7 @@ import { useGuidelines } from "@/hooks/useGuidelines/useGuidelines";
 import { useUpdateGuideline } from "@/hooks/useGuidelines/useGuidelines";
 import { Analityc } from "@/icons/Analityc";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
+import { customToast } from "@/utils/customToast";
 import { toast } from "sonner";
 
 import { FilterGuidelines } from "./FiltersGuidelines";
@@ -113,9 +114,9 @@ const GuidelinesContent = () => {
           id: String(confirmInactiveId),
           ativo: false,
         });
-        toast.success("Documento inativado com sucesso");
+        customToast.success("Documento inativado com sucesso");
       } catch {
-        toast.error("Erro ao inativar documento");
+        customToast.error("Erro ao inativar documento");
       }
       setConfirmInactiveId(null);
     }

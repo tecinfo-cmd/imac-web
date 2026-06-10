@@ -15,9 +15,9 @@ import { useCreateSuppressionAuthorization } from "@/hooks/useEnvironmentalAnaly
 import { useGetIssuingBodies } from "@/hooks/useEnvironmentalAnalysis/useGetIssuingBodies";
 import { useGetSuppressionTypes } from "@/hooks/useEnvironmentalAnalysis/useGetSuppressionTypes";
 import { useTechnicalResponsibleContestationStore } from "@/store/useTechnicalResponsibleContestationStore";
+import { customToast } from "@/utils/customToast";
 import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 import { DocumentsTechnical } from "./Documents";
 
@@ -159,9 +159,8 @@ export const SuppressionAuthorizationSection = ({
     if (invalidFiles.length > 0) {
       invalidFiles.forEach((file) => {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
         );
       });
       // Limpar input e estado
@@ -194,9 +193,8 @@ export const SuppressionAuthorizationSection = ({
     if (invalidFiles.length > 0) {
       invalidFiles.forEach((file) => {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
         );
       });
       // Limpar input e estado
@@ -247,25 +245,25 @@ export const SuppressionAuthorizationSection = ({
 
   const handleRemoveSuppressionData = (index: number) => {
     setSuppressionDataList((prev) => prev.filter((_, i) => i !== index));
-    toast.success("Dados removidos com sucesso!");
+    customToast.success("Dados removidos com sucesso!");
   };
 
   const handleSubmitSuppressionAuthorization = async () => {
     if (suppressionDataList.length === 0) {
-      toast.error(
+      customToast.error(
         "Preencha o formulário acima e clique em 'Adicionar' para incluir pelo menos uma autorização de supressão!"
       );
       return;
     }
 
     if (!justification || !justification.trim()) {
-      toast.error("A justificativa é obrigatória!");
+      customToast.error("A justificativa é obrigatória!");
       return;
     }
 
     try {
       if (files.length === 0) {
-        toast.error(
+        customToast.error(
           "Adicione pelo menos um arquivo na Anotação de responsabilidade técnica!"
         );
         return;
@@ -332,7 +330,7 @@ export const SuppressionAuthorizationSection = ({
         },
         {
           onSuccess: () => {
-            toast.success(
+            customToast.success(
               "Contestação de autorização de supressão enviada com sucesso!"
             );
 
@@ -344,7 +342,7 @@ export const SuppressionAuthorizationSection = ({
           },
           onError: (error) => {
             console.error("Erro ao enviar contestação:", error);
-            toast.error("Erro ao enviar contestação. Tente novamente.");
+            customToast.error("Erro ao enviar contestação. Tente novamente.");
           },
         }
       );

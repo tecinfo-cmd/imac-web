@@ -9,7 +9,7 @@ import { useGetFarmByIdPublic } from "@/hooks/useTrackProducers/useGetFarmById";
 import { usePremCompliancePublic } from "@/hooks/useTrackProducers/usePremCompliancePublic";
 import { Imac } from "@/icons/Imac";
 import { LogoSideName } from "@/icons/LogoSideName";
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 
 function GetDcsStatusContent() {
   const searchParams = useSearchParams();
@@ -42,7 +42,7 @@ function GetDcsStatusContent() {
       setPdfUrl(primeiraUrl);
       setShowPdfViewer(true);
     } else {
-      toast.error(
+      customToast.error(
         "Nenhum documento encontrado, por favor assine o termo de adequação e compromisso."
       );
     }

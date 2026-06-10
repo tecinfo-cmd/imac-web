@@ -14,6 +14,7 @@ import { usePagamentoVoucher } from "@/hooks/useEnrollmentFee/useEnrollmentFee";
 import { getAddressByCep } from "@/hooks/useEnrollmentFee/useEnrollmentFee";
 import Barcode from "@/icons/BarCode";
 import CopyIcon from "@/icons/Copy";
+import { customToast } from "@/utils/customToast";
 import { maskCep } from "@/utils/maskCEP";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "sonner";
@@ -90,7 +91,7 @@ export default function EnrollmentFee() {
     const formData = getValues();
     
     if (!selected || !formData.cep || !formData.logradouro || !formData.bairro || !formData.localidade || !formData.uf) {
-      toast.error("Preencha todos os campos antes de gerar o boleto.");
+      customToast.error("Preencha todos os campos antes de gerar o boleto.");
       return;
     }
 
@@ -103,17 +104,17 @@ export default function EnrollmentFee() {
         cidade: formData.localidade,
         uf: formData.uf,
       });
-      toast.success("Boleto gerado com sucesso!");
+      customToast.success("Boleto gerado com sucesso!");
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao gerar boleto!");
+      customToast.error("Erro ao gerar boleto!");
     }
   };
 
   const handleCopyCodigoBarras = () => {
     if (pagamentoQuery?.data?.codigoBarras) {
       navigator.clipboard.writeText(pagamentoQuery.data.codigoBarras);
-      toast.success("Código de barras copiado!");
+      customToast.success("Código de barras copiado!");
     }
   };
 

@@ -22,9 +22,9 @@ import { useGetProductionCycle } from "@/hooks/useFarms/useGetProductionCycle";
 import { useLinkOwnerToFarm } from "@/hooks/useFarms/useLinkOwnerToFarm";
 import { useUpdateFarm } from "@/hooks/useFarms/useUpdateFarm";
 import { useFarmStore } from "@/store/useFarmStore";
+import { customToast } from "@/utils/customToast";
 import { maskCep } from "@/utils/maskCEP";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 import { PropertieDocument } from "./Propertie-Document";
 import { RegisterOwner } from "./Register-Owner";
@@ -94,7 +94,7 @@ export const RegisterFarmLayout = () => {
       value: Number(farm.cicloProducao?.id) || 0,
       label: farm.cicloProducao?.descricao || "",
     });
-    setValue("numeroProprietarios", farm.numeroProprietarios ?? 0);
+    setValue("numeroProprietarios", farm.numeroProprietarios ?? 1);
     if (farm.documentos) {
       setDocumentos(
         farm.documentos.map((doc) => ({
@@ -125,7 +125,7 @@ export const RegisterFarmLayout = () => {
       .filter((idx) => idx !== null);
     if (invalidIndexes.length > 0) {
       invalidIndexes.forEach((idx) => {
-        toast.error(
+        customToast.error(
           `Preencha todos os campos do coproprietário ${Number(idx) + 1}!`
         );
       });
@@ -136,7 +136,7 @@ export const RegisterFarmLayout = () => {
 
   const handleUpdateFarm = async (data: any) => {
     if (documentos.length < 3) {
-      toast.error("Adicione os 3 documentos obrigatórios antes de salvar!");
+      customToast.error("Adicione os 3 documentos obrigatórios antes de salvar!");
       return;
     }
     if (!(await validateOwners())) return;
@@ -193,7 +193,7 @@ export const RegisterFarmLayout = () => {
       }
       ownersLinked = true;
     } catch {
-      toast.error("Erro ao enviar coproprietários!");
+      customToast.error("Erro ao enviar coproprietários!");
     }
 
     const arquivosNovos = documentos.filter(
@@ -215,21 +215,21 @@ export const RegisterFarmLayout = () => {
             headers: { "Content-Type": "multipart/form-data" },
           }
         );
-        toast.success("Dados enviados com sucesso!");
+        customToast.success("Dados enviados com sucesso!");
         setDocumentos(documentos.filter((doc) => !(doc instanceof File)));
         refetch();
       } catch {
-        toast.error("Erro ao enviar documentos!");
+        customToast.error("Erro ao enviar documentos!");
       }
     } else if (arquivosNovos.length > 0 && arquivosNovos.length < 3) {
-      toast.error(
+      customToast.error(
         "Para enviar novos documentos, selecione pelo menos 3 arquivos!"
       );
       return;
     } else {
       // não há novos arquivos para enviar — se os proprietários foram vinculados com sucesso, mostrar sucesso
       if (ownersLinked) {
-        toast.success("Dados enviados com sucesso!");
+        customToast.success("Dados enviados com sucesso!");
         refetch();
       }
     }

@@ -3,7 +3,7 @@ import { Controller } from "react-hook-form";
 import { FiUpload } from "react-icons/fi";
 
 import { Trash } from "@/icons/Trash";
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 
 function validateFileName(fileName: string): boolean {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ () ]+$/;
@@ -78,9 +78,8 @@ export const InputFileUpload = ({
                   const file = e.dataTransfer.files[0];
                   if (!validateFileName(file.name)) {
                     const invalidChars = getInvalidCharacters(file.name);
-                    toast.error(
-                      `Nome de arquivo inválido. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
-                      { duration: 5000 }
+                    customToast.error(
+                      `Nome de arquivo inválido. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
                     );
                     return;
                   }
@@ -105,9 +104,8 @@ export const InputFileUpload = ({
                   const file = e.target.files?.[0];
                   if (file && !validateFileName(file.name)) {
                     const invalidChars = getInvalidCharacters(file.name);
-                    toast.error(
-                      `Nome de arquivo inválido. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
-                      { duration: 5000 }
+                    customToast.error(
+                      `Nome de arquivo inválido. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
                     );
                     if (inputRef.current) inputRef.current.value = "";
                     return;

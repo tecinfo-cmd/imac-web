@@ -13,9 +13,9 @@ import { api } from "@/api";
 import { setUnauthorizedCallback } from "@/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
+import { customToast } from "@/utils/customToast";
 import { jwtDecode } from "jwt-decode";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
-import { toast } from "sonner";
 
 import { SignInCredentials, useSignIn } from "../hooks/useAuth/useSignIn";
 
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         router.push("/dashboard");
       } catch (error) {
         console.error(error);
-        toast.error("Email ou senha inválidos");
+        customToast.error("Email ou senha inválidos");
       }
     },
     [router, setRole, signIn]

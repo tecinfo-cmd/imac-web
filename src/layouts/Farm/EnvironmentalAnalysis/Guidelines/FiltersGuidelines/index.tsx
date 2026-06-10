@@ -18,9 +18,9 @@ import {
   useUpdateGuideline,
 } from "@/hooks/useGuidelines/useGuidelines";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
+import { customToast } from "@/utils/customToast";
 import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const guidelineSchema = yup.object().shape({
   titulo: yup
@@ -213,16 +213,16 @@ export const FilterGuidelines = ({
       handleCloseModal();
 
       if (isEditMode) {
-        toast.success("Documento orientativo atualizado com sucesso!");
+        customToast.success("Documento orientativo atualizado com sucesso!");
       } else {
-        toast.success("Documento orientativo criado com sucesso!");
+        customToast.success("Documento orientativo criado com sucesso!");
       }
     } catch (error) {
       console.error("Erro ao salvar documento orientativo:", error);
       if (isEditMode) {
-        toast.error("Erro ao atualizar documento orientativo");
+        customToast.error("Erro ao atualizar documento orientativo");
       } else {
-        toast.error("Erro ao salvar documento orientativo");
+        customToast.error("Erro ao salvar documento orientativo");
       }
     }
   };

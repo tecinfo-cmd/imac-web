@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/layouts/DashboardUser/Properties/[id]/SelfInspection/components/Modal";
 
 import { useCheckElegibility } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
+import { customToast } from "@/utils/customToast";
 import { maskCAR } from "@/utils/formatters/maskCar";
-import { toast } from "sonner";
 
 type FilterUsersProps = {
   onFilter: (filters: any) => void;
@@ -35,11 +35,11 @@ export const FilterElegibilityAbattoir = ({ onFilter }: FilterUsersProps) => {
 
   const { mutate: checkElegibility, isPending } = useCheckElegibility({
     onSuccess: () => {
-      toast.success("Consulta enviada com sucesso!");
+      customToast.success("Consulta enviada com sucesso!");
       resetModal();
     },
     onError: () => {
-      toast.error("Erro ao consultar elegibilidade, tente novamente.");
+      customToast.error("Erro ao consultar elegibilidade, tente novamente.");
     },
   });
 

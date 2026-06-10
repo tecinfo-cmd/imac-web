@@ -15,8 +15,8 @@ import { yup } from "@/config/yup";
 import { useCreateSuitabilityPlan } from "@/hooks/useEnvironmentalAnalysis/useCreateSuitabilityPlan";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { useTechnicalResponsibleSuitabilityPlanStore } from "@/store/useTechnicalResponsibleSuitabilityPlanStore";
+import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 type Documento = {
   id: number;
@@ -62,6 +62,7 @@ export const SuitabilityPlan = ({
   });
 
   const [files, setFiles] = useState<(Documento | File)[]>([]);
+  const [files2, setFiles2] = useState<(Documento | File)[]>([]);
   const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
     null
   );
@@ -102,24 +103,24 @@ export const SuitabilityPlan = ({
 
   const handleSaveDocuments = async (data: SuitabilityPlanFormData) => {
     if (proposeNewArea === null) {
-      toast.error("Selecione se deseja propor uma nova área para regeneração!");
+      customToast.error("Selecione se deseja propor uma nova área para regeneração!");
       return;
     }
 
-    if (files.length === 0) {
-      toast.error("Adicione pelo menos um arquivo!");
+    if (files.length === 0 || files2.length === 0) {
+      customToast.error("Adicione pelo menos um arquivo em cada seção de documentos!");
       return;
     }
 
     if (!technicalResponsible) {
-      toast.error("Primeiro cadastre um responsável técnico!");
+      customToast.error("Primeiro cadastre um responsável técnico!");
       return;
     }
 
     const stripExtension = (filename: string) =>
       filename.replace(/\.[^/.]+$/, "");
 
-    const params = files.map((file) => {
+    const params = [...files, ...files2].map((file) => {
       if (file instanceof File) {
         return {
           nome: file.name,
@@ -139,16 +140,16 @@ export const SuitabilityPlan = ({
         analysisId: analysisId,
         data: {
           parametros: JSON.stringify(params),
-          arquivos: files.filter((file): file is File => file instanceof File),
+          arquivos: [...files, ...files2].filter((file): file is File => file instanceof File),
           motivo: data.motivo,
           idResponsavelTecnico: Number(technicalResponsible.id),
         },
       });
 
-      toast.success("Plano de adequação salvo com sucesso!");
+      customToast.success("Plano de adequação salvo com sucesso!");
       refetch();
     } catch {
-      toast.error("Erro ao salvar plano de adequação. Tente novamente.");
+      customToast.error("Erro ao salvar plano de adequação. Tente novamente.");
     }
   };
 
@@ -379,11 +380,21 @@ export const SuitabilityPlan = ({
 
                   <DocumentsTechnical files={files} setFiles={setFiles} />
 
+                  <DocumentsTechnical
+                    files={files2}
+                    setFiles={setFiles2}
+                    title="Campo de anexo exclusivo para arquivo SHP zipado"
+                    subtitle="(Obrigatório o envio do arquivo SHP no formato .zip)"
+                  />
+
                   <div className="my-6 flex justify-end">
                     <Button
                       type="submit"
                       disabled={
-                        createSuitabilityPlan.isPending || !technicalResponsible
+                        createSuitabilityPlan.isPending ||
+                        !technicalResponsible ||
+                        files.length === 0 ||
+                        files2.length === 0
                       }
                       variant="green"
                       className="w-[320px]"

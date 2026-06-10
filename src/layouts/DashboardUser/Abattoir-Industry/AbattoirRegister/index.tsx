@@ -29,13 +29,13 @@ import {
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
+import { customToast } from "@/utils/customToast";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 import { formatDateToISO } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 function validarTelefone(telefone: string): boolean {
   const regex = /^(\(?\d{2}\)?\s?)?(9?\d{4})-?(\d{4})$/;
@@ -305,10 +305,10 @@ export const AbattoirRegisterLayout = ({
         }, 500);
       }
 
-      toast.success("Frigorífico cadastrado com sucesso!");
+      customToast.success("Frigorífico cadastrado com sucesso!");
     } catch (error) {
       console.log(error);
-      toast.error("Erro ao cadastrar frigorífico.");
+      customToast.error("Erro ao cadastrar frigorífico.");
     }
   };
 
@@ -329,10 +329,10 @@ export const AbattoirRegisterLayout = ({
 
       setIsEditing(false);
 
-      toast.success("Frigorífico atualizado com sucesso!");
+      customToast.success("Frigorífico atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar frigorífico:", error);
-      toast.error("Erro ao atualizar frigorífico.");
+      customToast.error("Erro ao atualizar frigorífico.");
     }
   };
 
@@ -364,10 +364,10 @@ export const AbattoirRegisterLayout = ({
 
       await refetchAbattoir();
 
-      toast.success("Usuário cadastrado com sucesso!");
+      customToast.success("Usuário cadastrado com sucesso!");
     } catch (error) {
       console.error("Erro ao cadastrar usuário:", error);
-      toast.error("Erro ao cadastrar usuário.");
+      customToast.error("Erro ao cadastrar usuário.");
     }
   };
 
@@ -429,10 +429,10 @@ export const AbattoirRegisterLayout = ({
 
       await refetchAbattoir();
 
-      toast.success("Usuário atualizado com sucesso!");
+      customToast.success("Usuário atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar usuário:", error);
-      toast.error("Erro ao atualizar usuário.");
+      customToast.error("Erro ao atualizar usuário.");
     }
   };
 

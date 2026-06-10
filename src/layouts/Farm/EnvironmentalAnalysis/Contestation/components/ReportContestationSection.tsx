@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { yup } from "@/config/yup";
 import { useCreateReportContestation } from "@/hooks/useEnvironmentalAnalysis/useCreateReportContestation";
 import { useTechnicalResponsibleContestationStore } from "@/store/useTechnicalResponsibleContestationStore";
+import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 import { DocumentsTechnical } from "./Documents";
 
@@ -93,12 +93,12 @@ export const ReportContestationSection = ({
   const handleSubmitReportContestation = async () => {
     try {
       if (files.length === 0) {
-        toast.error("Adicione pelo menos um arquivo!");
+        customToast.error("Adicione pelo menos um arquivo!");
         return;
       }
 
       if (!technicalResponsible?.id) {
-        toast.error("Responsável técnico não encontrado!");
+        customToast.error("Responsável técnico não encontrado!");
         return;
       }
 
@@ -125,13 +125,13 @@ export const ReportContestationSection = ({
         },
         {
           onSuccess: () => {
-            toast.success("Contestação por laudo enviada com sucesso!");
+            customToast.success("Contestação por laudo enviada com sucesso!");
             setFiles([]);
             setSent(true);
           },
           onError: (error) => {
             console.error("Erro ao enviar contestação por laudo:", error);
-            toast.error(
+            customToast.error(
               "Erro ao enviar contestação por laudo. Tente novamente."
             );
           },
