@@ -24,8 +24,8 @@ import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
+import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 import * as yup from "yup";
 
 const menuItems = [
@@ -98,7 +98,7 @@ export const CarReviewLayout = () => {
     }
 
     if (!arquivo) {
-      toast.error("Selecione um arquivo antes de enviar.");
+      customToast.error("Selecione um arquivo antes de enviar.");
       return;
     }
 
@@ -125,13 +125,13 @@ export const CarReviewLayout = () => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      toast.success("Documento enviado com sucesso!");
+      customToast.success("Documento enviado com sucesso!");
       reset();
       setOpenModal(false);
       await refetchObjection();
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao enviar o documento.");
+      customToast.error("Erro ao enviar o documento.");
     } finally {
       setIsSubmitting(false);
     }

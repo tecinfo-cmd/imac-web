@@ -10,13 +10,13 @@ import {
   useGetFarmById,
 } from "@/hooks/useFarms/useGetFarmById";
 import { useLinkOwnerToFarm } from "@/hooks/useFarms/useLinkOwnerToFarm";
+import { customToast } from "@/utils/customToast";
 import { formatDate } from "@/utils/formatters/formatDate";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 import { maskDate } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { maskRG } from "@/utils/maskRG";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 interface UpdateOwnerFormProps {
   farmId: number | undefined;
@@ -83,14 +83,14 @@ export const UpdateOwnerForm = ({
 
     await linkOwner(payload, {
       onSuccess: () => {
-        toast.success("Proprietário atualizado com sucesso!");
+        customToast.success("Proprietário atualizado com sucesso!");
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEY_GET_FARM_BY_ID],
         });
         onSuccess?.();
       },
       onError: () => {
-        toast.error("Erro ao atualizar proprietário.");
+        customToast.error("Erro ao atualizar proprietário.");
       },
     });
   };

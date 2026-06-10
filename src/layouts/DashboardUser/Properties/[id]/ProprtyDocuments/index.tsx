@@ -26,8 +26,8 @@ import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { useUserRoleStore } from "@/store/useUserRoleStore";
+import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const customMenuItems = [
   {
@@ -142,7 +142,7 @@ export default function PropertyDocumentsLayout({
     }
 
     if (!arquivo) {
-      toast.error("Selecione um arquivo antes de enviar.");
+      customToast.error("Selecione um arquivo antes de enviar.");
       return;
     }
 
@@ -167,13 +167,13 @@ export default function PropertyDocumentsLayout({
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      toast.success("Documento enviado com sucesso!");
+      customToast.success("Documento enviado com sucesso!");
       reset();
       setOpenModal(false);
       refetch();
     } catch (err) {
       console.error(err);
-      toast.error("Erro ao enviar o documento.");
+      customToast.error("Erro ao enviar o documento.");
     } finally {
       setIsSubmitting(false);
     }

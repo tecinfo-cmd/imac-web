@@ -146,6 +146,11 @@ export const EnvironmentalAnalysisLayout = () => {
   const adjustment =
     farm?.retornoAnalises?.[0]?.planoAdequacao?.situacao === "Em Análise";
 
+  const isContestationUnderAnalysis =
+    farm?.retornoAnalises?.[0]?.contestacaoLaudo?.situacao === "Em Análise" ||
+    farm?.retornoAnalises?.[0]?.contestacaoAutorizacaoSupressao?.situacao ===
+      "Em Análise";
+
   const { adequacyEnabled } = useMemo(() => {
     const currentAnalysis = farm?.retornoAnalises?.[0];
     const currentAnalysisId =
@@ -211,8 +216,8 @@ export const EnvironmentalAnalysisLayout = () => {
     const effectiveDisabled =
       !!disabled ||
       (key === "contestation" && !contestationEnabled) ||
-      (key === "AdequancyTerm" && adjustment) ||
-      (key === "suitabilityPlan" && !adequacyEnabled);
+      (key === "AdequancyTerm" && (adjustment || isContestationUnderAnalysis)) ||
+      (key === "suitabilityPlan" && (!adequacyEnabled || isContestationUnderAnalysis));
 
     const buttonElement = (
       <button
@@ -245,7 +250,9 @@ export const EnvironmentalAnalysisLayout = () => {
     ) {
       tooltipMessage = "Assine o plano de adequação para prosseguir.";
     } else if (key === "AdequancyTerm" || key === "suitabilityPlan") {
-      if (!adequacyEnabled) {
+      if (isContestationUnderAnalysis) {
+        tooltipMessage = "Aguarde a conclusão da análise da contestação.";
+      } else if (!adequacyEnabled) {
         tooltipMessage =
           "Confirme as detecções ou aguarde a conclusão da contestação.";
       } else if (!viewStatus) {

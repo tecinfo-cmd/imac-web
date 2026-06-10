@@ -6,7 +6,7 @@ import { Table } from "@/components/Table";
 import { Tooltip } from "@/components/Tooltip";
 
 import { Eye } from "@/icons/Eye";
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 
 function validateFileName(fileName: string): boolean {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ()]+$/;
@@ -45,9 +45,8 @@ export const PropertieDocument = ({
     if (invalidFiles.length > 0) {
       invalidFiles.forEach((file) => {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
         );
       });
       // Filtrar apenas arquivos válidos

@@ -26,8 +26,9 @@ import Modal from "@/components/ui/modals/modal";
 import Step from "@/components/ui/step";
 
 import { useCAR } from "@/hooks/useCAR";
+import { customToast } from "@/utils/customToast";
 import { setCookie } from "nookies";
-import { toast, Toaster } from "sonner";
+import { Toaster } from "sonner";
 
 export default function Home() {
   const [carValue, setCarValue] = useState<string>("");
@@ -200,7 +201,7 @@ export default function Home() {
         console.error("Erro ao enviar para API:", error);
         const match = (error as Error).message.match(/"message":"([^"]+)"/);
         const errorMessage = match ? match[1] : "Erro ao enviar solicitação";
-        toast.error(`${errorMessage}`);
+        customToast.error(`${errorMessage}`);
       }
     }
   };

@@ -4,7 +4,7 @@ import { IoTrashSharp } from "react-icons/io5";
 
 import { Table } from "@/components/Table";
 
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 
 function validateFileName(fileName: string): boolean {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ()]+$/;
@@ -28,9 +28,13 @@ type Documento = {
 export const DocumentsTechnical = ({
   files,
   setFiles,
+  title = "Anotação de responsabilidade técnica",
+  subtitle = "(Matricula do imóvel, recibo CAR, contrato de compra e venda / locação, documentos de identificação e comprovante de endereço)",
 }: {
   files: (Documento | File)[];
   setFiles: React.Dispatch<React.SetStateAction<(Documento | File)[]>>;
+  title?: string;
+  subtitle?: string;
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,9 +50,8 @@ export const DocumentsTechnical = ({
     if (invalidFiles.length > 0) {
       invalidFiles.forEach((file) => {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
         );
       });
       // Filtrar apenas arquivos válidos
@@ -81,11 +84,10 @@ export const DocumentsTechnical = ({
         onDrop={handleDrop}
       >
         <div className="bg-[#21801A] text-white px-4 py-2 mt-8 font-semibold">
-          <h3>Anotação de responsabilidade técnica</h3>
-          <span className="text-sm font-normal">
-            (Matricula do imóvel, recibo CAR, contrato de compra e venda /
-            locação, documentos de identificação e comprovante de endereço)
-          </span>
+          <h3>{title}</h3>
+          {subtitle && (
+            <span className="text-sm font-normal">{subtitle}</span>
+          )}
         </div>
         <Table.Container className="!pt-0">
           <Table.Header>

@@ -158,7 +158,7 @@ export const Contestation = ({
           <div className="bg-white border border-[#CAC4D0] shadow">
             <div className="bg-[#1A6415] text-white p-4">
               <h2 className="text-center font-semibold uppercase">
-                Situação da Autorização de sepressão
+                Situação da Autorização de supressão
               </h2>
             </div>
             <div className="p-6">

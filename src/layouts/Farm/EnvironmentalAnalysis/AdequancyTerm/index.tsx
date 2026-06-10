@@ -9,7 +9,7 @@ import EmailModal from "@/components/ui/modals/emailModal";
 
 import { useAdequancyTerm } from "@/hooks/useAdequancyTerm/useAdequancyTerm";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 interface AdequancyTermProps {
   farmId: number;
 }
@@ -50,7 +50,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
       refetch();
     },
     onError: (error: any) => {
-      toast.error("Erro ao aceitar o termo de adequação");
+      customToast.error("Erro ao aceitar o termo de adequação");
       console.error("Erro:", error);
     },
   });

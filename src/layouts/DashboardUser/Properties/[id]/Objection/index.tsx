@@ -30,7 +30,7 @@ import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 
 const validateFileName = (fileName: string): boolean => {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ()]+$/;
@@ -279,9 +279,8 @@ export const ObjectionLayout = () => {
     if (file && file.type === "application/pdf") {
       if (!validateFileName(file.name)) {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`
         );
         return;
       }
@@ -444,7 +443,7 @@ export const ObjectionLayout = () => {
       });
 
       if (erros.length) {
-        toast.error(erros.join("\n"), { duration: 6000 });
+        customToast.error(erros.join("\n"));
         return;
       }
 
@@ -530,9 +529,8 @@ export const ObjectionLayout = () => {
       }
 
       if (arquivosOut.length === 0 && poligonosOut.length === 0) {
-        toast.error(
-          "Nada para enviar: preencha pelo menos um polígono ou anexe um arquivo.",
-          { duration: 4000 }
+        customToast.error(
+          "Nada para enviar: preencha pelo menos um polígono ou anexe um arquivo."
         );
         return;
       }
@@ -551,7 +549,7 @@ export const ObjectionLayout = () => {
       if (poligonosOut.length) payload.poligonos = poligonosOut;
 
       await submitObjectionAsync(payload);
-      toast.success("Parecer enviado com sucesso!", { duration: 5000 });
+      customToast.success("Parecer enviado com sucesso!");
       if (refetch) await refetch();
     } catch (err: any) {
       console.error(err);
@@ -559,7 +557,7 @@ export const ObjectionLayout = () => {
         err?.response?.data?.message ||
         err?.message ||
         "Falha ao enviar o parecer.";
-      toast.error(apiMessage, { duration: 5000 });
+      customToast.error(apiMessage);
     }
   };
 
@@ -930,9 +928,8 @@ export const ObjectionLayout = () => {
                         const file = e.target.files?.[0];
                         if (file && !validateFileName(file.name)) {
                           const invalidChars = getInvalidCharacters(file.name);
-                          toast.error(
-                            `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
-                            { duration: 5000 }
+                          customToast.error(
+                            `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`
                           );
                           const input = e.target as HTMLInputElement;
                           input.value = "";
@@ -1125,13 +1122,9 @@ export const ObjectionLayout = () => {
                                 shouldDirty: true,
                                 shouldValidate: true,
                               });
-                              toast.success("Arquivo convertido para WKT!", {
-                                duration: 4000,
-                              });
+                              customToast.success("Arquivo convertido para WKT!");
                             } else {
-                              toast.error("Nenhum WKT encontrado no arquivo.", {
-                                duration: 4000,
-                              });
+                              customToast.error("Nenhum WKT encontrado no arquivo.");
                             }
                           }
                         }}

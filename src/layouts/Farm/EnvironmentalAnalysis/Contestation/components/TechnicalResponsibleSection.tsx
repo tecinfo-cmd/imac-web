@@ -13,11 +13,11 @@ import { yup } from "@/config/yup";
 import { useCreateTechnicalResponsible } from "@/hooks/useEnvironmentalAnalysis/useCreateTechnicalResponsible";
 import { useGetTechnicalResponsible } from "@/hooks/useEnvironmentalAnalysis/useGetTechnicalResponsible";
 import { useTechnicalResponsibleContestationStore } from "@/store/useTechnicalResponsibleContestationStore";
+import { customToast } from "@/utils/customToast";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const technicalResponsibleSchema = yup.object({
   cpf: yup.string().required("CPF é obrigatório"),
@@ -115,10 +115,10 @@ export const TechnicalResponsibleSection = () => {
     await createTechnicalResponsible(data, {
       onSuccess: (response) => {
         setTechnicalResponsible(response);
-        toast.success("Responsável técnico salvo com sucesso!");
+        customToast.success("Responsável técnico salvo com sucesso!");
       },
       onError: () => {
-        toast.error("Erro ao salvar responsável técnico. Tente novamente.");
+        customToast.error("Erro ao salvar responsável técnico. Tente novamente.");
       },
     });
   };

@@ -29,13 +29,13 @@ import {
 } from "@/hooks/useAbattoir/useAbattoir";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
+import { customToast } from "@/utils/customToast";
 import { maskCep } from "@/utils/maskCEP";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 import { formatDateToISO } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const userSchema = yup.object({
   cpf: yup.string().required(),
@@ -246,10 +246,10 @@ const AbattoirEditLayout = () => {
       console.log("Dados refetchados:", refetchResult.data);
 
       setIsEditing(false);
-      toast.success("Frigorífico atualizado com sucesso!");
+      customToast.success("Frigorífico atualizado com sucesso!");
     } catch (error) {
       console.error("Erro detalhado ao atualizar frigorífico:", error);
-      toast.error("Erro ao atualizar frigorífico. Tente novamente.");
+      customToast.error("Erro ao atualizar frigorífico. Tente novamente.");
     }
   };
 
@@ -281,10 +281,10 @@ const AbattoirEditLayout = () => {
 
       await refetch();
 
-      toast.success("Usuário cadastrado com sucesso!");
+      customToast.success("Usuário cadastrado com sucesso!");
     } catch (error) {
       console.error("Erro ao cadastrar usuário:", error);
-      toast.error("Erro ao cadastrar usuário.");
+      customToast.error("Erro ao cadastrar usuário.");
     }
   };
 
@@ -335,10 +335,10 @@ const AbattoirEditLayout = () => {
       await refetch();
       await refetch();
 
-      toast.success("Usuário atualizado com sucesso!");
+      customToast.success("Usuário atualizado com sucesso!");
     } catch (error) {
       console.error("Erro ao atualizar usuário:", error);
-      toast.error("Erro ao atualizar usuário.");
+      customToast.error("Erro ao atualizar usuário.");
     }
   };
 

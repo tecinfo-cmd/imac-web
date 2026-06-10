@@ -34,9 +34,9 @@ import { useObjectionData } from "@/hooks/useGetProperties/useObjectionData";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
+import { customToast } from "@/utils/customToast";
 import { maskDate } from "@/utils/maskDate";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const validateFileName = (fileName: string): boolean => {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._() ]+$/;
@@ -175,7 +175,7 @@ export const SelfInspectionLayout = () => {
     if (primeiraUrl) {
       setReportUrl(primeiraUrl);
     } else {
-      toast.error("Relatório de autovistoria ainda não foi finalizado");
+      customToast.error("Relatório de autovistoria ainda não foi finalizado");
     }
   };
 
@@ -187,15 +187,14 @@ export const SelfInspectionLayout = () => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type !== "application/pdf") {
-        toast.error("Por favor, selecione apenas arquivos PDF");
+        customToast.error("Por favor, selecione apenas arquivos PDF");
         return;
       }
 
       if (!validateFileName(file.name)) {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`
         );
         if (fileInputRef.current) fileInputRef.current.value = "";
         return;
@@ -231,15 +230,14 @@ export const SelfInspectionLayout = () => {
       const file = files[0];
 
       if (file.type !== "application/pdf") {
-        toast.error("Por favor, selecione apenas arquivos PDF");
+        customToast.error("Por favor, selecione apenas arquivos PDF");
         return;
       }
 
       if (!validateFileName(file.name)) {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`
         );
         return;
       }
@@ -252,7 +250,7 @@ export const SelfInspectionLayout = () => {
 
   const onParecerSubmit = async (formData: any) => {
     if (!selectedFile) {
-      toast.error("Por favor, selecione um arquivo");
+      customToast.error("Por favor, selecione um arquivo");
       return;
     }
 
@@ -262,12 +260,12 @@ export const SelfInspectionLayout = () => {
         status: formData.parecer.toUpperCase(),
         file: selectedFile,
       });
-      toast.success("Parecer salvo com sucesso!");
+      customToast.success("Parecer salvo com sucesso!");
       setReportUrl(null);
       setSelectedFile(null);
     } catch (error) {
       console.error(error);
-      toast.error("Erro ao salvar parecer!");
+      customToast.error("Erro ao salvar parecer!");
     }
   };
 
@@ -283,12 +281,12 @@ export const SelfInspectionLayout = () => {
           setTimeout(() => {
             setIsModalOpen(false);
           }, 5000);
-          toast.success("Agendamento realizado com sucesso!");
+          customToast.success("Agendamento realizado com sucesso!");
           refetch();
         },
         onError: (error: any) => {
           console.log(error);
-          toast.error("Erro ao agendar vistoria.");
+          customToast.error("Erro ao agendar vistoria.");
         },
       }
     );

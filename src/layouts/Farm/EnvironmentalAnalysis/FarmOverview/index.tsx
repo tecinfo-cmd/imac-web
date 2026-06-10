@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 import { api } from "@/api";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { customToast } from "@/utils/customToast";
 import { toast } from "sonner";
 
 interface FarmOverviewProps {
@@ -61,7 +62,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
       const protocol = data[data.length - 1]?.id;
 
       if (!protocol) {
-        toast.error("Protocolo não encontrado.", { id: toastId });
+        customToast.error("Protocolo não encontrado.", { id: toastId });
         return;
       }
 
@@ -96,7 +97,7 @@ export const FarmOverview = ({ farmId }: FarmOverviewProps) => {
     } catch (err: any) {
       console.error("Erro ao solicitar análise:", err);
       console.error("Erro completo:", err?.response?.data);
-      toast.error(
+      customToast.error(
         err?.response?.data?.message ||
           "Erro ao solicitar análise socioambiental. Tente novamente.",
         { id: toastId }

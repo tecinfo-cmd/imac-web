@@ -12,13 +12,13 @@ import {
   useGetFarmById,
 } from "@/hooks/useFarms/useGetFarmById";
 import { useLinkOwnerToFarm } from "@/hooks/useFarms/useLinkOwnerToFarm";
+import { customToast } from "@/utils/customToast";
 import { maskCPFOrCNPJ } from "@/utils/maskCPFOrCNPJ";
 import { maskDate } from "@/utils/maskDate";
 import { maskPhone } from "@/utils/maskPhone";
 import { maskRG } from "@/utils/maskRG";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 interface RegisterCoOwnerFormProps {
   farmId: number | undefined;
@@ -94,13 +94,13 @@ export const RegisterCoOwnerForm = ({ farmId }: RegisterCoOwnerFormProps) => {
 
     await linkOwner(payload, {
       onSuccess: () => {
-        toast.success("Co-proprietário(s) vinculado(s) com sucesso!");
+        customToast.success("Co-proprietário(s) vinculado(s) com sucesso!");
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEY_GET_FARM_BY_ID],
         });
       },
       onError: () => {
-        toast.error("Erro ao vincular co-proprietário(s).");
+        customToast.error("Erro ao vincular co-proprietário(s).");
       },
     });
   };

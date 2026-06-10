@@ -14,10 +14,10 @@ import {
   useAssociateUser,
 } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
 import { useAbattoirUser } from "@/hooks/useAbattoirElegibilities/useAbattoirElegibilities";
+import { customToast } from "@/utils/customToast";
 import { maskCPF } from "@/utils/maskCPF";
 import { maskPhone } from "@/utils/maskPhone";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { toast } from "sonner";
 
 const customModalSchema = yup.object().shape({
   cpf: yup.string().required("CPF obrigatório").min(11, "CPF inválido"),
@@ -80,10 +80,10 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
       resetModal();
       setShowForm(false);
       onClose();
-      toast.success("Produtor cadastrado com sucesso.");
+      customToast.success("Produtor cadastrado com sucesso.");
     },
     onError: () => {
-      toast.error("Erro ao cadastrar produtor. Tente novamente.");
+      customToast.error("Erro ao cadastrar produtor. Tente novamente.");
     },
   });
 
@@ -92,10 +92,10 @@ export const ElegibilityAbattoirDetail: FC<Props> = ({
       resetModal();
       setShowForm(false);
       onClose();
-      toast.success("Usuário associado com sucesso.");
+      customToast.success("Usuário associado com sucesso.");
     },
     onError: () => {
-      toast.error("Erro ao associar usuário. Tente novamente.");
+      customToast.error("Erro ao associar usuário. Tente novamente.");
     },
   });
 

@@ -30,7 +30,7 @@ import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 //import { Taxa } from "@/icons/Taxa";
 import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
-import { toast } from "sonner";
+import { customToast } from "@/utils/customToast";
 
 const validateFileName = (fileName: string): boolean => {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._() ]+$/;
@@ -106,9 +106,8 @@ export const PlanoAdequacaoLayout = () => {
     if (file && file.type === "application/pdf") {
       if (!validateFileName(file.name)) {
         const invalidChars = getInvalidCharacters(file.name);
-        toast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
-          { duration: 5000 }
+        customToast.error(
+          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`
         );
         return;
       }
@@ -129,9 +128,8 @@ export const PlanoAdequacaoLayout = () => {
     const file = e.target.files?.[0] ?? null;
     if (file && !validateFileName(file.name)) {
       const invalidChars = getInvalidCharacters(file.name);
-      toast.error(
-        `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`,
-        { duration: 5000 }
+      customToast.error(
+        `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}`
       );
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
@@ -223,7 +221,7 @@ export const PlanoAdequacaoLayout = () => {
 
   const handleDownloadSelectedDocs = () => {
     if (!documentosPlano.length || !selectedDocsIds.length) {
-      toast.error("Selecione pelo menos um documento para baixar.");
+      customToast.error("Selecione pelo menos um documento para baixar.");
       return;
     }
     documentosPlano
@@ -303,9 +301,7 @@ export const PlanoAdequacaoLayout = () => {
   const onSubmit = async (values: FormValues) => {
     try {
       if (!values.parecerTecnicoFile) {
-        toast.error("Selecione o parecer da análise da contestação.", {
-          duration: 5000,
-        });
+        customToast.error("Selecione o parecer da análise da contestação.");
         return;
       }
       const wktObrigatorio = ["deferido", "deferido_parcial"].includes(
@@ -316,30 +312,24 @@ export const PlanoAdequacaoLayout = () => {
 
       if (wktObrigatorio) {
         if (!cleanedWkt) {
-          toast.error(
-            "O campo WKT é obrigatório para parecer Deferido ou Deferido Parcialmente.",
-            { duration: 5000 }
+          customToast.error(
+            "O campo WKT é obrigatório para parecer Deferido ou Deferido Parcialmente."
           );
           return;
         }
         if (!isValidPolygonWKT(cleanedWkt)) {
-          toast.error(
-            "Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.",
-            { duration: 5000 }
+          customToast.error(
+            "Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON."
           );
           return;
         }
       } else if (cleanedWkt && !isValidPolygonWKT(cleanedWkt)) {
-        toast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.", {
-          duration: 5000,
-        });
+        customToast.error("Informe um WKT válido do tipo POLYGON ou MULTIPOLYGON.");
         return;
       }
 
       if (!values.parecerTecnicoFile) {
-        toast.error("Selecione o parecer da análise da contestação.", {
-          duration: 5000,
-        });
+        customToast.error("Selecione o parecer da análise da contestação.");
         return;
       }
 
@@ -357,7 +347,7 @@ export const PlanoAdequacaoLayout = () => {
       };
 
       await submitPlanoAdequacaoAsync(payload);
-      toast.success("Parecer enviado com sucesso!", { duration: 5000 });
+      customToast.success("Parecer enviado com sucesso!");
       reset();
       setSelectedDocsIds([]);
       if (refetch) await refetch();
@@ -368,7 +358,7 @@ export const PlanoAdequacaoLayout = () => {
         err?.message ||
         "Falha ao enviar o parecer.";
 
-      toast.error(apiMessage, { duration: 5000 });
+      customToast.error(apiMessage);
     }
   };
 
@@ -651,13 +641,9 @@ export const PlanoAdequacaoLayout = () => {
                             shouldDirty: true,
                             shouldValidate: true,
                           });
-                          toast.success("Arquivo convertido para WKT!", {
-                            duration: 4000,
-                          });
+                          customToast.success("Arquivo convertido para WKT!");
                         } else {
-                          toast.error("Nenhum WKT encontrado no arquivo.", {
-                            duration: 4000,
-                          });
+                          customToast.error("Nenhum WKT encontrado no arquivo.");
                         }
                       }
                     }}
