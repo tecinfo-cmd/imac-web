@@ -1,6 +1,6 @@
 {
   "name": "imac-web",
-  "version": "PREM-HOM-V-1.0.0.22",
+  "version": "PREM-HOM-V-1.0.0.23",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
