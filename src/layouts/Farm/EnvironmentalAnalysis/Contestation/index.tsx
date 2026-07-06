@@ -1,15 +1,18 @@
 "use client";
 import Image from "next/image";
+import { useState } from "react";
 import { GoAlertFill } from "react-icons/go";
 import { LuFileSearch } from "react-icons/lu";
 
 import { ReportContestationSection } from "./components/ReportContestationSection";
 import { SuppressionAuthorizationSection } from "./components/SuppressionAuthorizationSection";
 import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
+import { ActionConfirmationModal } from "@/components/ConfirmationModal";
 import { Button } from "@/components/ui/button";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
-import { setConfirmedClicked } from "@/utils/contestationFlags";
+import { useUpdateFarmActions } from "@/hooks/useFarms/useUpdateFarmActions";
+import { customToast } from "@/utils/customToast";
 import { formatDate } from "@/utils/formatters/formatDate";
 
 interface ContestationProps {
@@ -20,6 +23,14 @@ interface ContestationProps {
   onAnalysisClick: () => void;
 }
 
+type ConfirmationAction = "requestSuitabilityPlan" | "signTerm" | null;
+
+const FINAL_STATUSES = ["DEFERIDO", "INDEFERIDO", "Deferido", "Indeferido"];
+
+const isFinalStatus = (status?: string | null) => {
+  return FINAL_STATUSES.includes(status ?? "");
+};
+
 export const Contestation = ({
   farmId,
   analysisId,
@@ -27,7 +38,11 @@ export const Contestation = ({
   onNavigateToAdequancyTerm,
   onAnalysisClick,
 }: ContestationProps) => {
-  const { data: farm, isLoading } = useGetFarmById(farmId);
+  const { data: farm, isLoading, refetch } = useGetFarmById(farmId);
+  const updateFarmActions = useUpdateFarmActions();
+
+  const [confirmationAction, setConfirmationAction] =
+    useState<ConfirmationAction>(null);
 
   if (isLoading) return <p>Carregando...</p>;
 
@@ -59,37 +74,137 @@ export const Contestation = ({
 
   const finalAnalysisId = analysisId || currentAnalysis?.id || 0;
 
-  const handleConfirmDetections = () => {
-    const idToUse = analysisId || currentAnalysis?.id;
+  const hasUserAlreadyChosenFinalPath =
+    !!farm?.proporNovaArea || !!farm?.confirmarEstrategia;
 
-    if (idToUse) {
-      setConfirmedClicked(farmId, idToUse);
-    }
+  const shouldDisableDecisionButtons =
+    hasUserAlreadyChosenFinalPath || updateFarmActions.isPending;
 
-    if (onNavigateToSuitabilityPlan && idToUse) {
-      onNavigateToSuitabilityPlan(farmId, idToUse);
-    }
+  const canShowReportDecisionButtons = isFinalStatus(
+    reportContestation?.situacao
+  );
 
-    if (onAnalysisClick) {
-      onAnalysisClick();
+  const canShowSuppressionDecisionButtons = isFinalStatus(
+    suppressionContestation?.situacao
+  );
+
+  const closeConfirmationModal = () => {
+    setConfirmationAction(null);
+  };
+
+  const handleOpenRequestSuitabilityPlanModal = () => {
+    if (shouldDisableDecisionButtons) return;
+    setConfirmationAction("requestSuitabilityPlan");
+  };
+
+  const handleOpenSignTermModal = () => {
+    if (shouldDisableDecisionButtons) return;
+    setConfirmationAction("signTerm");
+  };
+
+  const handleRequestSuitabilityPlan = async () => {
+    if (!finalAnalysisId) return;
+
+    try {
+      await updateFarmActions.mutateAsync({
+        idPropriedade: farmId,
+        contestarDeteccoes: true,
+        confirmarDeteccoes: farm?.confirmarDeteccoes ?? false,
+        proporNovaArea: farm?.proporNovaArea ?? false,
+        confirmarEstrategia: false,
+        termoAssinado: farm?.termoAssinado ?? false,
+      });
+
+      await refetch();
+
+      onAnalysisClick?.();
+      onNavigateToSuitabilityPlan?.(farmId, finalAnalysisId);
+
+      closeConfirmationModal();
+
+      customToast.success("Redirecionando para a Estratégia de Adequação.");
+    } catch {
+      customToast.error("Erro ao salvar a ação. Tente novamente.");
     }
   };
 
-  const handleNavigateToAdequancyTerm = () => {
-    const idToUse = analysisId || currentAnalysis?.id;
+  const handleSignTerm = async () => {
+    if (!finalAnalysisId) return;
 
-    if (idToUse) {
-      setConfirmedClicked(farmId, idToUse);
-    }
+    try {
+      await updateFarmActions.mutateAsync({
+        idPropriedade: farmId,
+        contestarDeteccoes: true,
+        confirmarDeteccoes: farm?.confirmarDeteccoes ?? false,
+        proporNovaArea: false,
+        confirmarEstrategia: true,
+        termoAssinado: farm?.termoAssinado ?? false,
+      });
 
-    if (onNavigateToAdequancyTerm && idToUse) {
-      onNavigateToAdequancyTerm(farmId, idToUse);
-    }
+      await refetch();
 
-    if (onAnalysisClick) {
-      onAnalysisClick();
+      onAnalysisClick?.();
+      onNavigateToAdequancyTerm?.(farmId, finalAnalysisId);
+
+      closeConfirmationModal();
+
+      customToast.success("Plano de Adequação habilitado com sucesso.");
+    } catch {
+      customToast.error("Erro ao salvar a ação. Tente novamente.");
     }
   };
+
+  const handleConfirmModalAction = () => {
+    if (confirmationAction === "requestSuitabilityPlan") {
+      handleRequestSuitabilityPlan();
+      return;
+    }
+
+    if (confirmationAction === "signTerm") {
+      handleSignTerm();
+    }
+  };
+
+  const renderDecisionButtons = () => {
+    return (
+      <div className="flex justify-end gap-4 mb-4 mr-4">
+        <Button
+          variant="danger"
+          className="px-4 py-2 text-sm"
+          disabled={shouldDisableDecisionButtons}
+          onClick={handleOpenRequestSuitabilityPlanModal}
+        >
+          Solicitar Estratégia de Adequação
+        </Button>
+
+        <Button
+          variant="green"
+          className="px-4 py-2 text-sm"
+          disabled={shouldDisableDecisionButtons}
+          onClick={handleOpenSignTermModal}
+        >
+          Assinar termo de Compromisso
+        </Button>
+      </div>
+    );
+  };
+
+  const confirmationModalContent = {
+    requestSuitabilityPlan: {
+      title: "Solicitar Estratégia de Adequação?",
+      description:
+        "Ao confirmar, você será direcionado para a Estratégia de Adequação. Enquanto a estratégia estiver em análise, não será possível assinar o Termo de Compromisso.",
+    },
+    signTerm: {
+      title: "Assinar Termo de Compromisso?",
+      description:
+        "Ao confirmar, você seguirá para o Plano de Adequação e não poderá mais solicitar a Estratégia de Adequação.",
+    },
+  };
+
+  const currentModalContent = confirmationAction
+    ? confirmationModalContent[confirmationAction]
+    : null;
 
   return (
     <>
@@ -229,6 +344,8 @@ export const Contestation = ({
                 />
               </div>
             )}
+
+            {canShowSuppressionDecisionButtons && renderDecisionButtons()}
           </div>
         </div>
       )}
@@ -312,18 +429,7 @@ export const Contestation = ({
                 />
               </div>
             )}
-            <div className="flex justify-end gap-4 mb-4 mr-4">
-              <Button
-                variant="danger"
-                className="px-4 py-2 text-sm"
-                onClick={handleConfirmDetections}
-              >
-                Solicitar Estrategia de Adequação
-              </Button>
-              <Button variant="green" className="px-4 py-2 text-sm" onClick={handleNavigateToAdequancyTerm}>
-                Assinar termo de Compromisso
-              </Button>
-            </div>
+            {canShowReportDecisionButtons && renderDecisionButtons()}
           </div>
         </div>
       )}
@@ -341,6 +447,19 @@ export const Contestation = ({
           reportContestation={reportContestation}
         />
       </div>
+
+      {currentModalContent && (
+        <ActionConfirmationModal
+          isOpen={!!confirmationAction}
+          title={currentModalContent.title}
+          description={currentModalContent.description}
+          confirmText="Sim, continuar"
+          cancelText="Cancelar"
+          isLoading={updateFarmActions.isPending}
+          onClose={closeConfirmationModal}
+          onConfirm={handleConfirmModalAction}
+        />
+      )}
     </>
   );
 };

@@ -203,6 +203,12 @@ export interface Farm {
   documentos: Documento[];
   territorios: Territorio[];
   retornoAnalises: Analise[];
+
+  contestarDeteccoes: boolean;
+  confirmarDeteccoes: boolean;
+  termoAssinado: boolean;
+  proporNovaArea: boolean;
+  confirmarEstrategia: boolean;
 }
 
 export const getFarmById = async (id: number | undefined) => {

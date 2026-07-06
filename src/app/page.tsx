@@ -170,7 +170,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          "https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/elegibilidades/solicitacoes",
+          `${process.env.NEXT_PUBLIC_API_HOST}elegibilidades/solicitacoes`,
           {
             method: "POST",
             headers: {

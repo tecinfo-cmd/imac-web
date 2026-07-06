@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -7,6 +8,7 @@ import { LuFileSearch } from "react-icons/lu";
 
 import { DocumentsTechnical } from "../Contestation/components/Documents";
 import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
+import { ActionConfirmationModal } from "@/components/ConfirmationModal";
 import { TableInformation } from "@/components/TableInformation";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { yup } from "@/config/yup";
 import { useCreateSuitabilityPlan } from "@/hooks/useEnvironmentalAnalysis/useCreateSuitabilityPlan";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
+import { useUpdateFarmActions } from "@/hooks/useFarms/useUpdateFarmActions";
 import { useTechnicalResponsibleSuitabilityPlanStore } from "@/store/useTechnicalResponsibleSuitabilityPlanStore";
 import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -32,17 +35,15 @@ interface SuitabilityPlanProps {
   onNavigateToAdequancyTerm?: () => void;
 }
 
+type ProposeNewAreaOption = "yes" | "no" | null;
+
+type ConfirmationAction = "proposeNewArea" | "doNotProposeNewArea" | null;
+
 const suitabilityPlanSchema = yup.object({
   motivo: yup.string().required("Justificativa é obrigatória"),
 });
 
 type SuitabilityPlanFormData = yup.InferType<typeof suitabilityPlanSchema>;
-
-const isSuccessfulStatus = (situacao: string | undefined): boolean => {
-  if (!situacao) return false;
-  const normalizedStatus = situacao;
-  return normalizedStatus === "Em Análise" || normalizedStatus === "DEFERIDO";
-};
 
 export const SuitabilityPlan = ({
   farmId,
@@ -51,6 +52,8 @@ export const SuitabilityPlan = ({
 }: SuitabilityPlanProps) => {
   const { data: farm, refetch } = useGetFarmById(farmId);
   const createSuitabilityPlan = useCreateSuitabilityPlan();
+  const updateFarmActions = useUpdateFarmActions();
+
   const { technicalResponsible } =
     useTechnicalResponsibleSuitabilityPlanStore();
 
@@ -63,26 +66,53 @@ export const SuitabilityPlan = ({
 
   const [files, setFiles] = useState<(Documento | File)[]>([]);
   const [files2, setFiles2] = useState<(Documento | File)[]>([]);
-  const [proposeNewArea, setProposeNewArea] = useState<"yes" | "no" | null>(
-    null
-  );
+  const [proposeNewArea, setProposeNewArea] =
+    useState<ProposeNewAreaOption>(null);
+  const [confirmationAction, setConfirmationAction] =
+    useState<ConfirmationAction>(null);
+  const [sent, setSent] = useState(false);
 
   const existingSuitabilityPlan = farm?.retornoAnalises?.find(
     (analise) => analise.planoAdequacao
   )?.planoAdequacao;
 
+  const hasSubmittedSuitabilityPlan = sent || !!existingSuitabilityPlan;
+
+  const imgAdequancyBase64 = farm?.territorios?.[0]?.imagemAdequacao;
+
+  const hasUserAlreadyChosenPath =
+    !!farm?.proporNovaArea || !!farm?.confirmarEstrategia || !!farm?.termoAssinado;
+
+  const canChangeProposeNewAreaOption = !hasUserAlreadyChosenPath;
+
+  const canAccess =
+    (!!farmId && !!analysisId) ||
+    !!existingSuitabilityPlan ||
+    !!farm?.proporNovaArea ||
+    !!farm?.confirmarEstrategia;
+
   useEffect(() => {
     if (existingSuitabilityPlan) {
       setValue("motivo", existingSuitabilityPlan.motivo);
       setProposeNewArea("yes");
+      return;
     }
-  }, [existingSuitabilityPlan, setValue]);
 
-  const hasValidParams = farmId && analysisId;
-  const hasSuitabilityPlanInProgress = farm?.analise?.planoAdequacao;
-  const imgAdequancyBase64 = farm?.territorios?.[0]?.imagemAdequacao;
+    if (farm?.proporNovaArea) {
+      setProposeNewArea("yes");
+      return;
+    }
 
-  const canAccess = hasValidParams || hasSuitabilityPlanInProgress;
+    if (farm?.confirmarEstrategia || farm?.termoAssinado) {
+      setProposeNewArea("no");
+    }
+  }, [
+    existingSuitabilityPlan,
+    farm?.proporNovaArea,
+    farm?.confirmarEstrategia,
+    farm?.termoAssinado,
+    setValue,
+  ]);
 
   if (!canAccess) {
     return (
@@ -97,18 +127,94 @@ export const SuitabilityPlan = ({
     );
   }
 
-  const handleProposeNewAreaChange = (value: "yes" | "no") => {
-    setProposeNewArea(value);
+  const closeConfirmationModal = () => {
+    setConfirmationAction(null);
+  };
+
+  const handleOpenProposeNewAreaModal = () => {
+    if (!canChangeProposeNewAreaOption) return;
+
+    setConfirmationAction("proposeNewArea");
+  };
+
+  const handleOpenDoNotProposeNewAreaModal = () => {
+    if (!canChangeProposeNewAreaOption) return;
+
+    setConfirmationAction("doNotProposeNewArea");
+  };
+
+  const handleConfirmProposeNewArea = async () => {
+    try {
+      await updateFarmActions.mutateAsync({
+        idPropriedade: farmId,
+        proporNovaArea: true,
+        confirmarEstrategia: false,
+        termoAssinado: false,
+      });
+
+      setProposeNewArea("yes");
+      closeConfirmationModal();
+
+      await refetch();
+
+      customToast.success("Estratégia de adequação habilitada com sucesso.");
+    } catch {
+      customToast.error("Erro ao salvar a ação. Tente novamente.");
+    }
+  };
+
+  const handleConfirmDoNotProposeNewArea = async () => {
+    try {
+      await updateFarmActions.mutateAsync({
+        idPropriedade: farmId,
+        proporNovaArea: false,
+        confirmarEstrategia: true,
+        termoAssinado: false,
+      });
+
+      setProposeNewArea("no");
+      closeConfirmationModal();
+
+      await refetch();
+
+      customToast.success("Plano de Adequação habilitado com sucesso.");
+
+      onNavigateToAdequancyTerm?.();
+    } catch {
+      customToast.error("Erro ao salvar a ação. Tente novamente.");
+    }
+  };
+
+  const handleConfirmModalAction = () => {
+    if (confirmationAction === "proposeNewArea") {
+      handleConfirmProposeNewArea();
+      return;
+    }
+
+    if (confirmationAction === "doNotProposeNewArea") {
+      handleConfirmDoNotProposeNewArea();
+    }
   };
 
   const handleSaveDocuments = async (data: SuitabilityPlanFormData) => {
     if (proposeNewArea === null) {
-      customToast.error("Selecione se deseja propor uma nova área para regeneração!");
+      customToast.error(
+        "Selecione se deseja propor uma nova área para regeneração!"
+      );
+      return;
+    }
+
+    if (proposeNewArea !== "yes") {
+      customToast.error(
+        "Para enviar a estratégia, é necessário selecionar a opção Sim."
+      );
       return;
     }
 
     if (files.length === 0 || files2.length === 0) {
-      customToast.error("Adicione pelo menos um arquivo em cada seção de documentos!");
+      customToast.error(
+        "Adicione pelo menos um arquivo em cada seção de documentos!"
+      );
       return;
     }
 
@@ -126,32 +232,52 @@ export const SuitabilityPlan = ({
           nome: file.name,
           tipo: stripExtension(file.name).toLocaleUpperCase(),
         };
-      } else {
-        return {
-          nome: file.nomeArquivo,
-          tipo: stripExtension(file.nomeArquivo).toLocaleUpperCase(),
-        };
       }
+
+      return {
+        nome: file.nomeArquivo,
+        tipo: stripExtension(file.nomeArquivo).toLocaleUpperCase(),
+      };
     });
 
     try {
       await createSuitabilityPlan.mutateAsync({
         farmId,
-        analysisId: analysisId,
+        analysisId,
         data: {
           parametros: JSON.stringify(params),
-          arquivos: [...files, ...files2].filter((file): file is File => file instanceof File),
+          arquivos: [...files, ...files2].filter(
+            (file): file is File => file instanceof File
+          ),
           motivo: data.motivo,
           idResponsavelTecnico: Number(technicalResponsible.id),
         },
       });
 
       customToast.success("Plano de adequação salvo com sucesso!");
+      setSent(true);
       refetch();
     } catch {
       customToast.error("Erro ao salvar plano de adequação. Tente novamente.");
     }
   };
+
+  const confirmationModalContent = {
+    proposeNewArea: {
+      title: "Propor nova área para regeneração?",
+      description:
+        "Ao confirmar esta opção, o formulário de Estratégia de Adequação será habilitado. Depois disso, você não poderá escolher a opção Não.",
+    },
+    doNotProposeNewArea: {
+      title: "Não propor nova área?",
+      description:
+        "Ao confirmar esta opção, você será direcionado para o Plano de Adequação e não poderá voltar para propor uma nova área para regeneração.",
+    },
+  };
+
+  const currentModalContent = confirmationAction
+    ? confirmationModalContent[confirmationAction]
+    : null;
 
   return (
     <>
@@ -162,18 +288,22 @@ export const SuitabilityPlan = ({
           a Estratégia <br /> de Adequação.
         </p>
       </div>
+
       <h1 className="text-xl text-[#1A6415] font-semibold text-center py-10">
         Estratégia de Adequação
       </h1>
+
       <div className="grid grid-cols-3 gap-8 p-6 border border-[#CAC4D0] rounded shadow mb-6">
         <div>
           <h2 className="text-[#21801A]">Cadastro Ambiental Rural (CAR)</h2>
           <p>{farm?.carFederal}</p>
         </div>
+
         <div>
           <h2 className="text-[#21801A]">Car Estadual</h2>
           <p>{farm?.carEstadual || "-"}</p>
         </div>
+
         <div>
           <h2 className="text-[#21801A]">Código Voucher PREM</h2>
           <p>{farm?.voucher}</p>
@@ -185,22 +315,26 @@ export const SuitabilityPlan = ({
               <h2 className="text-[#21801A]">Nome da propriedade</h2>
               <p>{farm?.nomePropriedade}</p>
             </div>
+
             <div>
               <h2 className="text-[#21801A]">Município</h2>
               <p>{farm?.endereco?.municipio}</p>
             </div>
+
             <div>
               <h2 className="text-[#21801A]">Estado</h2>
               <p>{farm?.endereco?.estado}</p>
             </div>
           </div>
         </div>
+
         <div className="col-span-2 mt-4">
           <div className="grid grid-cols-2">
             <div>
               <h2 className="text-[#21801A]">Etapa Atual</h2>
               <p>{farm?.etapa}</p>
             </div>
+
             <div>
               <h2 className="text-[#21801A]">Status</h2>
               <p>{farm?.status}</p>
@@ -209,8 +343,7 @@ export const SuitabilityPlan = ({
         </div>
       </div>
 
-      {existingSuitabilityPlan &&
-        isSuccessfulStatus(existingSuitabilityPlan.situacao) && (
+      {existingSuitabilityPlan && (
           <div className="mb-6">
             <div className="bg-white border border-[#CAC4D0] shadow">
               <div className="bg-[#1A6415] text-white p-4">
@@ -218,6 +351,7 @@ export const SuitabilityPlan = ({
                   Situação da Estratégia de Adequação
                 </h2>
               </div>
+
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -237,6 +371,7 @@ export const SuitabilityPlan = ({
                       {existingSuitabilityPlan.situacao}
                     </p>
                   </div>
+
                   <div>
                     <span className="text-[#21801A] font-medium">
                       Observação:
@@ -260,6 +395,7 @@ export const SuitabilityPlan = ({
                             existingSuitabilityPlan.documentos.find(
                               (doc) => doc.tipo === "ADEQUACAO"
                             );
+
                           if (adequacaoDoc) {
                             window.open(adequacaoDoc.urlArquivo, "_blank");
                           }
@@ -271,6 +407,7 @@ export const SuitabilityPlan = ({
                     </div>
                   )}
               </div>
+
               {imgAdequancyBase64 && (
                 <div className="flex justify-center py-4">
                   <Image
@@ -286,17 +423,18 @@ export const SuitabilityPlan = ({
           </div>
         )}
 
-      {existingSuitabilityPlan &&
-      isSuccessfulStatus(existingSuitabilityPlan.situacao) ? (
+      {hasSubmittedSuitabilityPlan ? (
         <div className="bg-white border border-[#CAC4D0] shadow">
           <div className="bg-[#1A6415] text-white p-4">
             <h2 className="font-semibold text-lg">Estratégia de Adequação</h2>
           </div>
+
           <div className="bg-[#E8F5E8] p-4 border-b border-[#CAC4D0]">
             <p className="text-[#0A3503] text-sm">
               Situação da Estratégia de Adequação
             </p>
           </div>
+
           <div className="p-6">
             <div className="text-center py-8">
               <p className="text-gray-600">
@@ -317,14 +455,17 @@ export const SuitabilityPlan = ({
                     name="proposeNewArea"
                     value="yes"
                     checked={proposeNewArea === "yes"}
-                    onChange={() => handleProposeNewAreaChange("yes")}
+                    disabled={!canChangeProposeNewAreaOption}
+                    onChange={handleOpenProposeNewAreaModal}
                     className="accent-[#21801A]"
                   />
+
                   <label htmlFor="propose-yes" className="ml-2 cursor-pointer">
                     Sim
                   </label>
                 </TableInformation.Value>
               </TableInformation.Column>
+
               <TableInformation.Column>
                 <TableInformation.Value>
                   <input
@@ -333,14 +474,11 @@ export const SuitabilityPlan = ({
                     name="proposeNewArea"
                     value="no"
                     checked={proposeNewArea === "no"}
-                    onChange={() => {
-                      handleProposeNewAreaChange("no");
-                      if (onNavigateToAdequancyTerm) {
-                        onNavigateToAdequancyTerm();
-                      }
-                    }}
+                    disabled={!canChangeProposeNewAreaOption}
+                    onChange={handleOpenDoNotProposeNewAreaModal}
                     className="accent-[#21801A]"
                   />
+
                   <label htmlFor="propose-no" className="ml-2 cursor-pointer">
                     Não
                   </label>
@@ -353,7 +491,7 @@ export const SuitabilityPlan = ({
             title="Estratégia de Adequação"
             showArrow
             disabled={proposeNewArea !== "yes"}
-            defaultOpen={!!existingSuitabilityPlan}
+            defaultOpen={!!existingSuitabilityPlan || proposeNewArea === "yes"}
           >
             <TableInformation.Row columnsPerRow={1}>
               <TableInformation.Column>
@@ -361,7 +499,9 @@ export const SuitabilityPlan = ({
                   Disponibilize o projeto da proposta de Estratégia de Adequação
                   na nova área para regeneração
                 </TableInformation.Title>
+
                 <br />
+
                 <TechnicalResponsibleSection />
 
                 <form onSubmit={handleSubmit(handleSaveDocuments)}>
@@ -370,6 +510,7 @@ export const SuitabilityPlan = ({
                       Justificativa: Explique de forma breve o objetivo do
                       laudo, indicando o que se pretende comprovar.
                     </p>
+
                     <TextArea
                       name="motivo"
                       label="Justificativa"
@@ -394,7 +535,8 @@ export const SuitabilityPlan = ({
                         createSuitabilityPlan.isPending ||
                         !technicalResponsible ||
                         files.length === 0 ||
-                        files2.length === 0
+                        files2.length === 0 ||
+                        proposeNewArea !== "yes"
                       }
                       variant="green"
                       className="w-[320px]"
@@ -411,6 +553,19 @@ export const SuitabilityPlan = ({
             </TableInformation.Row>
           </TableInformation.Section>
         </TableInformation>
+      )}
+
+      {currentModalContent && (
+        <ActionConfirmationModal
+          isOpen={!!confirmationAction}
+          title={currentModalContent.title}
+          description={currentModalContent.description}
+          confirmText="Sim, continuar"
+          cancelText="Cancelar"
+          isLoading={updateFarmActions.isPending}
+          onClose={closeConfirmationModal}
+          onConfirm={handleConfirmModalAction}
+        />
       )}
     </>
   );
