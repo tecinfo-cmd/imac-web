@@ -171,9 +171,11 @@ export const SuitabilityPlan = ({
     try {
       await updateFarmActions.mutateAsync({
         idPropriedade: farmId,
+        contestarDeteccoes: farm?.contestarDeteccoes ?? false,
+        confirmarDeteccoes: farm?.confirmarDeteccoes ?? false,
         proporNovaArea: false,
         confirmarEstrategia: true,
-        termoAssinado: false,
+        termoAssinado: farm?.termoAssinado ?? false,
       });
 
       setProposeNewArea("no");
