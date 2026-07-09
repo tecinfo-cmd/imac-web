@@ -28,6 +28,9 @@ const termoStatuses = [
 export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
   const { data: farm, refetch } = useGetFarmById(farmId);
   const imagemBase64 = farm?.territorios?.[0]?.imagemAnalise;
+  const imgContestation = farm?.territorios?.[0]?.imagemContestacao;
+  const imgStrategy = farm?.territorios?.[0]?.imagemAdequacao;
+  const imageToShow = imgStrategy || imgContestation || imagemBase64;
 
   const status = termoStatuses.includes(farm?.status ?? "");
 
@@ -191,10 +194,10 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                 <TableInformation.Title>
                   Área destinada à Regeneração
                 </TableInformation.Title>
-                {imagemBase64 && (
+                {imageToShow && (
                   <div className="flex justify-center py-4">
                     <Image
-                      src={`${imagemBase64}`}
+                      src={`${imageToShow}`}
                       alt="Área destinada à Regeneração"
                       width={900}
                       height={700}
