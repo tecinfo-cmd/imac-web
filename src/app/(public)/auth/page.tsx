@@ -32,7 +32,12 @@ export default function Auth() {
     <div className="bg-[#DFEEE5] min-h-screen flex flex-col md:grid md:grid-cols-[60%_40%] items-center justify-center place-items-center">
       <div className="bg-[#1A6415] bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0)_44%,_rgba(0,0,0,0.38)_100%)] w-full h-full rounded-r-full flex items-center justify-center p-4">
         <div className="bg-[#DFEEE5] w-full max-w-[400px] rounded-xl shadow-lg p-5 flex flex-col justify-center items-center">
+          <div className="flex justify-center">
           <Logo width={135} height={150} />
+          <h1 className="text-justify text-base md:text-lg text-[#1A3380] font-bold mt-9">
+           Programa de <br /> Reinserção e <br /> Monitoramento
+        </h1>
+        </div>
           <form
             className="flex flex-col gap-3 w-full"
             onSubmit={handleSubmit(handleSubmitSignIn)}
@@ -73,8 +78,8 @@ export default function Auth() {
       <div className="hidden md:flex items-center justify-center flex-col gap-4 text-[#175912] h-auto md:h-[50vh] p-6">
         <h1 className="text-4xl md:text-5xl font-bold">PREM</h1>
         <Logo />
-        <h1 className="text-2xl md:text-3xl text-center leading-snug">
-          Programa de Reinserção <br />e Monitoramento
+        <h1 className="text-2xl md:text-3xl text-center leading-snug text-[#1A3380] font-bold">
+           Programa de <br /> Reinserção e <br /> Monitoramento
         </h1>
       </div>
     </div>

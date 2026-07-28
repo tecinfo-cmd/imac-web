@@ -20,6 +20,7 @@ import { useUpdateFarmActions } from "@/hooks/useFarms/useUpdateFarmActions";
 import { useTechnicalResponsibleSuitabilityPlanStore } from "@/store/useTechnicalResponsibleSuitabilityPlanStore";
 import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Legenda } from "@/components/Legenda";
 
 type Documento = {
   id: number;
@@ -413,7 +414,7 @@ export const SuitabilityPlan = ({
             </div>
 
             {imgAdequancyBase64 && (
-              <div className="flex justify-center py-4">
+              <div className="flex w-full flex-col items-center gap-4 py-4">
                 <Image
                   src={`${imgAdequancyBase64}`}
                   alt="Área destinada à Regeneração"
@@ -421,6 +422,7 @@ export const SuitabilityPlan = ({
                   height={700}
                   className="max-w-full rounded-[20px] shadow"
                 />
+                <Legenda />
               </div>
             )}
           </div>

@@ -18,6 +18,7 @@ import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
+import { Legenda } from "@/components/Legenda";
 //import { Eye } from "@/icons/Eye";
 
 const customMenuItems = [
@@ -65,7 +66,10 @@ export const AdjustmentTermLayout = () => {
   const propriedadeIdNumber = propriedadeId ? Number(propriedadeId) : undefined;
   const { data: farm } = useGetFarmById(propriedadeIdNumber);
 
-  const imagemBase64 = farm?.territorios?.[0]?.imagemAdequacao;
+  const imagemBase64 = farm?.territorios?.[0]?.imagemAnalise;
+  const imgContestation = farm?.territorios?.[0]?.imagemContestacao;
+  const imgStrategy = farm?.territorios?.[0]?.imagemAdequacao;
+  const imageToShow = imgStrategy || imgContestation || imagemBase64;
 
   const { data: propriedade, isLoading } = usePropertyMonitoring(propriedadeId);
 
@@ -140,15 +144,16 @@ export const AdjustmentTermLayout = () => {
               <TableInformation.Title>
                 Área destinada à Regeneração
               </TableInformation.Title>
-              {imagemBase64 && (
-                <div className="flex justify-center py-4">
+              {imageToShow && (
+                <div className="flex w-full flex-col items-center gap-4 py-4">
                   <Image
-                    src={`${imagemBase64}`}
+                    src={`${imageToShow}`}
                     alt="Área destinada à Regeneração"
                     width={900}
                     height={700}
                     className="max-w-full rounded-[20px] shadow"
                   />
+                  <Legenda />
                 </div>
               )}
             </TableInformation>

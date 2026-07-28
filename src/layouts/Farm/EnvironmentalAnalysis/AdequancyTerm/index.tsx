@@ -10,6 +10,7 @@ import EmailModal from "@/components/ui/modals/emailModal";
 import { useAdequancyTerm } from "@/hooks/useAdequancyTerm/useAdequancyTerm";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { customToast } from "@/utils/customToast";
+import { Legenda } from "@/components/Legenda";
 interface AdequancyTermProps {
   farmId: number;
 }
@@ -195,7 +196,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                   Área destinada à Regeneração
                 </TableInformation.Title>
                 {imageToShow && (
-                  <div className="flex justify-center py-4">
+                  <div className="flex w-full flex-col items-center gap-4 py-4">
                     <Image
                       src={`${imageToShow}`}
                       alt="Área destinada à Regeneração"
@@ -203,6 +204,7 @@ export const AdequancyTerm = ({ farmId }: AdequancyTermProps) => {
                       height={700}
                       className="max-w-full rounded-[20px] shadow"
                     />
+                    <Legenda className="ml-4" />
                   </div>
                 )}
               </TableInformation>

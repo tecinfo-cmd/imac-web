@@ -254,7 +254,7 @@ export default function Home() {
                       }}
                       className="text-[#666666] underline hover:text-gray-700 cursor-pointer"
                     >
-                      não sei o número CAR
+                      Não sei o número CAR
                     </a>
                   </p>
                 </div>
@@ -269,7 +269,7 @@ export default function Home() {
                 />
                 <MaskedInput
                   mask="(00) 00000-0000"
-                  label="telefone de contato (whatsapp)*"
+                  label="Telefone de contato (whatsapp)*"
                   type="tel"
                   value={phone}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -281,7 +281,7 @@ export default function Home() {
                 />
 
                 <Input
-                  label="e-mail de contato*"
+                  label="E-mail de contato*"
                   type="email"
                   value={email}
                   onChange={(e: {
@@ -297,7 +297,7 @@ export default function Home() {
                   className="w-[17px] h-[17px] border-[1px] border-[#CAC4D0] shadow-[inset_0px_0px_5px_2px_rgba(0,0,0,0.2)] "
                   error={errors.isChecked}
                 >
-                  aceito os termos e condições de uso.
+                  Aceito os termos e condições de uso.
                 </CheckboxComponent>
 
                 <Button

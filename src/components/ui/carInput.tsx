@@ -42,7 +42,7 @@ const CARInput = ({ value, onChange, error }: CARInputProps) => {
   return (
     <div className="w-full">
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        número do CAR federal*
+        Número do CAR federal*
       </label>
       <Input
         ref={inputRef}
