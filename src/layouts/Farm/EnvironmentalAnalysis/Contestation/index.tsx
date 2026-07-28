@@ -14,6 +14,7 @@ import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { useUpdateFarmActions } from "@/hooks/useFarms/useUpdateFarmActions";
 import { customToast } from "@/utils/customToast";
 import { formatDate } from "@/utils/formatters/formatDate";
+import { Legenda } from "@/components/Legenda";
 
 interface ContestationProps {
   farmId: number;
@@ -334,7 +335,7 @@ export const Contestation = ({
                 )}
             </div>
             {imgContestationBase64 && (
-              <div className="flex justify-center py-4">
+              <div className="flex w-full flex-col items-center gap-4 py-4">
                 <Image
                   src={`${imgContestationBase64}`}
                   alt="Área destinada à Regeneração"
@@ -342,6 +343,7 @@ export const Contestation = ({
                   height={700}
                   className="max-w-full rounded-[20px] shadow"
                 />
+                <Legenda  />
               </div>
             )}
 
@@ -419,7 +421,7 @@ export const Contestation = ({
             </div>
 
             {imgContestationBase64 && (
-              <div className="flex justify-center py-4">
+              <div className="flex w-full flex-col items-center gap-4 py-4">
                 <Image
                   src={`${imgContestationBase64}`}
                   alt="Área destinada à Regeneração"
@@ -427,6 +429,7 @@ export const Contestation = ({
                   height={700}
                   className="max-w-full rounded-[20px] shadow"
                 />
+                <Legenda />
               </div>
             )}
             {canShowReportDecisionButtons && renderDecisionButtons()}

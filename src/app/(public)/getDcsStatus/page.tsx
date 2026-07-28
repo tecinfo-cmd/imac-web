@@ -5,7 +5,6 @@ import { Suspense, useEffect, useState } from "react";
 import { Table } from "@/components/Table";
 import { Button } from "@/components/ui/button";
 
-import { useGetFarmByIdPublic } from "@/hooks/useTrackProducers/useGetFarmById";
 import { usePremCompliancePublic } from "@/hooks/useTrackProducers/usePremCompliancePublic";
 import { Imac } from "@/icons/Imac";
 import { LogoSideName } from "@/icons/LogoSideName";
@@ -16,7 +15,6 @@ function GetDcsStatusContent() {
   const carFederal = searchParams.get("carFederal") || "";
   const idPropriedade = searchParams.get("idPropriedade") || "";
 
-  const { data: farmData } = useGetFarmByIdPublic(Number(idPropriedade));
 
   const [dataHoraAbertura, setDataHoraAbertura] = useState<string>("");
   const [showPdfViewer, setShowPdfViewer] = useState<boolean>(false);
@@ -35,15 +33,14 @@ function GetDcsStatusContent() {
   };
 
   const handleViewDCS = () => {
-    const primeiraUrl =
-      farmData?.documentos?.find((doc: { tipo: string; }) => doc.tipo === "DCS")?.urlArquivo || "";
+    const urlDocumento = data?.urlDcs;
 
-    if (primeiraUrl) {
-      setPdfUrl(primeiraUrl);
+    if (urlDocumento) {
+      setPdfUrl(urlDocumento);
       setShowPdfViewer(true);
     } else {
       customToast.error(
-        "Nenhum documento encontrado, por favor assine o termo de adequação e compromisso."
+        "Documento não encontrado."
       );
     }
   };
@@ -91,7 +88,9 @@ function GetDcsStatusContent() {
           <br />
           SOCIOAMBIENTAL
         </h2>
-        <div className={`${getStatusColor(data.status)} px-2 py-2 md:px-4 md:py-2 font-bold mb-6 rounded text-center text-sm md:text-base`}>
+        <div
+          className={`${getStatusColor(data.status)} px-2 py-2 md:px-4 md:py-2 font-bold mb-6 rounded text-center text-sm md:text-base`}
+        >
           SITUAÇÃO: {data.status} - Data/Hora da consulta: {dataHoraAbertura}
         </div>
         <Table.Container className="!pt-0">
@@ -122,22 +121,36 @@ function GetDcsStatusContent() {
         </Table.Container>
         <Table.Container className="!pt-0">
           <Table.Header>
-            <Table.Title colspan={3}>
-              as seguintes detecções de desmatamento do território em questão:
+            <Table.Title colspan={4}>
+              As seguintes detecções de desmatamento do território em questão:
             </Table.Title>
           </Table.Header>
+
+          <Table.Header>
+            <Table.Title>Polígono</Table.Title>
+            <Table.Title>TAD/ID</Table.Title>
+            <Table.Title>Área degradada</Table.Title>
+            <Table.Title>Área à regenerar</Table.Title>
+          </Table.Header>
+
           <Table.Body>
             {Array.isArray(data.deteccoes) && data.deteccoes.length > 0 ? (
-              data.deteccoes.map((item: any, idx: number) => (
-                <Table.Row key={idx}>
-                  <Table.Cell colspan={3}>
-                    {typeof item === "string" ? item : JSON.stringify(item)}
-                  </Table.Cell>
-                </Table.Row>
-              ))
+              data.deteccoes.map((item: any, index: number) => {
+                const deteccao =
+                  typeof item === "string" ? JSON.parse(item) : item;
+
+                return (
+                  <Table.Row key={index}>
+                    <Table.Cell>{deteccao.tipo || "-"}</Table.Cell>
+                    <Table.Cell>{deteccao.idDeteccoes || "-"}</Table.Cell>
+                    <Table.Cell>{deteccao.areaHa || "-"}</Table.Cell>
+                    <Table.Cell>{deteccao.areaARegenerar || "-"}</Table.Cell>
+                  </Table.Row>
+                );
+              })
             ) : (
               <Table.Row>
-                <Table.Cell colspan={3}>Nenhuma detecção encontrada</Table.Cell>
+                <Table.Cell colspan={2}>Nenhuma detecção encontrada</Table.Cell>
               </Table.Row>
             )}
           </Table.Body>

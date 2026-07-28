@@ -34,16 +34,16 @@ function ConfirmationContent() {
   const token = searchParams.get("token");
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading"
-  );
+  "loading"
+   );
 
   useEffect(() => {
-    if (!id || !token) {
-      setStatus("error");
-      return;
-    }
+   if (!id || !token) {
+    setStatus("error");
+   return;
+   }
 
-    fetch(
+ fetch(
       `https://imac-dev-f8b98.ondigitalocean.app/imac/api/v1/agrotools/solicitacoes/${id}/validar?token=${token}`,
       {
         method: "GET",
@@ -99,7 +99,7 @@ function ConfirmationContent() {
             <Logo width={130} height={130} />
           </div>
           <div className="flex justify-center">
-            <p className="text-left text-base md:text-lg text-[#2F3F13]">
+            <p className="text-center text-base md:text-lg text-[#1A3380] font-bold">
               Programa de <br /> Reinserção e <br /> Monitoramento
             </p>
           </div>
