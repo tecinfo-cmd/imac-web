@@ -30,11 +30,13 @@ export const DocumentsTechnical = ({
   setFiles,
   title = "Anotação de responsabilidade técnica",
   subtitle = "(Matricula do imóvel, recibo CAR, contrato de compra e venda / locação, documentos de identificação e comprovante de endereço)",
+  acceptedExtensions,
 }: {
   files: (Documento | File)[];
   setFiles: React.Dispatch<React.SetStateAction<(Documento | File)[]>>;
   title?: string;
   subtitle?: string;
+  acceptedExtensions?: string[];
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,27 +47,57 @@ export const DocumentsTechnical = ({
     if (!newFiles) return;
     const fileArr = Array.from(newFiles);
 
-    // Validar nomes de arquivos
-    const invalidFiles = fileArr.filter((file) => !validateFileName(file.name));
-    if (invalidFiles.length > 0) {
-      invalidFiles.forEach((file) => {
-        const invalidChars = getInvalidCharacters(file.name);
-        customToast.error(
-          `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
-        );
-      });
-      // Filtrar apenas arquivos válidos
-      const validFiles = fileArr.filter((file) => validateFileName(file.name));
-      if (validFiles.length === 0) return;
+    const filesWithInvalidName = fileArr.filter(
+      (file) => !validateFileName(file.name)
+    );
+    filesWithInvalidName.forEach((file) => {
+      const invalidChars = getInvalidCharacters(file.name);
+      customToast.error(
+        `Arquivo "${file.name}" rejeitado. Caracteres não permitidos: ${invalidChars}. Permitidos: letras, números, acentos, _ e -`
+      );
+    });
+
+    const filesWithInvalidExtension = acceptedExtensions
+      ? fileArr.filter(
+          (file) =>
+            !acceptedExtensions.some((extension) =>
+              file.name.toLowerCase().endsWith(extension.toLowerCase())
+            )
+        )
+      : [];
+    filesWithInvalidExtension.forEach((file) => {
+      customToast.error(
+        `Arquivo "${file.name}" rejeitado. Formato permitido: ${acceptedExtensions?.join(
+          ", "
+        )}.`
+      );
+    });
+
+    const validFiles = fileArr.filter((file) => {
+      if (!validateFileName(file.name)) return false;
+
+      return (
+        !acceptedExtensions ||
+        acceptedExtensions.some((extension) =>
+          file.name.toLowerCase().endsWith(extension.toLowerCase())
+        )
+      );
+    });
+
+    if (validFiles.length === 0) {
+      if (inputRef.current) inputRef.current.value = "";
+      return;
     }
 
-    const validFiles = fileArr.filter((file) => validateFileName(file.name));
     const merged = [...files, ...validFiles].slice(0, 3);
     setFiles(merged);
+
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (files.length < 3) handleFiles(e.dataTransfer.files);
   };
 
@@ -180,7 +212,7 @@ export const DocumentsTechnical = ({
           multiple
           hidden
           onChange={(e) => handleFiles(e.target.files)}
-          accept="*"
+          accept={acceptedExtensions?.join(",") ?? "*"}
         />
       </div>
     </>

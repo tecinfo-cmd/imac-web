@@ -9,6 +9,7 @@ import { LuFileSearch } from "react-icons/lu";
 import { DocumentsTechnical } from "../Contestation/components/Documents";
 import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
 import { ActionConfirmationModal } from "@/components/ConfirmationModal";
+import { Legenda } from "@/components/Legenda";
 import { TableInformation } from "@/components/TableInformation";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,6 @@ import { useUpdateFarmActions } from "@/hooks/useFarms/useUpdateFarmActions";
 import { useTechnicalResponsibleSuitabilityPlanStore } from "@/store/useTechnicalResponsibleSuitabilityPlanStore";
 import { customToast } from "@/utils/customToast";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Legenda } from "@/components/Legenda";
 
 type Documento = {
   id: number;
@@ -494,6 +494,7 @@ export const SuitabilityPlan = ({
           </TableInformation.Section>
 
           <TableInformation.Section
+            key={`suitability-plan-${proposeNewArea ?? "unselected"}`}
             title="Estratégia de Adequação"
             showArrow
             disabled={proposeNewArea !== "yes"}
@@ -532,6 +533,7 @@ export const SuitabilityPlan = ({
                     setFiles={setFiles2}
                     title="Campo de anexo exclusivo para arquivo SHP zipado"
                     subtitle="(Obrigatório o envio do arquivo SHP no formato .zip)"
+                    acceptedExtensions={[".zip"]}
                   />
 
                   <div className="my-6 flex justify-end">

@@ -31,6 +31,8 @@ import { Analityc } from "@/icons/Analityc";
 import { Eye } from "@/icons/Eye";
 import { convertShapefileToWkt } from "@/utils/convertShapefileToWkt";
 import { customToast } from "@/utils/customToast";
+import { formatCurrency } from "@/utils/formatters/formatCurrency";
+import { toast } from "sonner";
 
 const validateFileName = (fileName: string): boolean => {
   const validPattern = /^[\w\-\u00C0-\u017FA-Za-z0-9._ ()]+$/;
@@ -1116,15 +1118,26 @@ export const ObjectionLayout = () => {
                         onFileChange={async (files) => {
                           const file = files?.[0];
                           if (file) {
-                            const wkt = await convertShapefileToWkt(file);
-                            if (wkt) {
-                              setValue(`deteccoes.${index}.wkt`, wkt, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              });
-                              customToast.success("Arquivo convertido para WKT!");
-                            } else {
-                              customToast.error("Nenhum WKT encontrado no arquivo.");
+                            const toastId = toast.loading("Convertendo arquivo...");
+
+                            try {
+                              const wkt = await convertShapefileToWkt(file);
+                              if (wkt) {
+                                setValue(`deteccoes.${index}.wkt`, wkt, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                });
+                                toast.dismiss(toastId);
+                                customToast.success("Arquivo convertido para WKT!");
+                              } else {
+                                toast.dismiss(toastId);
+                                customToast.error("Nenhum WKT encontrado no arquivo.");
+                              }
+                            } catch {
+                              toast.dismiss(toastId);
+                              customToast.error(
+                                "Não foi possível converter o arquivo. Tente novamente."
+                              );
                             }
                           }
                         }}
@@ -1168,6 +1181,7 @@ export const ObjectionLayout = () => {
                 name="valorMulta"
                 disabled
                 control={control}
+                mask={(value) => formatCurrency(Number(value)) ?? ""}
               />
               <InputSelect
                 name="descontoPercentual"

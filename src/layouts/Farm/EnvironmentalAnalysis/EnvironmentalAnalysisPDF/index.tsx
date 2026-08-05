@@ -65,7 +65,7 @@ export const EnvironmentalAnalysisPDF = ({
           idPropriedade: farmId,
           confirmarDeteccoes: true,
           contestarDeteccoes: false,
-          proporNovaArea: true,
+          proporNovaArea: false,
           confirmarEstrategia: false,
           termoAssinado: false,
         });

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { GoAlertFill } from "react-icons/go";
 import { MdOutlineMarkEmailRead } from "react-icons/md";
 
+import { Legenda } from "@/components/Legenda";
 import { TableInformation } from "@/components/TableInformation";
 import { Button } from "@/components/ui/button";
 import EmailModal from "@/components/ui/modals/emailModal";
@@ -10,7 +11,6 @@ import EmailModal from "@/components/ui/modals/emailModal";
 import { useAdequancyTerm } from "@/hooks/useAdequancyTerm/useAdequancyTerm";
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { customToast } from "@/utils/customToast";
-import { Legenda } from "@/components/Legenda";
 interface AdequancyTermProps {
   farmId: number;
 }

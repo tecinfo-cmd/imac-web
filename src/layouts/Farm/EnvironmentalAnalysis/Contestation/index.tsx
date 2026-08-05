@@ -8,13 +8,13 @@ import { ReportContestationSection } from "./components/ReportContestationSectio
 import { SuppressionAuthorizationSection } from "./components/SuppressionAuthorizationSection";
 import { TechnicalResponsibleSection } from "./components/TechnicalResponsibleSection";
 import { ActionConfirmationModal } from "@/components/ConfirmationModal";
+import { Legenda } from "@/components/Legenda";
 import { Button } from "@/components/ui/button";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { useUpdateFarmActions } from "@/hooks/useFarms/useUpdateFarmActions";
 import { customToast } from "@/utils/customToast";
 import { formatDate } from "@/utils/formatters/formatDate";
-import { Legenda } from "@/components/Legenda";
 
 interface ContestationProps {
   farmId: number;
@@ -111,7 +111,7 @@ export const Contestation = ({
         idPropriedade: farmId,
         contestarDeteccoes: true,
         confirmarDeteccoes: farm?.confirmarDeteccoes ?? false,
-        proporNovaArea: farm?.proporNovaArea ?? false,
+        proporNovaArea: true,
         confirmarEstrategia: false,
         termoAssinado: farm?.termoAssinado ?? false,
       });
