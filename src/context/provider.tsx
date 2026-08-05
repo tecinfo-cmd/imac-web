@@ -37,7 +37,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const { mutateAsync: signIn, isPending } = useSignIn();
   const { setUserData, clearSession } = useAuthStore();
   const { setRole, clearRole } = useUserRoleStore();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => parseCookies().email ?? "");
 
   useEffect(() => {
     setUnauthorizedCallback(() => {
@@ -108,6 +108,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const signOut = useCallback(() => {
     destroyCookie(undefined, "@IMAC:T");
     destroyCookie(undefined, "email");
+    setEmail("");
     localStorage.clear();
     sessionStorage.clear();
     clearSession();

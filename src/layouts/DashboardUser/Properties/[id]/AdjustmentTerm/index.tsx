@@ -12,13 +12,13 @@ import {
 import { InfoGrid } from "@/components/InfoGrid";
 import { LayoutContainer } from "@/components/LayoutContainer";
 //import { Table } from "@/components/Table";
+import { Legenda } from "@/components/Legenda";
 import { TableInformation } from "@/components/TableInformation";
 
 import { useGetFarmById } from "@/hooks/useFarms/useGetFarmById";
 import { usePropertyMonitoring } from "@/hooks/useGetProperties/usePropertMonitoring";
 import { Abattoir } from "@/icons/Abattoir";
 import { Analityc } from "@/icons/Analityc";
-import { Legenda } from "@/components/Legenda";
 //import { Eye } from "@/icons/Eye";
 
 const customMenuItems = [
